@@ -26,73 +26,73 @@ import Chart
 import Prettychart
 import Chart.Examples
 import Optics.Core
+import Data.ByteString.Char8 qualified as C
+import Data.Text qualified as T
+import Control.Monad
 print "imports loaded"
 (display, quit) <- startChartServer (Just "chart-svg-dev")
 disp x = display $ x & set (#markupOptions % #markupHeight) 250 & set (#hudOptions % #frames % ix 1 % _2 % #buffer) 0.1
 #+end_src
 
 #+RESULTS:
-#+begin_example
-Ok, one module loaded.
-> > > > >
-imports loaded
-Setting phasers to stun... (port 9160) (ctrl-c to quit)
-<interactive>:67:24: error: [GHC-88464]
-    Variable not in scope: set :: t13 -> t14 -> a -> a0
-    Suggested fix: Perhaps use ‘seq’ (imported from Prelude)
-
-<interactive>:67:44: error: [GHC-88464]
-    Variable not in scope: (%) :: t11 -> t12 -> t13
-
-<interactive>:67:67: error: [GHC-88464]
-    Variable not in scope: set :: t9 -> t10 -> a0 -> ChartOptions
-    Suggested fix: Perhaps use ‘seq’ (imported from Prelude)
-
-<interactive>:67:84: error: [GHC-88464]
-    Variable not in scope: (%) :: t1 -> t2 -> t3
-
-<interactive>:67:94: error: [GHC-88464]
-    Variable not in scope: (%) :: t3 -> t4 -> t5
-
-<interactive>:67:96: error: [GHC-88464]
-    Variable not in scope: ix :: t0 -> t4
-    Suggested fix:
-      Perhaps use one of these:
-        ‘x’ (line 67), ‘_x’ (imported from Chart),
-        ‘id’ (imported from Prelude)
-
-<interactive>:67:101: error: [GHC-88464]
-    Variable not in scope: (%) :: t5 -> t6 -> t7
-
-<interactive>:67:103: error: [GHC-88464]
-    • Found hole: _2 :: t6
-      Where: ‘t6’ is an ambiguous type variable
-      Or perhaps ‘_2’ is mis-spelled, or not in scope
-    • In the second argument of ‘(%)’, namely ‘_2’
-      In the first argument of ‘(%)’, namely
-        ‘#hudOptions % #frames % ix 1 % _2’
-      In the first argument of ‘set’, namely
-        ‘(#hudOptions % #frames % ix 1 % _2 % #buffer)’
-    • Relevant bindings include
-        x :: a (bound at <interactive>:67:6)
-        disp :: a -> IO Bool (bound at <interactive>:67:1)
-      Valid hole fits include
-        it :: () (defined at <interactive>:65:1)
-        display :: ChartOptions -> IO Bool (defined at <interactive>:66:2)
-        quit :: IO () (defined at <interactive>:66:11)
-        x :: a (bound at <interactive>:67:6)
-        $trModule :: ghc-prim-0.10.0:GHC.Types.Module
-          (defined at <interactive>:1:1)
-        otherwise :: Bool
-          (imported from ‘Prelude’ (and originally defined in ‘GHC.Base’))
-        (Some hole fits suppressed; use -fmax-valid-hole-fits=N or -fno-max-valid-hole-fits)
-
-<interactive>:67:106: error: [GHC-88464]
-    Variable not in scope: (%) :: t7 -> t8 -> t9
-#+end_example
+: [1 of 1] Compiling Lib              ( src/Lib.hs, interpreted )
+: Ok, one module loaded.
+: ghci> Ok, one module loaded.
+: ghci
+: >
+: imports loaded
+: Setting pha>s ers to stun... (port 9160) (ctrl-c to quit)
 
 #+begin_src haskell :results output
-disp lineExample
+disp unitExample
+#+end_src
+
+#+RESULTS:
+: True
+
+** Next Text chart (re)callibration
+
+- more precise callibration between text, points and rect
+
+#+begin_src haskell :results output
+ts <- fmap T.pack <$> replicateM 4 (unwords <$> replicateM 3 word)
+s = defaultTextStyle & #anchor .~ AnchorStart
+ts' = zipWith (\t x -> TextChart s [(t, Point 0 x)]) ts [0..]
+ts
+#+end_src
+
+#+RESULTS:
+: ["ullam ad qui","voluptas inventore earum","ipsum fugiat qui","sapiente ad quisquam"]
+
+#+begin_src haskell :results output
+display $ mempty & #charts .~ unnamed ts'
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell :results output
+ts'
+#+end_src
+
+#+RESULTS:
+: [TextChart (TextStyle {size = 0.12, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.45, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Nothing}) [("ullam ad qui",Point 0.0 0.0)],TextChart (TextStyle {size = 0.12, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.45, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Nothing}) [("voluptas inventore earum",Point 0.0 1.0)],TextChart (TextStyle {size = 0.12, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.45, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Nothing}) [("ipsum fugiat qui",Point 0.0 2.0)],TextChart (TextStyle {size = 0.12, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.45, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Nothing}) [("sapiente ad quisquam",Point 0.0 3.0)]]
+
+
+#+begin_src haskell :results output
+:t styleBoxes
+r1 = RectChart defaultRectStyle [fromMaybe undefined $ styleBoxes ts']
+#+end_src
+
+#+RESULTS:
+: styleBoxes :: [Chart] -> Maybe (Rect Double)
+
+#+begin_src haskell :results output
+t' = take 4 ts'
+rDefault = RectChart defaultRectStyle [one]
+ps = (\x -> GlyphChart defaultGlyphStyle [Point 0 x]) <$>  [0..3]
+r1 = RectChart defaultRectStyle [fromMaybe undefined $ styleBoxes t']
+display $ mempty & #charts .~ unnamed (t' <> [r1] <> ps)
 #+end_src
 
 #+RESULTS:

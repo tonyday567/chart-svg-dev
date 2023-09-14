@@ -71,10 +71,6 @@ common ghc2021-stanza
     default-extensions:
       ImportQualifiedPost
       StandaloneKindSignatures
-  -- but keeping ormolu happy
-  if impl(ghc >=8.10)
-    default-extensions:
-      NoImportQualifiedPost
 
 common ghc-options-stanza
   ghc-options:
@@ -96,5 +92,7 @@ library
     prettychart,
     faker,
     optics-core,
+    bytestring,
+    text,
   exposed-modules:
     Lib
