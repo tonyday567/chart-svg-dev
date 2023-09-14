@@ -1,0 +1,6 @@
+packages:
+  chart-svg-dev.cabal
+  ../chart-svg/chart-svg.cabal
+  ../prettychart/prettychart.cabal
+
+allow-newer: prettychart:chart-svg
