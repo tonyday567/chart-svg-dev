@@ -94,5 +94,7 @@ library
     optics-core,
     bytestring,
     text,
+    numhask,
+    mtl,
   exposed-modules:
     Lib
