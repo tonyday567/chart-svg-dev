@@ -1,11 +1,16 @@
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 {-# LANGUAGE OverloadedLabels #-}
+{-# OPTIONS_GHC -Wno-missing-signatures #-}
 
 module Lib
   ( exampleTextChart
   , exampleText
-  , exampleTextChart')
-where
+  , exampleTextChart'
+  , runG
+  , rvs
+  , rvsp
+  , toCT
+  ) where
 
 import Prelude
 import Chart
@@ -14,6 +19,9 @@ import Data.Text qualified as T
 import Data.Text (Text)
 import Optics.Core
 import Control.Monad
+import System.Random
+import System.Random.Stateful
+import System.Random.MWC.Distributions
 
 exampleTextChart :: Int -> Int -> IO [Chart]
 exampleTextChart r c = do
@@ -25,8 +33,28 @@ exampleText :: Int -> Int -> IO [Text]
 exampleText r c =
   fmap T.pack <$> replicateM r (unwords <$> replicateM c word)
 
-exampleTextChart' :: Int -> Int -> TextStyle -> IO [Chart]
+exampleTextChart' :: Int -> Int -> Style -> IO [Chart]
 exampleTextChart' r c s = do
   ts <- fmap T.pack <$> replicateM r (unwords <$> replicateM c word)
   let s' = s & #anchor .~ AnchorStart
   pure $ zipWith (\t x -> TextChart s' [(t, Point 0 x)]) ts [0..]
+
+-- | rvs creates a list of standard normal random variates.
+--
+rvs n g = replicateM n (standard g)
+
+-- | rvsPair generates a list of correlated random variate tuples
+--
+-- >>> rvsp gen 3 0.8
+-- [(1.8005943761746166e-2,7.074509906249835e-2),(0.36444481359059255,-0.7073208451897444),(-1.2939898115295387,-0.643930709405127)]
+--
+rvsp n c g = do
+  s0 <- rvs n g
+  s1 <- rvs n g
+  let s1' = zipWith (\x y -> c * x + sqrt (1 - c * c) * y) s0 s1
+  pure $ zip s0 s1'
+
+runG = runStateGen_ (mkStdGen 69)
+
+toCT :: ChartOptions -> ChartTree
+toCT co = view #charts $ forgetHud co

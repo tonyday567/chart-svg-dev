@@ -6,7 +6,7 @@
 
 ~chart-svg-dev~ is a development environment for chart-svg.
 
-* Usage
+* Imports
 
 #+begin_src haskell :results output
 :r
@@ -31,26 +31,171 @@ import Data.ByteString.Char8 qualified as C
 import Data.Text qualified as T
 import Control.Monad
 import NumHask.Prelude qualified as NH
-print "imports loaded"
+import Data.Functor.Identity
+import Data.Bifunctor
 (display, quit) <- startChartServer (Just "chart-svg-dev")
-disp x = display $ x & set (#markupOptions % #markupHeight) (Just 250) & set (#hudOptions % #frames % ix 1 % _2 % #buffer) 0.1
 #+end_src
 
 #+RESULTS:
-: [1 of 1] Compiling Lib              ( src/Lib.hs, interpreted )
-: Ok, one module loaded.
-: ghci> Ok, one module loaded.
-: imports loaded
-: Setting phasers to stun... (por>t  9160) (ctrl-c to quit)
 
 #+begin_src haskell :results output
-disp unitExample
+display unitExample
 #+end_src
 
 #+RESULTS:
 : True
 
-** Text chart (re)callibration
+** chart-svg examples
+
+#+begin_src haskell :results output
+writeAllExamples
+#+end_src
+
+#+RESULTS:
+: ok
+
+#+begin_src haskell :results output
+display $ pathExample & #markupOptions % #chartAspect .~ ChartAspect
+#+end_src
+
+#+RESULTS:
+: True
+
+
+* ToDo ScaleP
+** ToDo generalise ScaleP
+** ToDo Add chartData for all chart types
+** trial chart
+
+#+begin_src haskell :results output
+mo = defaultMarkupOptions & #chartAspect .~ ChartAspect & #markupHeight .~ Just 300
+gs = defaultGlyphStyle & #scaleGlyph .~ ScalePArea
+ho = defaultHudOptions & #axes %~ fmap (second (#ticks % #gtick %~ fmap (first (#scaleGlyph .~ ScalePArea))))
+r2 = mempty & #charts .~ unnamed [GlyphChart gs $ uncurry Point <$> runG (rvsp 4 (-0.5))] & #hudOptions .~ ho :: ChartOptions
+display $ mempty & #markupOptions .~ mo & #charts .~ stack 3 0.1 (replicate 9 (toCT r2))
+-- display r2
+
+#+end_src
+
+#+RESULTS:
+: True
+
+Different glyphtick
+
+#+begin_src haskell :results output
+sh = TriangleGlyph (Point 0.0 (0.5 * sqrt 2)) (Point (-cos (pi / 3)) (-sin (pi / 3) / 2)) (Point (cos (pi / 3)) (-sin (pi / 3) / 2))
+mo = defaultMarkupOptions & #chartAspect .~ FixedAspect 2 & #markupHeight .~ Just 300
+gs = defaultGlyphStyle & #scaleGlyph .~ ScalePArea
+ho = defaultHudOptions & #axes %~ fmap (second (#ticks % #gtick %~ fmap (first (#scaleGlyph .~ ScalePArea >>> #shape .~ sh))))
+r2 = mempty & #charts .~ unnamed [GlyphChart gs $ uncurry Point <$> runG (rvsp 4 (-0.5))] & #hudOptions .~ ho :: ChartOptions
+-- display $ mempty & #markupOptions .~ mo & #charts .~ stack 3 0.1 (replicate 9 (toCT r2))
+-- display r2
+display $ mempty & #markupOptions .~ mo & #charts .~ hori 0.1 (replicate 3 (toCT r2))
+
+#+end_src
+
+#+RESULTS:
+: True
+
+Other chart types
+
+#+begin_src haskell :results output
+mo = defaultMarkupOptions & #chartAspect .~ FixedAspect 1.5 & #markupHeight .~ Just 300
+-- display $ pathExample & #markupOptions .~ mo
+display $ mempty & #markupOptions .~ mo & #charts .~ stack 5 0.1 (replicate 25 (toCT pathExample))
+
+#+end_src
+
+#+RESULTS:
+: True
+
+
+** Next style unification
+
+similar to https://hackage.haskell.org/package/reanimate-svg-0.9.3.1/docs/Graphics-SvgTree-Types.html#v:drawAttributes
+
+#+begin_src haskell :results output
+data RectStyle = RectStyle
+  { borderSize :: Double,
+    borderColor :: Colour,
+    color :: Colour,
+    scaleRect :: ScaleP
+  }
+data TextStyle = TextStyle
+  { size :: Double,
+    color :: Colour,
+    anchor :: Anchor,
+    hsize :: Double,
+    vsize :: Double,
+    vshift :: Double,
+    rotation :: Maybe Double,
+    scaleText :: ScaleP,
+    escapeText :: EscapeText,
+    frame :: Maybe RectStyle
+  }
+data GlyphStyle = GlyphStyle
+  { -- | glyph radius
+    size :: Double,
+    -- | fill color
+    color :: Colour,
+    -- | stroke color
+    borderColor :: Colour,
+    -- | stroke width (adds a bit to the bounding box)
+    borderSize :: Double,
+    shape :: GlyphShape,
+    rotation :: Maybe Double,
+    translate :: Maybe (Point Double),
+    scaleGlyph :: ScaleP
+  }
+data LineStyle = LineStyle
+  { size :: Double,
+    color :: Colour,
+    linecap :: Maybe LineCap,
+    linejoin :: Maybe LineJoin,
+    dasharray :: Maybe [Double],
+    dashoffset :: Maybe Double,
+    scaleLine :: ScaleP
+  }
+data PathStyle = PathStyle
+  { borderSize :: Double,
+    borderColor :: Colour,
+    color :: Colour,
+    scalePath' :: ScaleP
+  }
+#+end_src
+
+linecap
+linejoin
+dasharray
+dashoffset
+
+scaleText
+escapeText
+frame
+
+* Color a frame lens
+
+  #+begin_src haskell :results output
+display (glyphsExample & #markupOptions % #chartAspect .~ FixedAspect 3 & traverseOf (#charts % charts') (Identity . fmap (\x -> x & set (glyphStyle' %? #scaleGlyph) ScalePArea)) & runIdentity & over (#hudOptions % #frames) (<>[(30, defaultFrameOptions & #frame %? #color .~ grey 0.5 0.4)]))
+  #+end_src
+
+
+#+RESULTS:
+: True
+
+* ToDo multiple axes on one side
+
+- [ ] better axis placement when multiple axis marks on one side
+
+
+#+begin_src haskell :results output
+disp $ unitExample & #hudOptions %~ colourHudOptions (set opac' 0.3) & #hudOptions %~ (<> (mempty & #axes .~ [(Priority 20, defaultAxisOptions)]))
+#+end_src
+
+#+RESULTS:
+: True
+
+* Text chart (re)callibration
 
 - more precise callibration of text scaling
 
@@ -61,10 +206,6 @@ t1 <- exampleTextChart 4 6
 display $ (mempty & #charts .~ unnamed t1 :: ChartOptions)
 t1
 #+end_src
-
-#+RESULTS:
-: True
-: [TextChart (TextStyle {size = 0.12, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.45, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Nothing}) [("perspiciatis molestiae nesciunt cumque eos a",Point 0.0 0.0)],TextChart (TextStyle {size = 0.12, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.45, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Nothing}) [("necessitatibus distinctio illum consectetur eaque architecto",Point 0.0 1.0)],TextChart (TextStyle {size = 0.12, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.45, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Nothing}) [("tempora reprehenderit iste ipsam molestias ut",Point 0.0 2.0)],TextChart (TextStyle {size = 0.12, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.45, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Nothing}) [("aspernatur omnis sunt voluptatem rerum numquam",Point 0.0 3.0)]]
 
 Adding a frame
 
@@ -298,4 +439,3 @@ display $ mempty & #charts .~ unnamed (t1 <> ps) & #hudOptions % #frames .~ [(3,
 
 #+RESULTS:
 : True
-

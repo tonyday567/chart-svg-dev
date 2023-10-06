@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="449" height="300" viewBox="-0.75 -0.5 1.5000 1.0"><style>svg {
+  color-scheme: light dark;
+}
+{
+  .canvas g, .title g, .axisbar g, .ticktext g, .tickglyph g, .ticklines g, .legendContent g text {
+    fill: rgb(5%, 5%, 5%);
+  }
+  .ticklines g, .tickglyph g, .legendBorder g {
+    stroke: rgb(5%, 5%, 5%);
+  }
+  .legendBorder g {
+    fill: rgb(94%, 94%, 94%);
+  }
+}
+@media (prefers-color-scheme:dark) {
+  .canvas g, .title g, .axisbar g, .ticktext g, .tickglyph g, .ticklines g, .legendContent g text {
+    fill: rgb(94%, 94%, 94%);
+  }
+  .ticklines g, .tickglyph g, .legendBorder g {
+    stroke: rgb(94%, 94%, 94%);
+  }
+  .legendBorder g {
+    fill: rgb(5%, 5%, 5%);
+  }
+}
+{
+  .text g {
+    fill: rgb(5%, 5%, 5%);
+  }
+}
+@media (prefers-color-scheme:dark) {
+  .text g {
+    fill: rgb(94%, 94%, 94%);
+  }
+}
+</style><g class="chart"><g class="text"><g stroke-width="0.0" stroke="none" fill="rgb(5%, 5%, 5%)" fill-opacity="1.0" font-size="0.0644" text-anchor="middle"><text x="-0.6030" y="0.3509">a</text><text x="-0.4744" y="0.3194">b</text><text x="-0.3470" y="0.2879">c</text><text x="-0.2223" y="0.2564">d</text><text x="-0.1013" y="0.2249">e</text><text x="0.0146" y="0.1934">f</text><text x="0.1244" y="0.1619">g</text><text x="0.2269" y="0.1304">h</text><text x="0.3212" y="0.0989">i</text><text x="0.4061" y="0.0674">j</text><text x="0.4810" y="0.0359">k</text><text x="0.5451" y="0.0044">l</text><text x="0.5977" y="-0.0271">m</text><text x="0.6383" y="-0.0586">n</text><text x="0.6665" y="-0.0901">o</text><text x="0.6820" y="-0.1216">p</text><text x="0.6847" y="-0.1531">q</text><text x="0.6745" y="-0.1846">r</text><text x="0.6516" y="-0.2161">s</text><text x="0.6161" y="-0.2476">t</text><text x="0.5684" y="-0.2791">u</text><text x="0.5090" y="-0.3106">v</text><text x="0.4386" y="-0.3421">w</text><text x="0.3577" y="-0.3736">x</text><text x="0.2672" y="-0.4051">y</text><text x="0.1680" y="-0.4366">z</text></g></g></g><g class="hud"><g class="frame"><g stroke-width="0" stroke="rgb(0%, 0%, 0%)" stroke-opacity="0" fill="rgb(100%, 100%, 100%)" fill-opacity="0.02"><rect width="1.3167" height="0.8512" x="-0.6175" y="-0.4684"/></g></g><g class="axis"><g class="ticks"><g class="tickglyph"><g stroke-width="0.0040" stroke="rgb(5%, 5%, 5%)" stroke-opacity="0.4" fill="rgb(5%, 5%, 5%)" fill-opacity="0.4"><g transform="rotate(-90.0, -0.6438, 0.3509)"><polyline points="-0.6438,0.3659
+-0.6438,0.3359"/></g><g transform="rotate(-90.0, -0.6438, 0.1934)"><polyline points="-0.6438,0.2084
+-0.6438,0.1784"/></g><g transform="rotate(-90.0, -0.6438, 0.0359)"><polyline points="-0.6438,0.0509
+-0.6438,0.0209"/></g><g transform="rotate(-90.0, -0.6438, -0.1216)"><polyline points="-0.6438,-0.1066
+-0.6438,-0.1366"/></g><g transform="rotate(-90.0, -0.6438, -0.2791)"><polyline points="-0.6438,-0.2641
+-0.6438,-0.2941"/></g><g transform="rotate(-90.0, -0.6438, -0.4366)"><polyline points="-0.6438,-0.4216
+-0.6438,-0.4516"/></g></g></g><g class="ticktext"><g stroke-width="0.0" stroke="none" fill="rgb(5%, 5%, 5%)" fill-opacity="1.0" font-size="0.0439" text-anchor="end"><text x="-0.6754" y="0.3618"> 0</text><text x="-0.6754" y="0.2043"> 5</text><text x="-0.6754" y="0.0468">10</text><text x="-0.6754" y="-0.1107">15</text><text x="-0.6754" y="-0.2682">20</text><text x="-0.6754" y="-0.4257">25</text></g></g><g class="ticklines"><g stroke-width="0.0050" stroke="rgb(5%, 5%, 5%)" stroke-opacity="0.05" fill="none"><polyline points="-0.6030,0.3509 0.6853,0.3509"/><polyline points="-0.6030,0.1934 0.6853,0.1934"/><polyline points="-0.6030,0.0359 0.6853,0.0359"/><polyline points="-0.6030,-0.1216 0.6853,-0.1216"/><polyline points="-0.6030,-0.2791 0.6853,-0.2791"/><polyline points="-0.6030,-0.4366 0.6853,-0.4366"/></g></g></g><g class="axisbar"><g stroke-width="0" stroke="rgb(0%, 0%, 0%)" stroke-opacity="0" fill="rgb(5%, 5%, 5%)" fill-opacity="0.4"><rect width="0.0035" height="0.7907" x="-0.6297" y="-0.4382"/></g></g></g><g class="axis"><g class="ticks"><g class="tickglyph"><g stroke-width="0.0040" stroke="rgb(5%, 5%, 5%)" stroke-opacity="0.4" fill="rgb(5%, 5%, 5%)" fill-opacity="0.4"><polyline points="-0.6030,0.4215
+-0.6030,0.3915"/><polyline points="-0.4741,0.4215
+-0.4741,0.3915"/><polyline points="-0.3453,0.4215
+-0.3453,0.3915"/><polyline points="-0.2165,0.4215
+-0.2165,0.3915"/><polyline points="-0.0877,0.4215
+-0.0877,0.3915"/><polyline points="0.0412,0.4215
+0.0412,0.3915"/><polyline points="0.1700,0.4215
+0.1700,0.3915"/><polyline points="0.2988,0.4215
+0.2988,0.3915"/><polyline points="0.4276,0.4215
+0.4276,0.3915"/><polyline points="0.5564,0.4215
+0.5564,0.3915"/><polyline points="0.6853,0.4215
+0.6853,0.3915"/></g></g><g class="ticktext"><g stroke-width="0.0" stroke="none" fill="rgb(5%, 5%, 5%)" fill-opacity="1.0" font-size="0.0439" text-anchor="middle"><text x="-0.6030" y="0.4566">0.0</text><text x="-0.4741" y="0.4566">0.1</text><text x="-0.3453" y="0.4566">0.2</text><text x="-0.2165" y="0.4566">0.3</text><text x="-0.0877" y="0.4566">0.4</text><text x="0.0412" y="0.4566">0.5</text><text x="0.1700" y="0.4566">0.6</text><text x="0.2988" y="0.4566">0.7</text><text x="0.4276" y="0.4566">0.8</text><text x="0.5564" y="0.4566">0.9</text><text x="0.6853" y="0.4566">1.0</text></g></g><g class="ticklines"><g stroke-width="0.0050" stroke="rgb(5%, 5%, 5%)" stroke-opacity="0.05" fill="none"><polyline points="-0.6030,0.3509 -0.6030,-0.4366"/><polyline points="-0.4741,0.3509 -0.4741,-0.4366"/><polyline points="-0.3453,0.3509 -0.3453,-0.4366"/><polyline points="-0.2165,0.3509 -0.2165,-0.4366"/><polyline points="-0.0877,0.3509 -0.0877,-0.4366"/><polyline points="0.0412,0.3509 0.0412,-0.4366"/><polyline points="0.1700,0.3509 0.1700,-0.4366"/><polyline points="0.2988,0.3509 0.2988,-0.4366"/><polyline points="0.4276,0.3509 0.4276,-0.4366"/><polyline points="0.5564,0.3509 0.5564,-0.4366"/><polyline points="0.6853,0.3509 0.6853,-0.4366"/></g></g></g><g class="axisbar"><g stroke-width="0" stroke="rgb(0%, 0%, 0%)" stroke-opacity="0" fill="rgb(5%, 5%, 5%)" fill-opacity="0.4"><rect width="1.2917" height="0.0032" x="-0.6047" y="0.3907"/></g></g></g><g class="frame"><g stroke-width="0" stroke="rgb(0%, 0%, 0%)" stroke-opacity="0" fill="rgb(100%, 100%, 100%)" fill-opacity="0.02"><rect width="1.5000" height="1.0" x="-0.75" y="-0.5"/></g></g></g></svg>

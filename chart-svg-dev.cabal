@@ -96,5 +96,7 @@ library
     text,
     numhask,
     mtl,
+    random,
+    mwc-random,
   exposed-modules:
     Lib
