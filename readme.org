@@ -10,7 +10,7 @@
 
 #+begin_src haskell :results output
 :r
-:set prompt "> "
+-- :set prompt "> "
 :set -Wno-type-defaults
 :set -Wno-name-shadowing
 :set -XOverloadedLabels
@@ -33,17 +33,13 @@ import Control.Monad
 import NumHask.Prelude qualified as NH
 import Data.Functor.Identity
 import Data.Bifunctor
+import Prettyprinter
+import Text.Pretty.Simple
+import MarkupParse
 (display, quit) <- startChartServer (Just "chart-svg-dev")
 #+end_src
 
 #+RESULTS:
-
-#+begin_src haskell :results output
-display unitExample
-#+end_src
-
-#+RESULTS:
-: True
 
 ** chart-svg examples
 
@@ -54,65 +50,424 @@ writeAllExamples
 #+RESULTS:
 : ok
 
+* Next chart-svg mega cleanup checklist
+
+- [ ] [[*small data range bug][small data range bug]]
+- [ ] audit ScaleP usage
+- [ ] using ScalePX and Y on glyph ticks
+- [ ] [[*reduce this tick gaps callibration][reduce this tick gaps callibration]]
+- [ ] [[*lineExample][lineExample]]
+- [ ] [[*Exact reproduction of proportionate scaling][Exact reproduction of proportionate scaling]]
+- [ ] [[*text chart scaling][text chart scaling]]
+- [ ] [[*chart-svg-dev: styleBox' versus styleBoxN' versus projectChartTree][chart-svg-dev: styleBox' versus styleBoxN' versus projectChartTree]]
+- [ ] Revisit anal [[file:~/haskell/anal/readme.org::*all in one][all in one]]
+- [ ] code ToDos
+- [ ] rebuild surface legend chart
+- [ ] move GlyphShape back to Style
+- [ ] switch to svg names for attributes
+- [ ] palette1 ==> palette
+- [ ] #charts -> #chartTree
+- [ ] rename initialCanvas
+- [ ] fix scalePath'
+- [ ] fix Rect show instance
+- [ ] Fix up Ticks
+  - prisms
+  - record types inside the sum types
+- [ ] better names for tick elements
+- [ ] remove placeText
+- [ ] simplify :: ChartTree -> ChartTree
+  descend, combining unnamed nodes
+- [ ] #hud --> #hudChart
+- [ ] shift from huds making ChartTrees to [Charts]
+- [ ] remove canvasStyleBox'
+- [ ] paint order
+  [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/paint-order][paint-order - SVG: Scalable Vector Graphics | MDN]]
+- [ ] check examples
+- [ ] check initialCanvas usage
+- [ ] check applyChartAspect usage
+- [ ] map runHud, addHud, toHuds
+- [ ] map HudChart usage
+- [ ] work upwards from mempty
+- [ ] default number of ticks to 5
+- [ ] smaller default text tick
+- [ ] smaller default text size
+- [ ] no border to legend
+
+* lineExample
+
+- [ ] y axis glyph tick buffer
+- [ ] y axis text tick buffer
+- [ ] why has unit tick extension happened?
+
 #+begin_src haskell :results output
-display $ pathExample & #markupOptions % #chartAspect .~ ChartAspect
+co = lineExample
+display unitExample
+#+end_src
+
+#+RESULTS:
+
+* reduce this tick gaps callibration
+
+This example looks accurate.
+
+#+begin_src haskell :results output
+r1 = fmap (*1) (Rect 0 1 0 1)
+bar' = (AxisBar (border 0.001 (grey 0.3 1)) 0.05 0 0)
+rs1 = border 0.001 (grey 0.3 1)
+tt = (defaultTextTick,0)
+gt = defaultGlyphTick & set #borderSize 0.001 & set #color (grey 0.3 1) & set #size 0.1
+g = TriangleGlyph (Point 0 1) (Point (-0.5) 0) (Point 0.5 0)
+display $ mempty & set #charts (unnamed [blankChart1 r1]) & set (#markupOptions % #chartAspect) UnscaledAspect & set (#markupOptions % #markupHeight) (Just 500) & set (#hudOptions % #axes) ([(5,defaultYAxisOptions & set #place PlaceLeft), (5,defaultXAxisOptions & set #place PlaceBottom)]) & set (#hudOptions % #axes % each % _2 % #ticks % #ltick) Nothing & set (#hudOptions % #axes % each % _2 % #bar) (Just bar') & set (#hudOptions % #axes % each % _2 % #ticks % #ttick) (Just tt) & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _2) 0 & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _1) gt & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _3) 0.0 & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _1 % #frame) (Just (border 0.005 black)) & set (#hudOptions % #frames) [(1,defaultFrameOptions & set #frame (Just rs1))]
+#+end_src
+
+* Exact reproduction of proportionate scaling
+
+- [ ] check if this proportionate scaling is exact
+
+Scaling of style elements is proportional to the ratio of areas of the before and after rectangle. This means that individual elements do not scale to the exact proportions of the overall projections.
+
+#+begin_src haskell :results output
+r1 = fmap (*1) (Rect 0 1 0 1)
+bar' = (AxisBar (blob (grey 0.3 0.1)) 0.05 0 0)
+bar'' = (AxisBar (border 0.001 (grey 0.3 1)) 0.05 0 0)
+rs1 = blob (grey 0.3 0.3)
+tt = defaultTextTick & set #scaleP ScalePArea & set #frame (Just rs1)
+gt = defaultGlyphTick & set #scaleP ScalePArea & set #borderSize 0 & set #color (grey 0.3 0.1) & set #size 0.1
+gt' = (Just (gt, SquareGlyph, 0))
+g = TriangleGlyph (Point 0 1) (Point (-0.5) 0) (Point 0.5 0)
+fa = ((0.536 + (0.536))/ (0.5 + 0.545))
+co = (mempty :: ChartOptions) & set #charts (unnamed [blankChart1 r1]) & set (#markupOptions % #chartAspect) (FixedAspect fa) & set (#hudOptions % #frames) [(1,defaultFrameOptions & set #frame (Just rs1))] & set (#hudOptions % #axes) ([(5,defaultXAxisOptions & set #place PlaceBottom), (6,defaultXAxisOptions & set #place PlaceBottom)]) & set (#hudOptions % #axes % each % _2 % #ticks % #ltick) Nothing & set (#hudOptions % #axes % each % _2 % #bar) (Just bar') & set (#hudOptions % #axes % each % _2 % #ticks % #gtick) Nothing & set (#hudOptions % #axes % each % _2 % #ticks % #ttick) (Just (tt,0)) & set (#hudOptions % #axes % each % _2 % #ticks % #style) (TickRound (FormatN FSCommaPrec (Just 1) 2 True True) 2 NoTickExtend)
+display co
+#+end_src
+
+#+RESULTS:
+
+*** Scaled boxes
+
+    #+begin_src haskell :results output
+asp = FixedAspect 1
+csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+viewbox = initialCanvas asp csAndHud
+finalCT = projectChartTreeN (view (#markupOptions % #repeatAspect) co) viewbox csAndHud
+sbox <$> (mconcat $ toListOf charts' finalCT)
+view styleBox' finalCT
+view styleBox' csAndHud
+    #+end_src
+
+#+RESULTS:
+: [Just Rect -0.466413194519965 0.466413194519965 -0.45721626154242156 0.5,Just Rect -0.466413194519965 0.466413194519965 -0.45721626154242156 0.5,Just Rect -0.5000000000000002 0.5000000000000002 -0.49999999999999994 -0.45894945996884584]
+: Just Rect -0.5000000000000002 0.5000000000000002 -0.49999999999999994 0.5
+: Just Rect -0.5489186602870815 0.5489186602870815 -0.545 0.5
+
+#+begin_src haskell :results output
+
+(0.536 + (0.536))/ (0.5 + 0.545)
+#+end_src
+
+#+RESULTS:
+: 1.0258373205741629
+
+An exact projection would be:
+
+#+begin_src haskell :results output
+p0 = fromMaybe undefined (view styleBox' csAndHud)
+p0
+c0 = mconcat $ toListOf charts' csAndHud
+p' = projectRect p0 (aspect 1) :: Rect Double -> Rect Double
+fmap p' . sbox <$> c0
+#+end_src
+
+#+RESULTS:
+: Rect -0.5489186602870815 0.5489186602870815 -0.545 0.5
+: [Just Rect -0.4672082563369478 0.46720825633694774 -0.45693779904306214 0.5,Just Rect -0.4672082563369478 0.46720825633694774 -0.45693779904306214 0.5,Just Rect -0.5 0.5 -0.5 -0.45789473684210524]
+
+#+begin_src haskell :results output
+ct' = projectChartTree one csAndHud
+view styleBox' ct'
+#+end_src
+
+#+RESULTS:
+: Just Rect -0.5008187862982173 0.5008187862982173 -0.4997202563985731 0.5
+
+* small data range bug
+
+- [ ] gaps are not scaling
+- [ ] bordersize of a vlineglyph
+- [ ] scalep usage in small data ranges
+- [ ] Is NoScaleP the defaultHudOptions
+- [ ] toggle to switch to ScalePArea when the hud is forgotten
+- [ ] vertical axis tick marks are slightly too left, hori ticks a bit too high, obvious on FixedAspect 2, hudOptionsExample
+
+#+begin_src haskell :results output
+bar' = (AxisBar (blob (grey 0.3 0.1)) 0.005 0.01 0)
+co = unitExample & set (#hudOptions % #axes % each % _2 % #bar) (Just bar') & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _3) 0 & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _2) 0.0 & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _1 % #scaleP) NoScaleP & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _1 % #borderSize) 0.005 & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _1 % #size) 0.02 & over (#charts % charts' % each % #chartData) (scaleChartData 0.001)
+display co
+#+end_src
+
+#+RESULTS:
+
+* chart-svg-dev: styleBox' versus styleBoxN' versus projectChartTree
+
+- [ ] Use styleBox' or projectChartTree?
+- [ ] exact reversal
+- [ ] jal does not converge
+
+#+begin_src haskell :results output
+view styleBox' ct
+#+end_src
+
+#+RESULTS:
+: Just Rect -6.0e-4 0.21659999999999996 2.5899999999999996e-2 0.1591
+
+#+begin_src haskell :results output
+aspect 2
+#+end_src
+
+#+RESULTS:
+: Rect -1.0 1.0 -0.5 0.5
+
+single application of styleBox projections
+
+#+begin_src haskell :results output
+ct1 = set styleBox' (Just $ aspect 2) ct
+view styleBox' ct1
+ctn = set (styleBoxN' 10) (Just $ aspect 2) ct
+view styleBox' ctn
+#+end_src
+
+#+RESULTS:
+: Just Rect -6.0e-4 0.21659999999999996 2.5899999999999996e-2 0.1591
+: Just Rect -6.0e-4 0.21659999999999996 2.5899999999999996e-2 0.1591
+
+#+begin_src haskell :results output
+ct' = projectChartTree (aspect 2) ct
+view styleBox' ct'
+#+end_src
+
+#+RESULTS:
+: Just Rect -1.0359530801519752 0.8429217253210086 -0.566022987491008 0.6144389040994819
+
+#+begin_src haskell :results output
+ct' = foldr ($) ct (replicate 10 (projectChartTree (aspect 2)))
+view styleBox' ct'
+#+end_src
+
+#+RESULTS:
+: Just Rect -0.9954771728174939 0.7898170527447951 -0.5346342740252994 0.5856292496911748
+
+* text chart scaling
+
+  #+begin_src haskell :results output
+exampleText <- fmap T.pack <$> replicateM 1 (unwords <$> replicateM 3 word)
+exampleText
+  #+end_src
+
+#+RESULTS:
+: ["accusamus et pariatur"]
+
+**** text scaling example
+
+#+begin_src haskell :results output
+exampleText <- fmap T.pack <$> replicateM 2 (unwords <$> replicateM 3 word)
+-- exampleText = ["illo vitae eius"]
+tsNoScale = defaultTextStyle & set #frame (Just $ defaultRectStyle) & set #anchor AnchorStart & set #scaleP NoScaleP
+tsScale = defaultTextStyle & set #frame (Just $ defaultRectStyle) & set #anchor AnchorStart & set #scaleP ScalePArea
+
+textNoScale = zipWith (\t x -> TextChart tsNoScale [(t, Point 0 x)]) exampleText [0..]
+textScale = zipWith (\t x -> TextChart tsScale [(t, Point 0 (x+0.2))]) exampleText [0..]
+points = Chart defaultGlyphStyle $ GlyphData ((CircleGlyph,) <$> (Point 0 0 :corners4 (Rect 0 1 (-0.5) 0.5)))
+cs = textScale <> [points]
+ct = unnamed cs
+co = mempty & #charts .~ ct & #markupOptions % #chartAspect .~ FixedAspect 2 :: ChartOptions
+display co
+#+end_src
+
+#+RESULTS:
+
+**** singular version "jal"
+
+#+begin_src haskell :results output
+-- exampleText <- fmap T.pack <$> replicateM 1 (unwords <$> replicateM 1 word)
+exampleText = ["jal"]
+tsNoScale = defaultTextStyle & set #frame (Just $ defaultRectStyle) & set #anchor AnchorStart & set #scaleP NoScaleP
+tsScale = defaultTextStyle & set #frame (Just $ defaultRectStyle) & set #anchor AnchorStart & set #scaleP ScalePArea
+
+textNoScale = zipWith (\t x -> TextChart tsNoScale [(t, Point 0 (x/4))]) exampleText [0..]
+textScale = zipWith (\t x -> TextChart tsScale [(t, Point 0 ((x+0.25)/4))]) exampleText [0..]
+points = Chart defaultGlyphStyle $ GlyphData ((CircleGlyph,) <$> (Point 0 0 :corners4 (Rect 0 1 0 1)))
+cs = textScale
+ct = unnamed cs
+co = mempty & #charts .~ ct & #markupOptions % #chartAspect .~ FixedAspect 1 :: ChartOptions
+display co
+#+end_src
+
+#+RESULTS:
+
+#+begin_src haskell :results output
+rOld = fromMaybe one $ view styleBox' ct
+sratio = scaleRatio ScalePArea (aspect 2) rOld
+sratio
+#+end_src
+
+#+RESULTS:
+: 8.314439450982071
+
+#+begin_src haskell :results output
+rOld
+#+end_src
+
+#+RESULTS:
+: Rect -6.0e-4 0.21659999999999996 2.5899999999999996e-2 0.1591
+
+**** Unscaled
+
+#+begin_src haskell :results output
+coUnscaled = co & #markupOptions % #chartAspect .~ UnscaledAspect
+display coUnscaled
 #+end_src
 
 #+RESULTS:
 : True
 
+**** scaling decomposition
 
-* ToDo ScaleP
-** ToDo generalise ScaleP
-** ToDo Add chartData for all chart types
-** trial chart
+font
 
 #+begin_src haskell :results output
-mo = defaultMarkupOptions & #chartAspect .~ ChartAspect & #markupHeight .~ Just 300
-gs = defaultGlyphStyle & #scaleGlyph .~ ScalePArea
-ho = defaultHudOptions & #axes %~ fmap (second (#ticks % #gtick %~ fmap (first (#scaleGlyph .~ ScalePArea))))
-r2 = mempty & #charts .~ unnamed [GlyphChart gs $ uncurry Point <$> runG (rvsp 4 (-0.5))] & #hudOptions .~ ho :: ChartOptions
-display $ mempty & #markupOptions .~ mo & #charts .~ stack 3 0.1 (replicate 9 (toCT r2))
--- display r2
+toListOf (charts' % each % #style % #size) ct
+#+end_src
 
+#+RESULTS:
+: [0.12,0.12,3.0e-2]
+
+scalePArea
+
+#+begin_src haskell :results output
+area' (Rect x z y w) = (z-x)*(w-y)
+ratioArea r r' = (area' r) / (area' r')
+#+end_src
+
+#+RESULTS:
+
+#+begin_src haskell :results output
+ratio' = sqrt $ ratioArea (aspect 2) (fromMaybe one $ view styleBox' ct)
+ratio'
+0.12 * ratio'
+#+end_src
+
+#+RESULTS:
+: 1.1527102580008153
+: 0.13832523096009783
+
+
+
+#+begin_src haskell :results output
+toListOf (charts' % each) ct & fmap sbox
+#+end_src
+
+#+RESULTS:
+: [Just Rect -6.0e-4 1.4405999999999999 0.16340000000000002 0.29660000000000003,Just Rect -6.0e-4 1.4405999999999999 -3.660000000000001e-2 9.66e-2,Just Rect -1.65e-2 1.0165 -0.5165 0.5165]
+
+
+Length of text @ 0.12 size
+
+#+begin_src haskell :results output
+fromIntegral (T.length $ head exampleText) * 0.55 * 0.12 + 0.5 * 0.01 * 0.12
+#+end_src
+
+#+RESULTS:
+: 1.3205999999999998
+
+#+begin_src haskell :results output
+view (#style % #borderSize) <$> cs
+#+end_src
+
+#+RESULTS:
+: [1.0e-2,1.0e-2,3.0e-3]
+
+
+mempty results
+
+runHud [] should lead to the same charts:
+
+#+begin_src haskell :results output
+foldOf charts' (mergeHudChart (runHud [] ct)) == foldOf charts' ct
 #+end_src
 
 #+RESULTS:
 : True
 
-Different glyphtick
+* legend guff
 
 #+begin_src haskell :results output
-sh = TriangleGlyph (Point 0.0 (0.5 * sqrt 2)) (Point (-cos (pi / 3)) (-sin (pi / 3) / 2)) (Point (cos (pi / 3)) (-sin (pi / 3) / 2))
-mo = defaultMarkupOptions & #chartAspect .~ FixedAspect 2 & #markupHeight .~ Just 300
-gs = defaultGlyphStyle & #scaleGlyph .~ ScalePArea
-ho = defaultHudOptions & #axes %~ fmap (second (#ticks % #gtick %~ fmap (first (#scaleGlyph .~ ScalePArea >>> #shape .~ sh))))
-r2 = mempty & #charts .~ unnamed [GlyphChart gs $ uncurry Point <$> runG (rvsp 4 (-0.5))] & #hudOptions .~ ho :: ChartOptions
--- display $ mempty & #markupOptions .~ mo & #charts .~ stack 3 0.1 (replicate 9 (toCT r2))
--- display r2
-display $ mempty & #markupOptions .~ mo & #charts .~ hori 0.1 (replicate 3 (toCT r2))
-
+display $ x1 & #charts .~ unnamed [blankChart1 one] & #hudOptions .~ (mempty & #legends .~ (view (#hudOptions % #legends) x1 & fmap (second (set (#textStyle % #frame %? #size) 0.1))))
 #+end_src
 
 #+RESULTS:
 : True
 
-Other chart types
+#+begin_src haskell :results output
+view (#hudOptions % #legends) x1
+#+end_src
+
+#+RESULTS:
+: [(Priority {priority = 12.0},LegendOptions {size = 0.3, buffer = 0.1, vgap = 0.2, hgap = 0.1, textStyle = Style {size = 0.2, borderSize = 1.0e-2, color = Colour 0.05 0.05 0.05 1.00, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Just (Style {size = 0.1, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}), linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, innerPad = 0.1, outerPad = 2.0e-2, frame = Just (Style {size = 0.1, borderSize = 1.0e-2, color = Colour 0.99 0.99 0.99 1.00, borderColor = Colour 0.05 0.05 0.05 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}), place = PlaceAbsolute Point 0.3 -0.35, overallScale = 0.25, legendCharts = [("palette1 0",[Chart {style = Style {size = 1.5e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 1.00, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = LineData [[Point 0.0 1.0,Point 1.0 1.0,Point 2.0 5.0]]}]),("palette1 1",[Chart {style = Style {size = 1.5e-2, borderSize = 1.0e-2, color = Colour 0.02 0.29 0.48 1.00, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = LineData [[Point 0.0 0.0,Point 2.8 3.0]]}]),("palette1 2",[Chart {style = Style {size = 1.5e-2, borderSize = 1.0e-2, color = Colour 0.66 0.07 0.55 1.00, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = LineData [[Point 0.5 4.0,Point 0.5 0.0]]}])]})]
+
 
 #+begin_src haskell :results output
-mo = defaultMarkupOptions & #chartAspect .~ FixedAspect 1.5 & #markupHeight .~ Just 300
--- display $ pathExample & #markupOptions .~ mo
-display $ mempty & #markupOptions .~ mo & #charts .~ stack 5 0.1 (replicate 25 (toCT pathExample))
-
+display $ textExample & over (#charts % charts') (fmap (set (#style % #frame) (Just defaultRectStyle))) & over (#charts % charts') (fmap (over (#chartData % textData') (fmap (take 12))))
 #+end_src
 
 #+RESULTS:
 : True
 
+#+begin_src haskell :results output
+:t styleBoxText
+textExample & foldOf (#charts % charts') & head & set #chartData (TextData [("a", Point 0 0)]) & set (#style % #frame) (Just defaultRectStyle) & markupChart
+#+end_src
 
-** Next style unification
+#+RESULTS:
+: styleBoxText :: Style -
+: Text -
+: Point Double -
+: Rect Double
+: Markup {elements = [Node {rootLabel = OpenTag StartTag "g" [Attr {attrName = "stroke-width", attrValue = "0.0"},Attr {attrName = "stroke", attrValue = "none"},Attr {attrName = "fill", attrValue = "rgb(5%, 5%, 5%)"},Attr {attrName = "fill-opacity", attrValue = "1.0"},Attr {attrName = "font-size", attrValue = "0.25"},Attr {attrName = "text-anchor", attrValue = "middle"}], subForest = [Node {rootLabel = OpenTag StartTag "g" [Attr {attrName = "stroke-width", attrValue = "0.0025"},Attr {attrName = "stroke", attrValue = "rgb(2%, 29%, 48%)"},Attr {attrName = "stroke-opacity", attrValue = "1.0"},Attr {attrName = "fill", attrValue = "rgb(2%, 73%, 80%)"},Attr {attrName = "fill-opacity", attrValue = "0.1"}], subForest = [Node {rootLabel = OpenTag EmptyElemTag "rect" [Attr {attrName = "width", attrValue = "0.115"},Attr {attrName = "height", attrValue = "0.2775"},Attr {attrName = "x", attrValue = "-0.0575"},Attr {attrName = "y", attrValue = "-0.1388"}], subForest = []}]},Node {rootLabel = OpenTag StartTag "text" [Attr {attrName = "x", attrValue = "0"},Attr {attrName = "y", attrValue = "0"}], subForest = [Node {rootLabel = Content "a", subForest = []}]}]}]}
+
+#+begin_src haskell :results output
+s = textExample & foldOf (#charts % charts') & head & view #style
+styleBoxText s "a" (Point 0 0)
+view #vsize s * 0.25 * 0.5
+#+end_src
+
+#+RESULTS:
+: Rect -5.625e-2 5.625e-2 -0.1375 0.1375
+: 0.1375
+
+A rectangular chart created to surround text continues to undergo scaling, whilst the text itself does not. This is why markupText includes creation of a rectangualr frame.
+
+#+begin_src haskell :results output
+textExample & foldOf (#charts % charts') & fmap (view #chartData >>> (\(TextData xs)-> xs)) & mconcat & fmap (\x -> Chart s (TextData [x])) & unnamed & (\x -> x <> rectangularize defaultRectStyle x) & (\x -> textExample & set #charts x :: ChartOptions) & set (#markupOptions % #chartAspect) (FixedAspect 2) & display
+#+end_src
+
+#+RESULTS:
+#+begin_example
+<interactive>:173:71: warning: [GHC-62161] [-Wincomplete-uni-patterns]
+    Pattern match(es) are non-exhaustive
+    In a lambda abstraction:
+        Patterns of type ‘ChartData’ not matched:
+            RectData _
+            LineData _
+            GlyphData _
+            PathData _
+            ...
+True
+#+end_example
+
+* style unification
 
 similar to https://hackage.haskell.org/package/reanimate-svg-0.9.3.1/docs/Graphics-SvgTree-Types.html#v:drawAttributes
+
+old styles
 
 #+begin_src haskell :results output
 data RectStyle = RectStyle
@@ -164,278 +519,36 @@ data PathStyle = PathStyle
   }
 #+end_src
 
-linecap
-linejoin
-dasharray
-dashoffset
+* chart-svg-dev: addHud refactor
 
-scaleText
-escapeText
-frame
+Removed from toHuds
 
-* Color a frame lens
+      #+begin_src haskell :results output
+      <> [ fromEffect (lastPriority o + 1) $
+             applyChartAspect asp
+         ]
+      #+end_src
 
-  #+begin_src haskell :results output
-display (glyphsExample & #markupOptions % #chartAspect .~ FixedAspect 3 & traverseOf (#charts % charts') (Identity . fmap (\x -> x & set (glyphStyle' %? #scaleGlyph) ScalePArea)) & runIdentity & over (#hudOptions % #frames) (<>[(30, defaultFrameOptions & #frame %? #color .~ grey 0.5 0.4)]))
-  #+end_src
+removed from runHudWith
 
+    #+begin_src haskell :results output
+    & (\x -> group (Just "chart") [view #chart x] <> group (Just "hud") [view #hud x])
+    #+end_src
 
-#+RESULTS:
-: True
+remove initial projection entirely.
 
-* ToDo multiple axes on one side
+          #+begin_src haskell :results output
+          (cs & over chart' (projectWith cb (maybe one padSingletons $ view styleBox' cs)))
+          #+end_src
 
-- [ ] better axis placement when multiple axis marks on one side
-
-
-#+begin_src haskell :results output
-disp $ unitExample & #hudOptions %~ colourHudOptions (set opac' 0.3) & #hudOptions %~ (<> (mempty & #axes .~ [(Priority 20, defaultAxisOptions)]))
-#+end_src
-
-#+RESULTS:
-: True
-
-* Text chart (re)callibration
-
-- more precise callibration of text scaling
-
-*** exampleTextChart
+removed:
 
 #+begin_src haskell :results output
-t1 <- exampleTextChart 4 6
-display $ (mempty & #charts .~ unnamed t1 :: ChartOptions)
-t1
+-- | Apply a ChartAspect
+applyChartAspect :: ChartAspect -> State HudChart ()
+applyChartAspect fa = do
+  hc <- get
+  case fa of
+    UnscaledAspect -> pure ()
+    _ -> modify (set hudBox' (getHudBox fa hc))
 #+end_src
-
-Adding a frame
-
-#+begin_src haskell :results output
-display $ (mempty & #charts .~ unnamed t1 & #hudOptions % #frames .~ [(3,FrameOptions (Just (defaultRectStyle & #color .~ set opac' 0.05 (palette1 4))) 0)])
-#+end_src
-
-#+RESULTS:
-: True
-
-Adding a point
-
-#+begin_src haskell :results output
-ps = (\x -> GlyphChart defaultGlyphStyle [Point 0 x]) <$>  [0..3]
-display $ (mempty & #charts .~ unnamed (t1 <> ps))
-#+end_src
-
-#+RESULTS:
-: True
-
-*** scaling decomposition of exampleTextChart
-
-**** ChartAspect
-
-No scaling anywhere looks ok.
-
-#+begin_src haskell :results output
-t1 <- exampleTextChart' 3 3 (defaultTextStyle & #frame .~ Just defaultRectStyle & #hsize .~ 0.65 & #vshift .~ (-0.3))
-display (mempty & #charts .~ unnamed t1 & #hudOptions % #chartAspect .~ ChartAspect :: ChartOptions)
-#+end_src
-
-#+RESULTS:
-: True
-
-#+begin_src haskell :results output
-fromIntegral (length "incidunt et consequatur") * 0.65 * 0.12
-#+end_src
-
-#+RESULTS:
-: 1.794
-
-Width is hsize * size * num characters plus a bit (???) (+/-0.0006)
-
-#+begin_src haskell :results output
-:set -Wno-incomplete-uni-patterns
-(Just r@(Rect x z y w)) = styleBoxes t1
-r
-#+end_src
-
-#+RESULTS:
-: Rect -6.0e-4 1.7946 -3.0600000000000006e-2 2.1026
-
-height is stylebox dimensions * width of 300
-
-#+begin_src haskell :results output
-(z-x)/(w-y)*300
-#+end_src
-
-#+RESULTS:
-: 252.46577911119442
-
-Add a frame gives same dimensions:
-
-#+begin_src haskell :results output
-chartFrame = #hudOptions % #frames .~ [(3,FrameOptions (Just (defaultRectStyle & #borderSize .~ 0 & #color .~ set opac' 0.05 (palette1 4))) 0)]
-display (mempty & #charts .~ unnamed t1 & chartFrame & #hudOptions % #chartAspect .~ ChartAspect :: ChartOptions)
-#+end_src
-
-#+RESULTS:
-: True
-
-**** FixedAspect
-#+begin_src haskell :results output
-chartFrame = #hudOptions % #frames .~ [(3,FrameOptions (Just (defaultRectStyle & #color .~ set opac' 0.05 (palette1 4))) 0)]
-t2 <- exampleTextChart' 3 3 (defaultTextStyle & #frame .~ Just defaultRectStyle & #hsize .~ 0.65 & #scalex .~ ScaleX)
-display $ (mempty & #charts .~ unnamed t2 :: ChartOptions)
-#+end_src
-
-#+RESULTS:
-: True
-
-#+begin_src haskell :results output
-chartFrame = #hudOptions % #frames .~ [(3,FrameOptions (Just (defaultRectStyle & #color .~ set opac' 0.05 (palette1 4))) 0)]
-t2 <- exampleTextChart' 3 3 (defaultTextStyle & #frame .~ Just defaultRectStyle & #hsize .~ 0.65)
-display $ (mempty & #charts .~ unnamed t2 :: ChartOptions)
-#+end_src
-
-#+RESULTS:
-: True
-
-#+begin_src haskell :results output
-fromIntegral (length "dignissimos in distinctio") *0.65 * 0.12
-:set -Wno-incomplete-uni-patterns
-(Just r@(Rect x z y w)) = styleBoxes t2
-r
-#+end_src
-
-#+RESULTS:
-: 1.95
-: Rect -6.0e-4 1.9506 -3.660000000000001e-2 2.0966
-
-x scaling for text size
-
-#+begin_src haskell :results output
-1.5 / (z-x) * 0.12
-#+end_src
-
-#+RESULTS:
-: 9.225092250922509e-2
-
-**** deconstruction of scaling functions
-
-addHud
-
-#+begin_src haskell :results output
-view styleBox' $ addHud mempty (unnamed t2)
-#+end_src
-
-#+RESULTS:
-: Just Rect -0.75 0.75 -0.5000000000000001 0.5
-
-#+begin_src haskell :results output
-1.5 / (1.9506 + 0.0006) * 0.12
-#+end_src
-
-#+RESULTS:
-: 9.225092250922509e-2
-
-initialCanvas
-
-#+begin_src haskell :results output
-ic = initialCanvas (view #chartAspect (mempty::HudOptions)) (unnamed t2)
-ic
-#+end_src
-
-#+RESULTS:
-: Rect -0.75 0.75 -0.5 0.5
-
-runHudWith
-
-#+begin_src haskell :results output
-import Data.Bifunctor
-(hs, db') = toHuds mempty $ maybe one padSingletons (view box' (unnamed t2))
-(view box' (unnamed t2))
-runHudWith ic db' hs (unnamed t2)
-
-length hs
-#+end_src
-
-#+RESULTS:
-: Just Rect 0.0 0.0 0.0 2.0
-: ChartTree {tree = Node {rootLabel = (Nothing,[]), subForest = [Node {rootLabel = (Just "chart",[]), subForest = [Node {rootLabel = (Nothing,[TextChart (TextStyle {size = 9.225092250922509e-2, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.65, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Just (RectStyle {borderSize = 1.0e-2, borderColor = Colour 0.02 0.29 0.48 1.00, color = Colour 0.02 0.73 0.80 0.10})}) [("veritatis iure natus",Point -0.7495387453874539 -0.4718634686346864)],TextChart (TextStyle {size = 9.225092250922509e-2, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.65, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Just (RectStyle {borderSize = 1.0e-2, borderColor = Colour 0.02 0.29 0.48 1.00, color = Colour 0.02 0.73 0.80 0.10})}) [("dignissimos in distinctio",Point -0.7495387453874539 -2.3062730627306294e-2)],TextChart (TextStyle {size = 9.225092250922509e-2, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.65, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Just (RectStyle {borderSize = 1.0e-2, borderColor = Colour 0.02 0.29 0.48 1.00, color = Colour 0.02 0.73 0.80 0.10})}) [("ea et aut",Point -0.7495387453874539 0.42573800738007384)]]), subForest = []}]},Node {rootLabel = (Just "hud",[]), subForest = [Node {rootLabel = (Nothing,[]), subForest = []}]}]}}
-: > 1
-
-projectWith
-
-#+begin_src haskell :results output
-ic
-db'
-projectWith ic db' <$> t1
-#+end_src
-
-#+RESULTS:
-: Rect -0.75 0.75 -0.5 0.5
-: Rect -0.5 0.5 0.0 2.0
-: [TextChart (TextStyle {size = 0.18, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.65, vsize = 1.1, vshift = -0.3, rotation = Nothing, scalex = ScaleX, frame = Just (RectStyle {borderSize = 1.0e-2, borderColor = Colour 0.02 0.29 0.48 1.00, color = Colour 0.02 0.73 0.80 0.10})}) [("delectus porro quia",Point 0.0 -0.5)],TextChart (TextStyle {size = 0.18, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.65, vsize = 1.1, vshift = -0.3, rotation = Nothing, scalex = ScaleX, frame = Just (RectStyle {borderSize = 1.0e-2, borderColor = Colour 0.02 0.29 0.48 1.00, color = Colour 0.02 0.73 0.80 0.10})}) [("molestiae molestiae voluptatibus",Point 0.0 0.0)],TextChart (TextStyle {size = 0.18, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.65, vsize = 1.1, vshift = -0.3, rotation = Nothing, scalex = ScaleX, frame = Just (RectStyle {borderSize = 1.0e-2, borderColor = Colour 0.02 0.29 0.48 1.00, color = Colour 0.02 0.73 0.80 0.10})}) [("aut ut eligendi",Point 0.0 0.5)]]
-
-applyChartAspect
-
-#+begin_src haskell :results output
-import Control.Monad.State.Lazy
-flip execState (HudChart (unnamed t1 & over chart' (projectWith ic db')) mempty db') (applyChartAspect (ChartAspect))
-#+end_src
-
-#+RESULTS:
-: HudChart {chart = ChartTree {tree = Node {rootLabel = (Nothing,[TextChart (TextStyle {size = 0.18, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.45, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Nothing}) [("doloremque",Point 0.0 -0.5)],TextChart (TextStyle {size = 0.18, color = Colour 0.05 0.05 0.05 1.00, anchor = AnchorStart, hsize = 0.45, vsize = 1.1, vshift = -0.25, rotation = Nothing, scalex = ScaleX, frame = Nothing}) [("reiciendis",Point 0.0 0.5)]]), subForest = []}}, hud = ChartTree {tree = Node {rootLabel = (Nothing,[]), subForest = []}}, dataBox = Rect -0.5 0.5 0.0 1.0}
-
-#+begin_src haskell :results output
-hc = (HudChart (unnamed t1 & over chart' (projectWith ic db')) mempty db')
-hc' = set hudBox' (getHudBox (FixedAspect 1.5) hc) hc
-#+end_src
-
-#+RESULTS:
-
-#+begin_src haskell :results output
-import NumHask.Prelude qualified as NH
-:set -Wno-incomplete-uni-patterns
-(Just hsb) = view hudStyleBox' hc
-(Just hb) = view hudBox' hc
-(Just rebox') = (getHudBox (FixedAspect 1.5) hc)
-r' = rebox' NH.- (hsb NH.- hb)
-:t styleBoxes $ projectWith r' hb <$> t1
-r'
-hb
-#+end_src
-
-#+RESULTS:
-: styleBoxes $ projectWith r' hb <$
-: t1 :: Maybe (Rect Double)
-: Rect -0.75 -6.000000000000005e-2 -0.44599999999999995 0.356
-: Rect 0.0 0.0 -0.5 0.5
-
-#+begin_src haskell :results output
-view hudStyleBox' hc
-view hudStyleBox' hc'
-view hudBox' hc'
-#+end_src
-
-#+RESULTS:
-: Just Rect 0.0 0.81 -0.554 0.644
-: Just Rect 0.0 0.81 -0.49999999999999994 0.5
-: Just Rect 0.0 0.0 -0.44599999999999995 0.356
-**** rectangle
-
-A rectangle based on the initial style box of text is not going to track scaling of text size in any way.
-
-#+begin_src haskell :results output
-r1 = RectChart defaultRectStyle [fromMaybe undefined $ styleBoxes t1]
-#+end_src
-
-#+RESULTS:
-
-**** point
-
-#+begin_src haskell :results output
-rDefault = RectChart defaultRectStyle [one]
-ps = (\x -> GlyphChart defaultGlyphStyle [Point 0 x]) <$>  [0..2]
-r1 = RectChart defaultRectStyle [fromMaybe undefined $ styleBoxes t1]
-display $ mempty & #charts .~ unnamed (t1 <> ps) & #hudOptions % #frames .~ [(3,FrameOptions (Just (defaultRectStyle & #color .~ set opac' 0.05 (palette1 4))) 0)]
-#+end_src
-
-#+RESULTS:
-: True
