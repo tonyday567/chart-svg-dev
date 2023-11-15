@@ -50,17 +50,14 @@ writeAllExamples
 #+RESULTS:
 : ok
 
-* Next chart-svg mega cleanup checklist
+* ToDo chart-svg mega cleanup checklist
 
-- [ ] [[*small data range bug][small data range bug]]
+- [ ] NoScaleP needs to be the default for HudOption elements
 - [ ] audit ScaleP usage
-- [ ] using ScalePX and Y on glyph ticks
-- [ ] [[*reduce this tick gaps callibration][reduce this tick gaps callibration]]
-- [ ] [[*lineExample][lineExample]]
-- [ ] [[*Exact reproduction of proportionate scaling][Exact reproduction of proportionate scaling]]
-- [ ] [[*text chart scaling][text chart scaling]]
+- [ ] toggle to switch to ScalePArea when the hud is forgotten
 - [ ] [[*chart-svg-dev: styleBox' versus styleBoxN' versus projectChartTree][chart-svg-dev: styleBox' versus styleBoxN' versus projectChartTree]]
 - [ ] Revisit anal [[file:~/haskell/anal/readme.org::*all in one][all in one]]
+- [ ] why has unit tick extension happened with Range (-0.5) 0.5?
 - [ ] code ToDos
 - [ ] rebuild surface legend chart
 - [ ] move GlyphShape back to Style
@@ -93,24 +90,11 @@ writeAllExamples
 - [ ] smaller default text size
 - [ ] no border to legend
 
-* lineExample
-
-- [ ] y axis glyph tick buffer
-- [ ] y axis text tick buffer
-- [ ] why has unit tick extension happened?
-
-#+begin_src haskell :results output
-co = lineExample
-display unitExample
-#+end_src
-
-#+RESULTS:
-
-* reduce this tick gaps callibration
+* tick gap callibration
 
 This example looks accurate.
 
-#+begin_src haskell :results output
+#+begin_src haskell-ng :results output
 r1 = fmap (*1) (Rect 0 1 0 1)
 bar' = (AxisBar (border 0.001 (grey 0.3 1)) 0.05 0 0)
 rs1 = border 0.001 (grey 0.3 1)
@@ -120,9 +104,9 @@ g = TriangleGlyph (Point 0 1) (Point (-0.5) 0) (Point 0.5 0)
 display $ mempty & set #charts (unnamed [blankChart1 r1]) & set (#markupOptions % #chartAspect) UnscaledAspect & set (#markupOptions % #markupHeight) (Just 500) & set (#hudOptions % #axes) ([(5,defaultYAxisOptions & set #place PlaceLeft), (5,defaultXAxisOptions & set #place PlaceBottom)]) & set (#hudOptions % #axes % each % _2 % #ticks % #ltick) Nothing & set (#hudOptions % #axes % each % _2 % #bar) (Just bar') & set (#hudOptions % #axes % each % _2 % #ticks % #ttick) (Just tt) & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _2) 0 & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _1) gt & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _3) 0.0 & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _1 % #frame) (Just (border 0.005 black)) & set (#hudOptions % #frames) [(1,defaultFrameOptions & set #frame (Just rs1))]
 #+end_src
 
-* Exact reproduction of proportionate scaling
+#+RESULTS:
 
-- [ ] check if this proportionate scaling is exact
+* Exact reproduction of proportionate scaling
 
 Scaling of style elements is proportional to the ratio of areas of the before and after rectangle. This means that individual elements do not scale to the exact proportions of the overall projections.
 
@@ -136,7 +120,7 @@ gt = defaultGlyphTick & set #scaleP ScalePArea & set #borderSize 0 & set #color 
 gt' = (Just (gt, SquareGlyph, 0))
 g = TriangleGlyph (Point 0 1) (Point (-0.5) 0) (Point 0.5 0)
 fa = ((0.536 + (0.536))/ (0.5 + 0.545))
-co = (mempty :: ChartOptions) & set #charts (unnamed [blankChart1 r1]) & set (#markupOptions % #chartAspect) (FixedAspect fa) & set (#hudOptions % #frames) [(1,defaultFrameOptions & set #frame (Just rs1))] & set (#hudOptions % #axes) ([(5,defaultXAxisOptions & set #place PlaceBottom), (6,defaultXAxisOptions & set #place PlaceBottom)]) & set (#hudOptions % #axes % each % _2 % #ticks % #ltick) Nothing & set (#hudOptions % #axes % each % _2 % #bar) (Just bar') & set (#hudOptions % #axes % each % _2 % #ticks % #gtick) Nothing & set (#hudOptions % #axes % each % _2 % #ticks % #ttick) (Just (tt,0)) & set (#hudOptions % #axes % each % _2 % #ticks % #style) (TickRound (FormatN FSCommaPrec (Just 1) 2 True True) 2 NoTickExtend)
+co = (mempty :: ChartOptions) & set #charts (unnamed [blankChart1 r1]) & set (#markupOptions % #chartAspect) (FixedAspect 1.5) & set (#hudOptions % #frames) [(1,defaultFrameOptions & set #frame (Just rs1))] & set (#hudOptions % #axes) ([(5,defaultXAxisOptions & set #place PlaceBottom), (6,defaultXAxisOptions & set #place PlaceBottom)]) & set (#hudOptions % #axes % each % _2 % #ticks % #ltick) Nothing & set (#hudOptions % #axes % each % _2 % #bar) (Just bar') & set (#hudOptions % #axes % each % _2 % #ticks % #gtick) Nothing & set (#hudOptions % #axes % each % _2 % #ticks % #ttick) (Just (tt,0)) & set (#hudOptions % #axes % each % _2 % #ticks % #style) (TickRound (FormatN FSCommaPrec (Just 1) 2 True True) 2 NoTickExtend)
 display co
 #+end_src
 
@@ -189,22 +173,12 @@ view styleBox' ct'
 #+RESULTS:
 : Just Rect -0.5008187862982173 0.5008187862982173 -0.4997202563985731 0.5
 
-* small data range bug
-
-- [ ] gaps are not scaling
-- [ ] bordersize of a vlineglyph
-- [ ] scalep usage in small data ranges
-- [ ] Is NoScaleP the defaultHudOptions
-- [ ] toggle to switch to ScalePArea when the hud is forgotten
-- [ ] vertical axis tick marks are slightly too left, hori ticks a bit too high, obvious on FixedAspect 2, hudOptionsExample
+* variance data range test
 
 #+begin_src haskell :results output
-bar' = (AxisBar (blob (grey 0.3 0.1)) 0.005 0.01 0)
-co = unitExample & set (#hudOptions % #axes % each % _2 % #bar) (Just bar') & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _3) 0 & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _2) 0.0 & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _1 % #scaleP) NoScaleP & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _1 % #borderSize) 0.005 & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _1 % #size) 0.02 & over (#charts % charts' % each % #chartData) (scaleChartData 0.001)
+co = unitExample & over (#charts % charts' % each % #chartData) (scaleChartData 1e6)
 display co
 #+end_src
-
-#+RESULTS:
 
 * chart-svg-dev: styleBox' versus styleBoxN' versus projectChartTree
 
@@ -263,7 +237,6 @@ exampleText
   #+end_src
 
 #+RESULTS:
-: ["accusamus et pariatur"]
 
 **** text scaling example
 
@@ -327,7 +300,6 @@ display coUnscaled
 #+end_src
 
 #+RESULTS:
-: True
 
 **** scaling decomposition
 
@@ -552,3 +524,87 @@ applyChartAspect fa = do
     UnscaledAspect -> pure ()
     _ -> modify (set hudBox' (getHudBox fa hc))
 #+end_src
+
+* addHud decomp
+
+#+begin_src haskell :results output
+-- | Decorate a ChartTree with HudOptions
+addHud :: ChartAspect -> HudOptions -> ChartTree -> ChartTree
+addHud asp ho cs =
+  runHudWith
+    (initialCanvas asp cs')
+    (fromMaybe db mdb)
+    hs
+    cs'
+  where
+    db = maybe one padSingletons (view box' cs)
+    (mdb, hs) = toHuds ho db
+    cs' = cs <> maybe mempty (\r -> bool ( named "datapadding" [BlankChart defaultStyle [r]] ) mempty (r==db) ) mdb
+#+end_src
+
+#+RESULTS:
+#+begin_example
+<interactive>:155:1-61: error: [GHC-39999]
+    • No instance for ‘Show
+                         (ChartAspect -> HudOptions -> ChartTree -> ChartTree)’
+        arising from a use of ‘print’
+        (maybe you haven't applied a function to enough arguments?)
+    • In a stmt of an interactive GHCi command: print it
+<interactive>:156:19: error: [GHC-58481]
+    parse error (possibly incorrect indentation or mismatched brackets)
+<interactive>:157:3-12: error: [GHC-39999]
+    • No instance for ‘Show
+                         (CanvasBox -> DataBox -> [Hud] -> ChartTree -> ChartTree)’
+        arising from a use of ‘print’
+        (maybe you haven't applied a function to enough arguments?)
+    • In a stmt of an interactive GHCi command: print it
+Rect -0.75 0.75 -0.5 0.5
+Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4
+<interactive>:160:5-6: error: [GHC-39999]
+    • No instance for ‘Show Hud’ arising from a use of ‘print’
+    • In a stmt of an interactive GHCi command: print it
+ChartTree {tree = Node {rootLabel = (Nothing,[]), subForest = [Node {rootLabel = (Just "unit",[Chart {style = Style {size = 6.0e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = NoScaleP, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = RectData [Rect -5.0e-4 5.0e-4 -5.0e-4 5.0e-4]}]), subForest = []},Node {rootLabel = (Just "datapadding",[Chart {style = Style {size = 6.0e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = NoScaleP, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = BlankData [Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4]}]), subForest = []}]}}
+<interactive>:162:3-7: error: [GHC-58481]
+    parse error on input ‘where’
+Rect -0.75 0.75 -0.5 0.5
+#+end_example
+
+#+begin_src haskell :results output
+asp = view (#markupOptions % #chartAspect) co
+asp
+ho = view #hudOptions co
+cs = view #charts co
+db = maybe one padSingletons (view box' cs)
+(mdb, hs) = toHuds ho db
+mdb
+cs' = cs <> maybe mempty (\r -> bool ( named "datapadding" [BlankChart defaultStyle [r]] ) mempty (r==db) ) mdb
+c0 = initialCanvas asp cs'
+c0
+db0 = fromMaybe db mdb
+db0
+#+end_src
+
+#+RESULTS:
+: FixedAspect 1.5
+: Just Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4
+: Rect -0.75 0.75 -0.5 0.5
+: Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4
+
+#+begin_src haskell :results output
+runHudWith c0 db0 hs cs'
+#+end_src
+
+    #+begin_src haskell :results output
+hc0 = HudChart (cs' & over chart' (projectWith c0 (maybe one padSingletons $ view styleBox' cs'))) mempty db0
+hc0
+    #+end_src
+
+#+RESULTS:
+: HudChart {chart = ChartTree {tree = Node {rootLabel = (Nothing,[]), subForest = [Node {rootLabel = (Just "unit",[Chart {style = Style {size = 6.0e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = NoScaleP, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = RectData [Rect -6.818181818181823e-2 6.818181818181834e-2 -4.545454545454547e-2 4.5454545454545525e-2]}]), subForest = []},Node {rootLabel = (Just "datapadding",[Chart {style = Style {size = 6.0e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = NoScaleP, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = BlankData [Rect -8.181818181818179e-2 8.181818181818179e-2 -5.454545454545451e-2 5.4545454545454564e-2]}]), subForest = []}]}}, hud = ChartTree {tree = Node {rootLabel = (Nothing,[]), subForest = []}}, dataBox = Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4}
+
+#+begin_src haskell :results output
+view box' cs'
+#+end_src
+
+#+RESULTS:
+: Just Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4
