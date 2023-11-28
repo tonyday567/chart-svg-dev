@@ -8,9 +8,8 @@
 
 * Imports
 
-#+begin_src haskell :results output
+#+begin_src haskell-ng :results output
 :r
--- :set prompt "> "
 :set -Wno-type-defaults
 :set -Wno-name-shadowing
 :set -XOverloadedLabels
@@ -40,209 +39,1517 @@ import MarkupParse
 #+end_src
 
 #+RESULTS:
+: Ok, one module loaded.
+: Setting phasers to stun... (port 9160) (ctrl-c to quit)
 
-** chart-svg examples
+* ToDo chart-svg mega cleanup checklist
 
-#+begin_src haskell :results output
+- [X] rerun whole org file and observe results
+- [X] styleBox' versus projectChartTree
+- [X] text box bug
+- [X] scaling text example
+- [X] examples audit
+- [X] NoScaleP needs to be the default for HudOption elements
+- [X] audit ScaleP usage
+- [X] toggle to switch to ScalePArea when the hud is forgotten
+- [X] surface legend
+- [ ] check & fix examples
+- [ ] fix compound code and compoundExample
+- [ ] Revisit anal [[file:~/haskell/anal/readme.org::*all in one][all in one]]
+- [ ] code ToDos
+- [ ] remove multiple reboxing
+- [ ] move GlyphShape back to Style
+- [ ] switch to svg names for attributes
+- [ ] palette1 ==> palette
+- [ ] #charts -> #chartTree
+- [ ] fix scalePath'
+- [ ] fix Rect show instance
+- [ ] Fix up Ticks
+  - lenses
+- [ ] better names for tick elements
+- [ ] check applyChartAspect usage
+- [ ] remove placeText
+- [ ] simplify :: ChartTree -> ChartTree
+  descend, combining unnamed nodes
+- [ ] #hud --> #hudChart
+- [ ] check Name usage in Huds
+- [ ] remove canvasStyleBox'
+- [ ] paint order
+  [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/paint-order][paint-order - SVG: Scalable Vector Graphics | MDN]]
+
+* chart-svg examples
+
+#+begin_src haskell-ng :results output
 writeAllExamples
 #+end_src
 
 #+RESULTS:
 : ok
 
-* ToDo chart-svg mega cleanup checklist
-
-- [ ] NoScaleP needs to be the default for HudOption elements
-- [ ] audit ScaleP usage
-- [ ] toggle to switch to ScalePArea when the hud is forgotten
-- [ ] [[*chart-svg-dev: styleBox' versus styleBoxN' versus projectChartTree][chart-svg-dev: styleBox' versus styleBoxN' versus projectChartTree]]
-- [ ] Revisit anal [[file:~/haskell/anal/readme.org::*all in one][all in one]]
-- [ ] why has unit tick extension happened with Range (-0.5) 0.5?
-- [ ] code ToDos
-- [ ] rebuild surface legend chart
-- [ ] move GlyphShape back to Style
-- [ ] switch to svg names for attributes
-- [ ] palette1 ==> palette
-- [ ] #charts -> #chartTree
-- [ ] rename initialCanvas
-- [ ] fix scalePath'
-- [ ] fix Rect show instance
-- [ ] Fix up Ticks
-  - prisms
-  - record types inside the sum types
-- [ ] better names for tick elements
-- [ ] remove placeText
-- [ ] simplify :: ChartTree -> ChartTree
-  descend, combining unnamed nodes
-- [ ] #hud --> #hudChart
-- [ ] shift from huds making ChartTrees to [Charts]
-- [ ] remove canvasStyleBox'
-- [ ] paint order
-  [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/paint-order][paint-order - SVG: Scalable Vector Graphics | MDN]]
-- [ ] check examples
-- [ ] check initialCanvas usage
-- [ ] check applyChartAspect usage
-- [ ] map runHud, addHud, toHuds
-- [ ] map HudChart usage
-- [ ] work upwards from mempty
-- [ ] default number of ticks to 5
-- [ ] smaller default text tick
-- [ ] smaller default text size
-- [ ] no border to legend
-
-* tick gap callibration
-
-This example looks accurate.
-
 #+begin_src haskell-ng :results output
-r1 = fmap (*1) (Rect 0 1 0 1)
-bar' = (AxisBar (border 0.001 (grey 0.3 1)) 0.05 0 0)
-rs1 = border 0.001 (grey 0.3 1)
-tt = (defaultTextTick,0)
-gt = defaultGlyphTick & set #borderSize 0.001 & set #color (grey 0.3 1) & set #size 0.1
-g = TriangleGlyph (Point 0 1) (Point (-0.5) 0) (Point 0.5 0)
-display $ mempty & set #charts (unnamed [blankChart1 r1]) & set (#markupOptions % #chartAspect) UnscaledAspect & set (#markupOptions % #markupHeight) (Just 500) & set (#hudOptions % #axes) ([(5,defaultYAxisOptions & set #place PlaceLeft), (5,defaultXAxisOptions & set #place PlaceBottom)]) & set (#hudOptions % #axes % each % _2 % #ticks % #ltick) Nothing & set (#hudOptions % #axes % each % _2 % #bar) (Just bar') & set (#hudOptions % #axes % each % _2 % #ticks % #ttick) (Just tt) & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _2) 0 & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _1) gt & set (#hudOptions % #axes % each % _2 % #ticks % #gtick %? _3) 0.0 & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _1 % #frame) (Just (border 0.005 black)) & set (#hudOptions % #frames) [(1,defaultFrameOptions & set #frame (Just rs1))]
+display $ barChart (defaultBarOptions & set (#barTextStyles % each % #anchor) AnchorMiddle & set (#barTextStyles % each % #size) 0.03 & set #textGap 0.04 & set #textGapNegative 0.06)  barDataExample & set (#markupOptions % #chartAspect) (CanvasAspect 1.5) & set #hudOptions mempty
 #+end_src
 
 #+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+display $ ellipseExample (FixedAspect 1.5) & set (#hudOptions % #axes % ix 1 % _2 % #ticks % #ttick %? _2) 0.04 & set (#hudOptions % #axes % ix 1 % _2 % #ticks % #gtick %? _3) 0.01 & set (#hudOptions % #legends % ix 0 % _2 % #vgap) 0.3 & set (#hudOptions % #titles % ix 0 % _2 % #style % #size) 0.032
+
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+co = lineExample
+writeChartOptions "other/line.svg" co
+display co
+#+end_src
+
+#+RESULTS:
+: True
+
+** variance data range test
+
+#+begin_src haskell-ng :results output
+co = unitExample & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _1 % #frame) (Just defaultRectStyle) & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _2) 0
+co' = co & over (#charts % charts' % each % #chartData) (scaleChartData 1)
+display co'
+#+end_src
+
+#+RESULTS:
+: True
+
+* example problems
+** pathExample
+- [ ] move text
+
+** lineExample
+
+#+begin_src haskell-ng :results output
+co = lineExample & set (#hudOptions % #legends % each % _2 % #size) 0.2 & set (#hudOptions % #legends % each % _2 % #frame) (Just defaultRectStyle) & set (#hudOptions % #legends % each % _2 % #vgap) 0 & set (#hudOptions % #legends % each % _2 % #outerPad) 0 & set (#hudOptions % #legends % each % _2 % #innerPad) 0 & set (#hudOptions % #legends % each % _2 % #textStyle % #frame) (Just defaultRectStyle) & set (#hudOptions % #legends % each % _2 % #overallScale) 0.5 & set (#hudOptions % #legends % each % _2 % #scaleP) ScalePX
+writeChartOptions "other/line.svg" co
+display co
+#+end_src
+
+#+RESULTS:
+: True
+** Done legend framing bug
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-11-27 Mon 14:45]
+:END:
+
+- [X] add scaleP for legendoptions
+
+lineExample legend with zero gaps and padding highlights that:
+
+- charts scale independently in the X and Y dimensions
+- chart styles scale proportionately.
+
+Thus legends have to choose to compromise by adopting X, Y, Area or MinDim
+
+#+begin_src haskell-ng :results output
+lo0 = defaultLegendOptions & set (#textStyle % #frame) (Just defaultRectStyle) & set #vgap 0 & set #hgap 0 & set #outerPad 0 & set #innerPad 0 & set #overallScale 0.2 & set #size 0.3 & set #legendCharts (take 3 $ fromMaybe undefined $ preview (#hudOptions % #legends % ix 0 % _2 % #legendCharts) lineExample) & set #buffer 0
+
+-- manual construction
+cs = legendChart lo0
+view styleBox' cs
+
+c0 = unnamed [RectChart defaultRectStyle [one]]
+cs'' = cs & over (charts' % each) (scaleChart 0.3)
+cs''' = placeLegend lo0 one cs'' & set (charts' % each % #style % #scaleP) ScalePX
+view styleBox' $ set styleBox' (Just one) (c0 <> cs''')
+
+-- automated construction via HudOptions
+display $ (mempty :: ChartOptions) & set #charts c0 & set (#markupOptions % #chartAspect) (FixedAspect 1) & set #hudOptions (mempty & set #legends [(100,lo0 & set #scaleP ScalePX)]) -- defaultHudOptions
+#+end_src
+
+#+RESULTS:
+: Just Rect -2.5e-3 1.6023999999999998 -9.129999999999999e-2 0.44650000000000006
+: Just Rect -0.5 0.49999999999999994 -0.5 0.5
+: True
+
+#+begin_src haskell-ng :results output
+display $ lineExample & set (#markupOptions % #chartAspect) (FixedAspect 1.5) & set (#hudOptions % #legends % each % _2 % #scaleP) ScalePX
+#+end_src
+
+#+RESULTS:
+: True
+
+** Done surface legend
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-11-28 Tue 14:25]
+:END:
+
+#+begin_src haskell-ng :results output
+display surfaceExample
+#+end_src
+
+#+RESULTS:
+: True
+
+scale and move basic charts
+
+#+begin_src haskell-ng :results output
+c' = [RectChart (defaultRectStyle & set #scaleP NoScaleP)  [one]]
+cs = (mconcat [named "left" c', named "right" c' & over (charts' % each) (scaleChart 0.5 >>> moveChart (Point 0.8 0.25))])
+display $ (mempty :: ChartOptions) & set #charts cs & set #hudOptions defaultHudOptions
+#+end_src
+
+#+RESULTS:
+: True
+
+scale and move legend
+
+#+begin_src haskell-ng :results output
+slc = surfaceLegendChart (Range (-0.5) 0.5) (defaultSurfaceLegendOptions dark "surface" & set (#sloLegendOptions % #vgap) 0.1 & set (#sloLegendOptions % #size) 0.6 & set (#sloLegendOptions % #hgap) 0 & set (#sloLegendOptions % #textStyle % #frame) (Just defaultRectStyle) & set (#sloAxisOptions % #ticks % #gtick) (Just (defaultGlyphTick, HLineGlyph, (-0.014))) & set (#sloAxisOptions % #ticks % #ttick) (Just (defaultTextTick, -0.005))) & set (charts' % each % #style % #scaleP) ScaleMinDim
+display $ (mempty :: ChartOptions) & set #charts (mconcat [named "proxy" c', slc & set (charts' % each % #style % #scaleP) ScalePArea & over (charts' % each) (scaleChart 1 >>> moveChart (Point 0.6 (-0.3)))]) & set #hudOptions defaultHudOptions
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+grain = Point 100 100
+r = one
+f = fst . bimap ((-1.0) *) (fmap ((-1.0) *)) . rosenbrock 1 10
+evenColors = trimColour . over lightness' (const 0.55) . palette1 <$> [0 .. 5]
+so = defaultSurfaceOptions & #soGrain .~ grain & #soRange .~ r & #soStyle % #surfaceColors .~ evenColors
+(cs, rangef) = surfacef f so
+slo = defaultSurfaceLegendOptions dark "surface" & set #sloWidth 0.1 & set (#sloStyle % #surfaceColors) evenColors & set (#sloLegendOptions % #vgap) 0.1 & set (#sloLegendOptions % #size) 0.6 & set (#sloLegendOptions % #hgap) 0 & set (#sloLegendOptions % #textStyle % #frame) (Just defaultRectStyle) & set (#sloAxisOptions % #ticks % #gtick) (Just (defaultGlyphTick, HLineGlyph, (-0.014))) & set (#sloAxisOptions % #ticks % #ttick) (Just (defaultTextTick, -0.005))
+
+slc = surfaceLegendChart rangef slo & set (charts' % each % #style % #scaleP) ScaleMinDim
+-- display $ (mempty :: ChartOptions) & set #charts (mconcat [named "surface" cs, slc & set (charts' % each % #style % #scaleP) ScalePArea & over (charts' % each) (scaleChart 1 >>> moveChart (Point 0.6 (-0.3)))]) & set #hudOptions defaultHudOptions
+display $ (mempty :: ChartOptions) & set #charts (mconcat [slc]) & set #hudOptions defaultHudOptions & #markupOptions .~ (defaultMarkupOptions & #cssOptions % #shapeRendering .~ UseCssCrisp)
+#+end_src
+
+addSurfaceLegend version
+
+#+begin_src haskell-ng :results output
+grain = Point 100 100
+r = one
+f = fst . bimap ((-1.0) *) (fmap ((-1.0) *)) . rosenbrock 1 10
+evenColors = trimColour . over lightness' (const 0.55) . palette1 <$> [0 .. 5]
+so = defaultSurfaceOptions & #soGrain .~ grain & #soRange .~ r & #soStyle % #surfaceColors .~ evenColors
+(cs, rangef) = surfacef f so
+slo = defaultSurfaceLegendOptions dark "surface" & set #sloWidth 0.1 & set (#sloStyle % #surfaceColors) evenColors & set (#sloLegendOptions % #vgap) 0.1 & set (#sloLegendOptions % #size) 0.6 & set (#sloLegendOptions % #hgap) 0 & set (#sloLegendOptions % #textStyle % #frame) (Just defaultRectStyle) & set (#sloAxisOptions % #ticks % #gtick) (Just (defaultGlyphTick, HLineGlyph, (-0.014))) & set (#sloAxisOptions % #ticks % #ttick) (Just (defaultTextTick, -0.005))
+
+slc = surfaceLegendChart rangef slo & set (charts' % each % #style % #scaleP) ScaleMinDim
+-- display $ (mempty :: ChartOptions) & set #charts (mconcat [named "surface" cs, slc & set (charts' % each % #style % #scaleP) ScalePArea & over (charts' % each) (scaleChart 1 >>> moveChart (Point 0.6 (-0.3)))]) & set #hudOptions defaultHudOptions
+display $ (mempty :: ChartOptions) & set #charts (mconcat [slc]) & set #hudOptions defaultHudOptions & #markupOptions .~ (defaultMarkupOptions & #cssOptions % #shapeRendering .~ UseCssCrisp)
+#+end_src
+
+#+RESULTS:
+: True
+
+- [ ] addHud
+- [ ] projectChartTree
+- [ ] mconcat with main chart
+
+co version
+
+#+begin_src haskell-ng :results output
+display $ (mempty :: ChartOptions) & set #charts (gridReferenceChart rangef slo) & set #hudOptions (mempty & set #axes [(1, view #sloAxisOptions slo & set #place PlaceRight)]) & set #markupOptions (defaultMarkupOptions & set (#cssOptions % #shapeRendering) UseCssCrisp) & set (#markupOptions % #chartAspect) (FixedAspect 0.2)
+#+end_src
+
+#+RESULTS:
+: True
+
+charttree version
+
+#+begin_src haskell-ng :results output
+grain = Point 100 100
+r = one
+f = fst . bimap ((-1.0) *) (fmap ((-1.0) *)) . rosenbrock 1 10
+evenColors = trimColour . over lightness' (const 0.55) . palette1 <$> [0 .. 5]
+so = defaultSurfaceOptions & #soGrain .~ grain & #soRange .~ r & #soStyle % #surfaceColors .~ evenColors
+(cs, rangef) = surfacef f so
+
+slo = defaultSurfaceLegendOptions & set (#sloSurfaceStyle % #surfaceColors) evenColors
+grc = gridReferenceChart rangef slo
+hoLegend = (mempty :: HudOptions) & set #axes [(1, view #sloAxisOptions slo)]
+grcLegend = addHud (FixedAspect (view #sloWidth slo)) hoLegend grc
+ct = view #charts surfaceExample
+ctbox = fromMaybe one (view styleBox' ct)
+legbox = projectOnR ctbox one (view #sloRect slo)
+ctBoth = mconcat [projectChartTree legbox grcLegend, ct]
+display $ (mempty :: ChartOptions) & set #charts ctBoth & set #markupOptions (defaultMarkupOptions & set (#cssOptions % #shapeRendering) UseCssCrisp) & set (#markupOptions % #chartAspect) ChartAspect & set #hudOptions defaultHudOptions
+#+end_src
+
+#+RESULTS:
+: True
+
+addSurfaceLegend version
+
+#+begin_src haskell-ng :results output
+grain = Point 100 100
+r = one
+f = fst . bimap ((-1.0) *) (fmap ((-1.0) *)) . rosenbrock 1 10
+evenColors = trimColour . over lightness' (const 0.55) . palette1 <$> [0 .. 5]
+so = defaultSurfaceOptions & #soGrain .~ grain & #soRange .~ r & #soStyle % #surfaceColors .~ evenColors
+(cs, rangef) = surfacef f so
+
+slo = defaultSurfaceLegendOptions & set (#sloSurfaceStyle % #surfaceColors) evenColors & set (#sloDataRange) rangef
+
+cs' = addSurfaceLegend slo (unnamed cs)
+
+display $ (mempty :: ChartOptions) & set #charts cs' & set #markupOptions (defaultMarkupOptions & set (#cssOptions % #shapeRendering) UseCssCrisp) & set (#markupOptions % #chartAspect) ChartAspect & set #hudOptions defaultHudOptions
+#+end_src
+
+#+RESULTS:
+: True
+
+
+#+begin_src haskell-ng :results output
+display $ (mempty :: ChartOptions) & set #charts grcLegend & set (#markupOptions % #chartAspect) ChartAspect & set #hudOptions defaultHudOptions
+#+end_src
+
+#+RESULTS:
+: True
+
+list of valid SLOs
+
+- [ ] sloAxisOptions
+- [ ] place
+- [ ] sloRect (in prop to normalised original chart as one)
+- [ ] sloResolution
+- [ ] sloColors
+- [ ] sloWidth
+
+#+begin_src haskell-ng :results output
+:t addHud
+:t forgetHud
+#+end_src
+
+#+RESULTS:
+: addHud :: ChartAspect -> HudOptions -> ChartTree -> ChartTree
+: forgetHud :: ChartOptions -> ChartOptions
+
+** ToDo compoundExample
+** Done stackExample
+:LOGBOOK:
+- State "Done"       from "ToDo"       [2023-11-24 Fri 06:41]
+:END:
+
+#+begin_src haskell-ng :results output
+display $ mempty & set #charts (stack 4 0.1 (replicate 16 $ (view #charts $ (set (#charts % charts' % each % #style % #scaleP) ScalePArea) $ forgetHud lineExample)))
+#+end_src
+
+#+RESULTS:
+: True
+
+** Done bar & sbar
+:LOGBOOK:
+- State "Done"       from "ToDo"       [2023-11-27 Mon 18:28]
+- State "Done"       from "Next"       [2023-11-23 Thu 20:51]
+:END:
+
+- [X] numbers are badly placed on both X and Y axis
+  - [X] Not due to negative
+- [X] numbers a bit small
+- [X] vgap on legend
+- [X] legend skewif
+- [X] bar Hori text is still Vert
+- [X] Stacked not showing second series
+- [X] bar Hori axis is wrong, extending beyond the original
+
+zeroised
+
+#+begin_src haskell-ng :results output
+e1 = barDataExample & over #barData (fmap (fmap (max 1))) & over #barData (fmap (take 4))
+display $ barChart (defaultBarOptions & set (#barTextStyles % each % #anchor) AnchorMiddle & set (#barTextStyles % each % #size) 0.2 & set #textGap 0 & set #textGapNegative 0) e1 & set (#markupOptions % #chartAspect) (FixedAspect 1) & set (#charts % charts' % each % #style % #scaleP) ScalePArea
+#+end_src
+
+#+RESULTS:
+: True
+
+too dependent on original barRect scale
+
+Hori
+
+#+begin_src haskell-ng :results output
+n = 1
+barDataExample' = barDataExample & over #barData (fmap (fmap (*n)))
+bo = (defaultBarOptions & set (#barOrientation) Hori & set (#barTextStyles % each % #anchor) AnchorMiddle & set (#barTextStyles % each % #size) 0.03 & set #textGap 0.03 & set #textGapNegative 0.05) & set #textShiftVert (-0.008)
+display $ barChart bo barDataExample'
+#+end_src
+
+#+RESULTS:
+: True
+
+Vert
+
+#+begin_src haskell-ng :results output
+n = 1
+barDataExample' = barDataExample & over #barData (fmap (fmap (*n)))
+bo = (defaultBarOptions & set (#barOrientation) Vert & set (#barTextStyles % each % #size) 0.03 & set #textGap 0.03 & set #textGapNegative 0.05) & set #textShiftVert (-0.008)
+display $ barChart bo barDataExample' & set (#markupOptions % #chartAspect) (FixedAspect 1.5) & set (#charts % charts' % each % #style % #scaleP) ScalePArea & set (#hudOptions % #frames) [(101, defaultFrameOptions & set #buffer 0.02)] & set (#hudOptions % #legends) []
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+barRects bo (view #barData barDataExample')
+barTexts bo (view #barData barDataExample')
+#+end_src
+
+** Done ellipse & quad & cubic
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-11-27 Mon 14:52]
+:END:
+- [X] title
+- [X] yaxis ticks
+- [X] quad
+- [X] cubic
+
+** Done text
+:LOGBOOK:
+- State "Done"       from              [2023-11-23 Thu 21:02]
+:END:
+
+#+begin_src haskell-ng :results output
+co = textExample --  & set (#charts % charts' % each % #style % #size) 0.1
+display co
+#+end_src
+
+#+RESULTS:
+: True
+
+** higher number of ticks
+
+#+begin_src haskell-ng :results output
+co = unitExample & set (#hudOptions % #axes % each % _2 % #ticks % #style % numTicks') (Just 8) & over (#charts % charts' % each % #chartData) (scaleChartData 1)
+display co
+#+end_src
+
+#+RESULTS:
+: True
 
 * Exact reproduction of proportionate scaling
 
 Scaling of style elements is proportional to the ratio of areas of the before and after rectangle. This means that individual elements do not scale to the exact proportions of the overall projections.
 
-#+begin_src haskell :results output
+The effect is typically small but in pathological instances can cause irritation.
+
+An extreme example, where:
+
+- tick and text marks fail to scale properly, if NoScaleP (the default) is used.
+- tick marks (almost) scale on ScalePArea, but text tick fails, because of an auto change in format
+
+#+begin_src haskell-ng :results output
+scale = NoScaleP
+asp = FixedAspect 2
+cszero =  (unnamed [blankChart1 one]) & over (charts' % each % #chartData) (scaleChartData 1)
 r1 = fmap (*1) (Rect 0 1 0 1)
-bar' = (AxisBar (blob (grey 0.3 0.1)) 0.05 0 0)
-bar'' = (AxisBar (border 0.001 (grey 0.3 1)) 0.05 0 0)
-rs1 = blob (grey 0.3 0.3)
-tt = defaultTextTick & set #scaleP ScalePArea & set #frame (Just rs1)
-gt = defaultGlyphTick & set #scaleP ScalePArea & set #borderSize 0 & set #color (grey 0.3 0.1) & set #size 0.1
-gt' = (Just (gt, SquareGlyph, 0))
-g = TriangleGlyph (Point 0 1) (Point (-0.5) 0) (Point 0.5 0)
-fa = ((0.536 + (0.536))/ (0.5 + 0.545))
-co = (mempty :: ChartOptions) & set #charts (unnamed [blankChart1 r1]) & set (#markupOptions % #chartAspect) (FixedAspect 1.5) & set (#hudOptions % #frames) [(1,defaultFrameOptions & set #frame (Just rs1))] & set (#hudOptions % #axes) ([(5,defaultXAxisOptions & set #place PlaceBottom), (6,defaultXAxisOptions & set #place PlaceBottom)]) & set (#hudOptions % #axes % each % _2 % #ticks % #ltick) Nothing & set (#hudOptions % #axes % each % _2 % #bar) (Just bar') & set (#hudOptions % #axes % each % _2 % #ticks % #gtick) Nothing & set (#hudOptions % #axes % each % _2 % #ticks % #ttick) (Just (tt,0)) & set (#hudOptions % #axes % each % _2 % #ticks % #style) (TickRound (FormatN FSCommaPrec (Just 1) 2 True True) 2 NoTickExtend)
-display co
+bar' = (AxisBar (border 0.001 (grey 0.3 1)) 0.05 0 0)
+rs1 = border 0.001 (grey 0.3 1)
+tt = (defaultTextTick & set #scaleP scale,0)
+gt = defaultGlyphTick & set #scaleP scale & set #borderSize 0.001 & set #color (grey 0.3 1) & set #size 0.1
+axes0 = [(5,defaultYAxisOptions & set #place PlaceLeft), (5,defaultXAxisOptions & set #place PlaceBottom)] & set (each % _2 % #ticks % #ltick) Nothing & set (each % _2 % #bar) (Just bar') & set (each % _2 % #ticks % #ttick) (Just tt) & set (each % _2 % #ticks % #ttick %? _2) 0 & set (each % _2 % #ticks % #gtick %? _1) gt & set (each % _2 % #ticks % #gtick %? _3) 0.0 & set (each % _2 % #ticks % #ttick %? _1 % #frame) (Just (border 0.005 black))
+cozero = (mempty :: ChartOptions) & set #charts cs & set (#hudOptions % #axes) axes0 & set (#hudOptions % #frames) [(1,defaultFrameOptions & set #frame (Just rs1))] & set (#markupOptions % #chartAspect) asp
+display cozero
 #+end_src
 
 #+RESULTS:
+: True
 
-*** Scaled boxes
+* projectChart
 
-    #+begin_src haskell :results output
-asp = FixedAspect 1
+- [X] get CanvasAspect working
+- [X] find a non-exact single projection
+- [X] styleRebox using jam
+
+** rebox code
+
+styleRebox is ~projectWith (r - (styleBox - box)) box~
+projectChartTree is ~projectWith r styleBox~
+
+#+begin_src haskell-ng :results output
+styleBox_ :: ChartTree -> Maybe (Rect Double)
+styleBox_ = styleBoxes . foldOf charts'
+
+styleRebox_ :: ChartTree -> Maybe (Rect Double) -> ChartTree
+styleRebox_ cs r =
+  cs
+    & over chart' (fromMaybe id $ projectWith <$> r' <*> box_ cs)
+  where
+    r' = (NH.-) <$> r <*> ((NH.-) <$> styleBox_ cs <*> box_ cs)
+
+-- | Lens between a style bounding box and a ChartTree tree.
+--
+-- Note that a round trip may be only approximately isomorphic ie
+--
+-- > forall c r. \c -> view styleBox' . set styleBox' r c ~= r
+styleBox' :: Lens' ChartTree (Maybe (Rect Double))
+styleBox' =
+  lens styleBox_ styleRebox_
+#+end_src
+
+#+begin_src haskell-ng :results output
+-- | Project a chart tree to a new bounding box, guarding against singleton bounds.
+projectChartTree :: Rect Double -> ChartTree -> ChartTree
+projectChartTree new ct = case view styleBox' ct of
+  Nothing -> ct
+  Just b -> ct & over charts' (fmap (projectWith new b))
+-- | projects a Chart to a new space from an old rectangular space, preserving linear metric structure.
+--
+-- FIXME: test singleton protections
+--
+-- >>> projectWith (fmap (2*) one) one r
+-- RectChart (RectStyle {borderSize = 1.0e-2, borderColor = Colour 0.02 0.29 0.48 1.00, color = Colour 0.02 0.73 0.80 0.10}) [Rect -1.0 1.0 -1.0 1.0]
+projectWith :: Rect Double -> Rect Double -> Chart -> Chart
+projectWith new old (Chart s a) =
+  Chart (scaleStyle (scaleRatio (view #scaleP s) new old) s) (projectChartDataWith new old a)
+
+projectChartDataWith :: Rect Double -> Rect Double -> ChartData -> ChartData
+projectChartDataWith new old (RectData a) = RectData (projectOnR new old <$> a)
+projectChartDataWith new old (TextData a) = TextData (second (projectOnP new old) <$> a)
+projectChartDataWith new old (LineData a) = LineData (fmap (projectOnP new old) <$> a)
+projectChartDataWith new old (GlyphData a) = GlyphData (fmap (second (projectOnP new old)) a)
+projectChartDataWith new old (PathData a) = PathData (projectPaths new old a)
+projectChartDataWith new old (BlankData a) = BlankData (projectOnR new old <$> a)
+#+end_src
+
+** projection decomp
+
+#+begin_src haskell-ng :results output
+co = jal
+-- co = tandp
+-- co = lineExample & set (#hudOptions % #legends % each % _2 % #place) PlaceRight & set (#markupOptions % #chartAspect) (CanvasAspect 1.5)
+asp = co & view (#markupOptions % #chartAspect)
 csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
-viewbox = initialCanvas asp csAndHud
-finalCT = projectChartTreeN (view (#markupOptions % #repeatAspect) co) viewbox csAndHud
-sbox <$> (mconcat $ toListOf charts' finalCT)
-view styleBox' finalCT
-view styleBox' csAndHud
-    #+end_src
-
-#+RESULTS:
-: [Just Rect -0.466413194519965 0.466413194519965 -0.45721626154242156 0.5,Just Rect -0.466413194519965 0.466413194519965 -0.45721626154242156 0.5,Just Rect -0.5000000000000002 0.5000000000000002 -0.49999999999999994 -0.45894945996884584]
-: Just Rect -0.5000000000000002 0.5000000000000002 -0.49999999999999994 0.5
-: Just Rect -0.5489186602870815 0.5489186602870815 -0.545 0.5
-
-#+begin_src haskell :results output
-
-(0.536 + (0.536))/ (0.5 + 0.545)
+viewbox = finalCanvas asp (Just csAndHud)
+finalCT = projectChartTreeN 4 viewbox csAndHud
+boxs' = sbox <$> (mconcat $ toListOf charts' finalCT)
+ct' = projectChartTree viewbox csAndHud
+ct'' = set styleBox' (Just viewbox) csAndHud
+putStrLn ("initial:  " <> show (initialCanvas asp Nothing))
+putStrLn ("csAndHud: " <> maybe "" show (view styleBox' csAndHud))
+putStrLn ("single:   " <> maybe "" show (view styleBox' ct'))
+putStrLn ("final:    " <> maybe "" show (view styleBox' finalCT))
+putStrLn ("rebox:    " <> maybe "" show (view styleBox' (set styleBox' (Just viewbox) csAndHud)))
+ct' == ct''
+display (mempty & set #charts csAndHud & set (#markupOptions % #chartAspect) ChartAspect)
 #+end_src
 
 #+RESULTS:
-: 1.0258373205741629
+: initial:  Rect -0.5 0.5 -0.5 0.5
+: csAndHud: Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+: single:   Rect -0.5387155110912017 0.8141468207614003 -0.5 0.5
+: final:    Rect -0.5 0.5326563466786947 -0.5 0.5
+: rebox:    Rect -0.5387155110912017 0.8141468207614003 -0.5 0.5
+: True
+: True
 
-An exact projection would be:
+** multi bulk test
 
-#+begin_src haskell :results output
-p0 = fromMaybe undefined (view styleBox' csAndHud)
-p0
-c0 = mconcat $ toListOf charts' csAndHud
-p' = projectRect p0 (aspect 1) :: Rect Double -> Rect Double
-fmap p' . sbox <$> c0
+#+begin_src haskell-ng :results output
+pPrint $ filter ((\(x,_,_) -> not x) . snd) $ second (sameMulti) <$> pathChartOptions
 #+end_src
 
 #+RESULTS:
-: Rect -0.5489186602870815 0.5489186602870815 -0.545 0.5
-: [Just Rect -0.4672082563369478 0.46720825633694774 -0.45693779904306214 0.5,Just Rect -0.4672082563369478 0.46720825633694774 -0.45693779904306214 0.5,Just Rect -0.5 0.5 -0.5 -0.45789473684210524]
+#+begin_example
+[
+    ( "other/text.svg"
+    ,
+        ( False
+        , Just Rect -0.75 0.75 -0.5 0.5
+        , Just Rect -0.75 0.7499999999999998 -0.5 0.5
+        )
+    )
+,
+    ( "other/bar.svg"
+    ,
+        ( False
+        , Just Rect -0.75 0.75 -0.5 0.5
+        , Just Rect -0.75 0.75 -0.49999999999999994 0.5
+        )
+    )
+,
+    ( "other/sbar.svg"
+    ,
+        ( False
+        , Just Rect -0.75 0.75 -0.5 0.5
+        , Just Rect -0.75 0.75 -0.49999999999999994 0.5
+        )
+    )
+,
+    ( "other/wave.svg"
+    ,
+        ( False
+        , Just Rect -0.75 0.75 -0.5 0.5
+        , Just Rect -0.75 0.7499999999999998 -0.5 0.5
+        )
+    )
+,
+    ( "other/path.svg"
+    ,
+        ( False
+        , Just Rect -0.4682206444223888 0.4682206444223888 -0.5 0.5
+        , Just Rect -0.4682206444223888 0.4682206444223888 -0.5 0.4999999999999999
+        )
+    )
+,
+    ( "other/date.svg"
+    ,
+        ( False
+        , Just Rect -0.75 0.7500000000000001 -0.5 0.4999999999999999
+        , Just Rect -0.75 0.7500000000000001 -0.49999999999999994 0.5
+        )
+    )
+,
+    ( "other/priorityv1.svg"
+    ,
+        ( False
+        , Just Rect -0.75 0.75 -0.5 0.5
+        , Just Rect -0.75 0.7500000000000002 -0.5 0.5
+        )
+    )
+,
+    ( "other/priorityv2.svg"
+    ,
+        ( False
+        , Just Rect -0.75 0.75 -0.5 0.5
+        , Just Rect -0.75 0.7500000000000002 -0.5 0.5
+        )
+    )
+]
+#+end_example
 
-#+begin_src haskell :results output
-ct' = projectChartTree one csAndHud
-view styleBox' ct'
+* jam
+
+#+begin_src haskell-ng :results output
+exampleText = ["jam"]
+tsScale = defaultTextStyle & set #frame (Just defaultRectStyle) & set #anchor AnchorMiddle & set #scaleP ScaleMinDim
+textScale = zipWith (\t x -> TextChart tsScale [(t, Point 0 x)]) exampleText [0..]
+ct = unnamed textScale
+jam = mempty & #charts .~ ct & set (#hudOptions % #frames) [(100,defaultFrameOptions & set #buffer 0 & set #frame (Just $ blob (grey 0.5 0.1)))] & set (#markupOptions % #chartAspect) (FixedAspect 2) :: ChartOptions
+display jam
 #+end_src
 
 #+RESULTS:
-: Just Rect -0.5008187862982173 0.5008187862982173 -0.4997202563985731 0.5
+: True
 
-* variance data range test
+** Done unscaled + no hud
+:LOGBOOK:
+- State "Done"       from              [2023-11-24 Fri 18:03]
+:END:
 
-#+begin_src haskell :results output
-co = unitExample & over (#charts % charts' % each % #chartData) (scaleChartData 1e6)
+#+begin_src haskell-ng :results output
+co = jam & set (#markupOptions % #chartAspect) UnscaledAspect & set #hudOptions mempty
 display co
-#+end_src
 
-* chart-svg-dev: styleBox' versus styleBoxN' versus projectChartTree
+asp = co & view (#markupOptions % #chartAspect)
+icanvas = initialCanvas asp Nothing
+cs = view #charts co
+csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+viewbox = finalCanvas asp (Just csAndHud)
+csAndHudSingle = set styleBox' (Just viewbox) csAndHud
+csm = set (styleBoxN' 10) (Just viewbox) csAndHud
+csp = projectChartWith (view (#markupOptions % #repeatAspect) co) (view (#markupOptions % #chartAspect) co) (view #hudOptions co) cs
 
-- [ ] Use styleBox' or projectChartTree?
-- [ ] exact reversal
-- [ ] jal does not converge
+-- addHud
+ho = view #hudOptions co
+db = maybe one padSingletons (view box' cs)
+(mdb, hs) = toHuds ho db
+csPadded = cs <> maybe mempty (\r -> bool (named "datapadding" [BlankChart defaultStyle [r]]) mempty (r == db)) mdb
+ivb = initialCanvas asp (Just csPadded)
+db' = fromMaybe db mdb
+csAndHud' = runHudWith ivb db' hs csPadded
+hc0 = cs & set styleBox' (Just ivb)
 
-#+begin_src haskell :results output
-view styleBox' ct
+-- projectWith
+new = ivb
+old = fromMaybe one $ view styleBox' csPadded
+csPaddeds = toListOf charts' csPadded & mconcat
+pwData = csPaddeds & over (each % #chartData) (projectChartDataWith new old)
+pwC = pwData & over (each % #style) (\s -> scaleStyle (scaleRatio (view #scaleP s) new old) s)
+pwRatio = scaleRatio (view #scaleP (head $ view #style <$> pwC)) new old
+pwStyle = view #style (head pwC)
+pwC' = unnamed pwC
+
+
+csp & view styleBox' & NH.traverse_ (show >>> ("co:" <>) >>> putStrLn)
+
+icanvas & (show >>> ("initial canvas:" <>) >>> putStrLn)
+cs & view styleBox' & NH.traverse_ (show >>> ("initial chart:" <>) >>> putStrLn)
+csAndHud & view styleBox' & NH.traverse_ (show >>> ("csAndHud:" <>) >>> putStrLn)
+viewbox & (show >>> ("final canvas:" <>) >>> putStrLn)
+csAndHudSingle & view styleBox' & NH.traverse_ (show >>> ("single proj:" <>) >>> putStrLn)
+csm & view styleBox' & NH.traverse_ (show >>> ("multi proj:" <>) >>> putStrLn)
+csPadded & view styleBox' & NH.traverse_ (show >>> ("padding:" <>) >>> putStrLn)
+ivb & (show >>> ("initial padded canvas:" <>) >>> putStrLn)
+hc0 & view styleBox' & NH.traverse_ (show >>> ("hc0:" <>) >>> putStrLn)
+csAndHud' & view styleBox' & NH.traverse_ (show >>> ("runHudWith:" <>) >>> putStrLn)
+
+-- projectWith
+ratio new & (show >>> ("ratio new:" <>) >>> putStrLn)
+ratio old & (show >>> ("ratio old:" <>) >>> putStrLn)
+pwRatio & (show >>> ("scale ratio:" <>) >>> putStrLn)
+
+
+db' & (show >>> ("data box padded:" <>) >>> putStrLn)
+
+svgViewbox (Rect x z y w) = (x, (-w), (z-x), (w-y))
+svgvb = svgViewbox <$> (view styleBox' csm)
+svgvb & NH.traverse_ (show >>> ("svg viewbox:" <>) >>> putStrLn)
+
 #+end_src
 
 #+RESULTS:
-: Just Rect -6.0e-4 0.21659999999999996 2.5899999999999996e-2 0.1591
+#+begin_example
+True
+co:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+initial canvas:Rect -0.5 0.5 -0.5 0.5
+initial chart:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+csAndHud:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+final canvas:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+single proj:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+multi proj:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+padding:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+initial padded canvas:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+hc0:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+runHudWith:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+ratio new:1.63063063063063
+ratio old:1.63063063063063
+scale ratio:1.0
+data box padded:Rect -0.5 0.5 -0.5 0.5
+svg viewbox:(-3.0e-4,-4.83e-2,0.10859999999999997,6.66e-2)
+#+end_example
 
-#+begin_src haskell :results output
-aspect 2
+** Done unscaled + zero frame
+:LOGBOOK:
+- State "Done"       from              [2023-11-24 Fri 18:03]
+:END:
+
+#+begin_src haskell-ng :results output
+co = jam & set (#markupOptions % #chartAspect) UnscaledAspect & set #hudOptions mempty & set (#hudOptions % #frames) [(100,defaultFrameOptions & set #buffer 0 & set #frame (Just $ blob (grey 0.5 0.1)))]
+display co
+
+asp = co & view (#markupOptions % #chartAspect)
+icanvas = initialCanvas asp Nothing
+cs = view #charts co
+csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+viewbox = finalCanvas asp (Just csAndHud)
+csAndHudSingle = set styleBox' (Just viewbox) csAndHud
+csm = set (styleBoxN' 10) (Just viewbox) csAndHud
+csp = projectChartWith (view (#markupOptions % #repeatAspect) co) (view (#markupOptions % #chartAspect) co) (view #hudOptions co) cs
+
+-- addHud
+ho = view #hudOptions co
+db = maybe one padSingletons (view box' cs)
+(mdb, hs) = toHuds ho db
+csPadded = cs <> maybe mempty (\r -> bool (named "datapadding" [BlankChart defaultStyle [r]]) mempty (r == db)) mdb
+ivb = initialCanvas asp (Just csPadded)
+db' = fromMaybe db mdb
+csAndHud' = runHudWith ivb db' hs csPadded
+hc0 = cs & set styleBox' (Just ivb)
+
+-- projectWith
+new = ivb
+old = fromMaybe one $ view styleBox' csPadded
+csPaddeds = toListOf charts' csPadded & mconcat
+pwData = csPaddeds & over (each % #chartData) (projectChartDataWith new old)
+pwC = pwData & over (each % #style) (\s -> scaleStyle (scaleRatio (view #scaleP s) new old) s)
+pwRatio = scaleRatio (view #scaleP (head $ view #style <$> pwC)) new old
+pwStyle = view #style (head pwC)
+pwC' = unnamed pwC
+
+
+csp & view styleBox' & NH.traverse_ (show >>> ("co:" <>) >>> putStrLn)
+
+icanvas & (show >>> ("initial canvas:" <>) >>> putStrLn)
+cs & view styleBox' & NH.traverse_ (show >>> ("initial chart:" <>) >>> putStrLn)
+csAndHud & view styleBox' & NH.traverse_ (show >>> ("csAndHud:" <>) >>> putStrLn)
+viewbox & (show >>> ("final canvas:" <>) >>> putStrLn)
+csAndHudSingle & view styleBox' & NH.traverse_ (show >>> ("single proj:" <>) >>> putStrLn)
+csm & view styleBox' & NH.traverse_ (show >>> ("multi proj:" <>) >>> putStrLn)
+csPadded & view styleBox' & NH.traverse_ (show >>> ("padding:" <>) >>> putStrLn)
+ivb & (show >>> ("initial padded canvas:" <>) >>> putStrLn)
+hc0 & view styleBox' & NH.traverse_ (show >>> ("hc0:" <>) >>> putStrLn)
+csAndHud' & view styleBox' & NH.traverse_ (show >>> ("runHudWith:" <>) >>> putStrLn)
+
+-- projectWith
+ratio new & (show >>> ("ratio new:" <>) >>> putStrLn)
+ratio old & (show >>> ("ratio old:" <>) >>> putStrLn)
+pwRatio & (show >>> ("scale ratio:" <>) >>> putStrLn)
+
+
+db' & (show >>> ("data box padded:" <>) >>> putStrLn)
+
+svgViewbox (Rect x z y w) = (x, (-w), (z-x), (w-y))
+svgvb = svgViewbox <$> (view styleBox' csm)
+svgvb & NH.traverse_ (show >>> ("svg viewbox:" <>) >>> putStrLn)
+
 #+end_src
 
 #+RESULTS:
-: Rect -1.0 1.0 -0.5 0.5
+#+begin_example
+True
+co:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+initial canvas:Rect -0.5 0.5 -0.5 0.5
+initial chart:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+csAndHud:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+final canvas:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+single proj:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+multi proj:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+padding:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+initial padded canvas:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+hc0:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+runHudWith:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+ratio new:1.63063063063063
+ratio old:1.63063063063063
+scale ratio:1.0
+data box padded:Rect -0.5 0.5 -0.5 0.5
+svg viewbox:(-3.0e-4,-4.83e-2,0.10859999999999997,6.66e-2)
+#+end_example
 
-single application of styleBox projections
+** Done ChartAspect + no hud
+:LOGBOOK:
+- State "Done"       from              [2023-11-26 Sun 07:50]
+- State "Done"       from              [2023-11-24 Fri 18:03]
+:END:
 
-#+begin_src haskell :results output
-ct1 = set styleBox' (Just $ aspect 2) ct
-view styleBox' ct1
-ctn = set (styleBoxN' 10) (Just $ aspect 2) ct
-view styleBox' ctn
+- [X] border cool as!
+
+#+begin_src haskell-ng :results output
+co = jam & set (#markupOptions % #chartAspect) ChartAspect & set #hudOptions mempty
+display co
+
+asp = co & view (#markupOptions % #chartAspect)
+icanvas = initialCanvas asp Nothing
+cs = view #charts co
+csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+viewbox = finalCanvas asp (Just csAndHud)
+csAndHudSingle = set styleBox' (Just viewbox) csAndHud
+csm = set (styleBoxN' 10) (Just viewbox) csAndHud
+csp = projectChartWith (view (#markupOptions % #repeatAspect) co) (view (#markupOptions % #chartAspect) co) (view #hudOptions co) cs
+
+-- addHud
+ho = view #hudOptions co
+db = maybe one padSingletons (view box' cs)
+(mdb, hs) = toHuds ho db
+csPadded = cs <> maybe mempty (\r -> bool (named "datapadding" [BlankChart defaultStyle [r]]) mempty (r == db)) mdb
+ivb = initialCanvas asp (Just csPadded)
+db' = fromMaybe db mdb
+csAndHud' = runHudWith ivb db' hs csPadded
+hc0 = cs & set styleBox' (Just ivb)
+
+-- projectWith
+new = ivb
+old = fromMaybe one $ view styleBox' csPadded
+csPaddeds = toListOf charts' csPadded & mconcat
+pwData = csPaddeds & over (each % #chartData) (projectChartDataWith new old)
+pwC = pwData & over (each % #style) (\s -> scaleStyle (scaleRatio (view #scaleP s) new old) s)
+pwRatio = scaleRatio (view #scaleP (head $ view #style <$> pwC)) new old
+pwStyle = view #style (head pwC)
+pwC' = unnamed pwC
+
+
+csp & view styleBox' & NH.traverse_ (show >>> ("co:" <>) >>> putStrLn)
+
+icanvas & (show >>> ("initial canvas:" <>) >>> putStrLn)
+cs & view styleBox' & NH.traverse_ (show >>> ("initial chart:" <>) >>> putStrLn)
+csAndHud & view styleBox' & NH.traverse_ (show >>> ("csAndHud:" <>) >>> putStrLn)
+viewbox & (show >>> ("final canvas:" <>) >>> putStrLn)
+csAndHudSingle & view styleBox' & NH.traverse_ (show >>> ("single proj:" <>) >>> putStrLn)
+csm & view styleBox' & NH.traverse_ (show >>> ("multi proj:" <>) >>> putStrLn)
+csPadded & view styleBox' & NH.traverse_ (show >>> ("padding:" <>) >>> putStrLn)
+ivb & (show >>> ("initial padded canvas:" <>) >>> putStrLn)
+hc0 & view styleBox' & NH.traverse_ (show >>> ("hc0:" <>) >>> putStrLn)
+csAndHud' & view styleBox' & NH.traverse_ (show >>> ("runHudWith:" <>) >>> putStrLn)
+
+-- projectWith
+ratio new & (show >>> ("ratio new:" <>) >>> putStrLn)
+ratio old & (show >>> ("ratio old:" <>) >>> putStrLn)
+pwRatio & (show >>> ("scale ratio:" <>) >>> putStrLn)
+
+
+db' & (show >>> ("data box padded:" <>) >>> putStrLn)
+
+svgViewbox (Rect x z y w) = (x, (-w), (z-x), (w-y))
+svgvb = svgViewbox <$> (view styleBox' csm)
+svgvb & NH.traverse_ (show >>> ("svg viewbox:" <>) >>> putStrLn)
+
 #+end_src
 
 #+RESULTS:
-: Just Rect -6.0e-4 0.21659999999999996 2.5899999999999996e-2 0.1591
-: Just Rect -6.0e-4 0.21659999999999996 2.5899999999999996e-2 0.1591
+#+begin_example
+True
+co:Rect -0.8153153153153152 0.8153153153153152 -0.5 0.5
+initial canvas:Rect -0.5 0.5 -0.5 0.5
+initial chart:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+csAndHud:Rect -0.815315315315315 0.8153153153153154 -0.5 0.5
+final canvas:Rect -0.8153153153153152 0.8153153153153152 -0.5 0.5
+single proj:Rect -0.8153153153153152 0.8153153153153152 -0.5 0.5
+multi proj:Rect -0.8153153153153152 0.8153153153153152 -0.5 0.5
+padding:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+initial padded canvas:Rect -0.815315315315315 0.815315315315315 -0.5 0.5
+hc0:Rect -0.815315315315315 0.8153153153153154 -0.5 0.5
+runHudWith:Rect -0.815315315315315 0.8153153153153154 -0.5 0.5
+ratio new:1.63063063063063
+ratio old:1.63063063063063
+scale ratio:15.015015015015013
+data box padded:Rect -0.5 0.5 -0.5 0.5
+svg viewbox:(-0.8153153153153152,-0.5,1.6306306306306304,1.0)
+#+end_example
 
-#+begin_src haskell :results output
-ct' = projectChartTree (aspect 2) ct
-view styleBox' ct'
+** Done ChartAspect + zero frame
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-11-26 Sun 07:59]
+- State "Done"       from              [2023-11-26 Sun 07:50]
+- State "Done"       from              [2023-11-24 Fri 18:03]
+:END:
+
+#+begin_src haskell-ng :results output
+co = jam & set (#markupOptions % #chartAspect) ChartAspect & set #hudOptions mempty & set (#hudOptions % #frames) [(100,defaultFrameOptions & set #buffer 0 & set #frame (Just $ blob (grey 0.5 0.1)))]
+display co
+
+asp = co & view (#markupOptions % #chartAspect)
+icanvas = initialCanvas asp Nothing
+cs = view #charts co
+csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+viewbox = finalCanvas asp (Just csAndHud)
+csAndHudSingle = set styleBox' (Just viewbox) csAndHud
+csm = set (styleBoxN' 10) (Just viewbox) csAndHud
+csp = projectChartWith (view (#markupOptions % #repeatAspect) co) (view (#markupOptions % #chartAspect) co) (view #hudOptions co) cs
+
+-- addHud
+ho = view #hudOptions co
+db = maybe one padSingletons (view box' cs)
+(mdb, hs) = toHuds ho db
+csPadded = cs <> maybe mempty (\r -> bool (named "datapadding" [BlankChart defaultStyle [r]]) mempty (r == db)) mdb
+ivb = initialCanvas asp (Just csPadded)
+db' = fromMaybe db mdb
+csAndHud' = runHudWith ivb db' hs csPadded
+hc0 = cs & set styleBox' (Just ivb)
+
+-- projectWith
+new = ivb
+old = fromMaybe one $ view styleBox' csPadded
+csPaddeds = toListOf charts' csPadded & mconcat
+pwData = csPaddeds & over (each % #chartData) (projectChartDataWith new old)
+pwC = pwData & over (each % #style) (\s -> scaleStyle (scaleRatio (view #scaleP s) new old) s)
+pwRatio = scaleRatio (view #scaleP (head $ view #style <$> pwC)) new old
+pwStyle = view #style (head pwC)
+pwC' = unnamed pwC
+
+
+csp & view styleBox' & NH.traverse_ (show >>> ("co:" <>) >>> putStrLn)
+
+icanvas & (show >>> ("initial canvas:" <>) >>> putStrLn)
+cs & view styleBox' & NH.traverse_ (show >>> ("initial chart:" <>) >>> putStrLn)
+csAndHud & view styleBox' & NH.traverse_ (show >>> ("csAndHud:" <>) >>> putStrLn)
+viewbox & (show >>> ("final canvas:" <>) >>> putStrLn)
+csAndHudSingle & view styleBox' & NH.traverse_ (show >>> ("single proj:" <>) >>> putStrLn)
+csm & view styleBox' & NH.traverse_ (show >>> ("multi proj:" <>) >>> putStrLn)
+csPadded & view styleBox' & NH.traverse_ (show >>> ("padding:" <>) >>> putStrLn)
+ivb & (show >>> ("initial padded canvas:" <>) >>> putStrLn)
+hc0 & view styleBox' & NH.traverse_ (show >>> ("hc0:" <>) >>> putStrLn)
+csAndHud' & view styleBox' & NH.traverse_ (show >>> ("runHudWith:" <>) >>> putStrLn)
+
+-- projectWith
+ratio new & (show >>> ("ratio new:" <>) >>> putStrLn)
+ratio old & (show >>> ("ratio old:" <>) >>> putStrLn)
+pwRatio & (show >>> ("scale ratio:" <>) >>> putStrLn)
+
+
+db' & (show >>> ("data box padded:" <>) >>> putStrLn)
+
+svgViewbox (Rect x z y w) = (x, (-w), (z-x), (w-y))
+svgvb = svgViewbox <$> (view styleBox' csm)
+svgvb & NH.traverse_ (show >>> ("svg viewbox:" <>) >>> putStrLn)
+
 #+end_src
 
 #+RESULTS:
-: Just Rect -1.0359530801519752 0.8429217253210086 -0.566022987491008 0.6144389040994819
+#+begin_example
+True
+co:Rect -0.8153153153153152 0.8153153153153152 -0.5 0.5
+initial canvas:Rect -0.5 0.5 -0.5 0.5
+initial chart:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+csAndHud:Rect -0.815315315315315 0.8153153153153154 -0.5 0.5
+final canvas:Rect -0.8153153153153152 0.8153153153153152 -0.5 0.5
+single proj:Rect -0.8153153153153152 0.8153153153153152 -0.5 0.5
+multi proj:Rect -0.8153153153153152 0.8153153153153152 -0.5 0.5
+padding:Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+initial padded canvas:Rect -0.815315315315315 0.815315315315315 -0.5 0.5
+hc0:Rect -0.815315315315315 0.8153153153153154 -0.5 0.5
+runHudWith:Rect -0.815315315315315 0.8153153153153154 -0.5 0.5
+ratio new:1.63063063063063
+ratio old:1.63063063063063
+scale ratio:15.015015015015013
+data box padded:Rect -0.5 0.5 -0.5 0.5
+svg viewbox:(-0.8153153153153152,-0.5,1.6306306306306304,1.0)
+#+end_example
 
-#+begin_src haskell :results output
-ct' = foldr ($) ct (replicate 10 (projectChartTree (aspect 2)))
-view styleBox' ct'
+** Done FixedAspect + no hud
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-11-26 Sun 12:04]
+- State "Done"       from "Next"       [2023-11-26 Sun 07:59]
+- State "Done"       from              [2023-11-26 Sun 07:50]
+- State "Done"       from              [2023-11-24 Fri 18:03]
+:END:
+
+With no hud, the viewbox is keyed off of the styleBox of the chart, which is different to the FixedAspect 1 requested.
+
+#+begin_src haskell-ng :results output
+co = jam & set (#markupOptions % #chartAspect) (FixedAspect 1) & set #hudOptions mempty & set (#charts % charts' % each % #style % #scaleP) ScaleMinDim & set (#charts % charts' % each % #style % #anchor) AnchorMiddle
+display co
+
+asp = co & view (#markupOptions % #chartAspect)
+icanvas = initialCanvas asp Nothing
+cs = view #charts co
+csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+viewbox = finalCanvas asp (Just csAndHud)
+csAndHudSingle = set styleBox' (Just viewbox) csAndHud
+csm = set (styleBoxN' 10) (Just viewbox) csAndHud
+csp = projectChartWith (view (#markupOptions % #repeatAspect) co) (view (#markupOptions % #chartAspect) co) (view #hudOptions co) cs
+
+-- addHud
+ho = view #hudOptions co
+db = maybe one padSingletons (view box' cs)
+(mdb, hs) = toHuds ho db
+csPadded = cs <> maybe mempty (\r -> bool (named "datapadding" [BlankChart defaultStyle [r]]) mempty (r == db)) mdb
+ivb = initialCanvas asp (Just csPadded)
+db' = fromMaybe db mdb
+csAndHud' = runHudWith ivb db' hs csPadded
+hc0 = cs & set styleBox' (Just ivb)
+
+-- projectWith
+new = ivb
+old = fromMaybe one $ view styleBox' csPadded
+csPaddeds = toListOf charts' csPadded & mconcat
+pwData = csPaddeds & over (each % #chartData) (projectChartDataWith new old)
+pwC = pwData & over (each % #style) (\s -> scaleStyle (scaleRatio (view #scaleP s) new old) s)
+pwRatio = scaleRatio (view #scaleP (head $ view #style <$> pwC)) new old
+pwStyle = view #style (head pwC)
+pwC' = unnamed pwC
+
+
+csp & view styleBox' & NH.traverse_ (show >>> ("co:" <>) >>> putStrLn)
+
+icanvas & (show >>> ("initial canvas:" <>) >>> putStrLn)
+cs & view styleBox' & NH.traverse_ (show >>> ("initial chart:" <>) >>> putStrLn)
+csAndHud & view styleBox' & NH.traverse_ (show >>> ("csAndHud:" <>) >>> putStrLn)
+viewbox & (show >>> ("final canvas:" <>) >>> putStrLn)
+csAndHudSingle & view styleBox' & NH.traverse_ (show >>> ("single proj:" <>) >>> putStrLn)
+csm & view styleBox' & NH.traverse_ (show >>> ("multi proj:" <>) >>> putStrLn)
+csPadded & view styleBox' & NH.traverse_ (show >>> ("padding:" <>) >>> putStrLn)
+ivb & (show >>> ("initial padded canvas:" <>) >>> putStrLn)
+hc0 & view styleBox' & NH.traverse_ (show >>> ("hc0:" <>) >>> putStrLn)
+csAndHud' & view styleBox' & NH.traverse_ (show >>> ("runHudWith:" <>) >>> putStrLn)
+
+-- projectWith
+ratio new & (show >>> ("ratio new:" <>) >>> putStrLn)
+ratio old & (show >>> ("ratio old:" <>) >>> putStrLn)
+pwRatio & (show >>> ("scale ratio:" <>) >>> putStrLn)
+
+db' & (show >>> ("data box padded:" <>) >>> putStrLn)
+
+svgViewbox (Rect x z y w) = (x, (-w), (z-x), (w-y))
+svgvb = svgViewbox <$> (view styleBox' csm)
+svgvb & NH.traverse_ (show >>> ("svg viewbox:" <>) >>> putStrLn)
+
 #+end_src
 
 #+RESULTS:
-: Just Rect -0.9954771728174939 0.7898170527447951 -0.5346342740252994 0.5856292496911748
+#+begin_example
+True
+co:Rect -0.5000000000000002 0.5000000000000002 -0.3937335125180429 0.2195261559902446
+initial canvas:Rect -0.5 0.5 -0.5 0.5
+initial chart:Rect -5.4299999999999994e-2 5.4299999999999994e-2 -1.8300000000000004e-2 4.83e-2
+csAndHud:Rect -0.5 0.4999999999999999 -0.39373351251804295 0.2195261559902445
+final canvas:Rect -0.5 0.5 -0.5 0.5
+single proj:Rect -0.5000000000000002 0.5000000000000002 -0.3937335125180429 0.2195261559902446
+multi proj:Rect -0.5000000000000002 0.5000000000000002 -0.3937335125180429 0.2195261559902446
+padding:Rect -5.4299999999999994e-2 5.4299999999999994e-2 -1.8300000000000004e-2 4.83e-2
+initial padded canvas:Rect -0.5 0.5 -0.5 0.5
+hc0:Rect -0.5 0.4999999999999999 -0.39373351251804295 0.2195261559902445
+runHudWith:Rect -0.5 0.4999999999999999 -0.39373351251804295 0.2195261559902445
+ratio new:1.0
+ratio old:1.6306306306306302
+scale ratio:9.208103130755065
+data box padded:Rect -0.5 0.5 -0.5 0.5
+svg viewbox:(-0.5000000000000002,-0.2195261559902446,1.0000000000000004,0.6132596685082875)
+#+end_example
 
-* text chart scaling
-
-  #+begin_src haskell :results output
-exampleText <- fmap T.pack <$> replicateM 1 (unwords <$> replicateM 3 word)
-exampleText
-  #+end_src
+#+begin_src haskell-ng :results output
+toListOf (each % #chartData) csPaddeds
+toListOf (each % #chartData) pwData
+exp1 = csPaddeds & over (each % #chartData) id & over (each % #style) (\s -> scaleStyle 6 (set #scaleP ScaleMinDim s))
+#+end_src
 
 #+RESULTS:
+: [TextData [("jam",Point 0.0 0.0)]]
+: [TextData [("jam",Point -5.551115123125783e-17 -0.2252252252252252)]]
+: True
 
-**** text scaling example
+** Done FixedAspect + zero frame
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-11-26 Sun 12:08]
+- State "Done"       from "Next"       [2023-11-26 Sun 12:04]
+- State "Done"       from "Next"       [2023-11-26 Sun 07:59]
+- State "Done"       from              [2023-11-26 Sun 07:50]
+- State "Done"       from              [2023-11-24 Fri 18:03]
+:END:
 
-#+begin_src haskell :results output
+#+begin_src haskell-ng :results output
+co = jam & set (#markupOptions % #chartAspect) (FixedAspect 1) & set #hudOptions mempty & set (#charts % charts' % each % #style % #scaleP) ScaleMinDim & set (#charts % charts' % each % #style % #anchor) AnchorMiddle & set (#hudOptions % #frames) [(100,defaultFrameOptions & set #buffer 0 & set #frame (Just $ blob (grey 0.5 0.1)))]
+display co
+
+asp = co & view (#markupOptions % #chartAspect)
+icanvas = initialCanvas asp Nothing
+cs = view #charts co
+csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+viewbox = finalCanvas asp (Just csAndHud)
+csAndHudSingle = set styleBox' (Just viewbox) csAndHud
+csm = set (styleBoxN' 10) (Just viewbox) csAndHud
+csp = projectChartWith (view (#markupOptions % #repeatAspect) co) (view (#markupOptions % #chartAspect) co) (view #hudOptions co) cs
+
+-- addHud
+ho = view #hudOptions co
+db = maybe one padSingletons (view box' cs)
+(mdb, hs) = toHuds ho db
+csPadded = cs <> maybe mempty (\r -> bool (named "datapadding" [BlankChart defaultStyle [r]]) mempty (r == db)) mdb
+ivb = initialCanvas asp (Just csPadded)
+db' = fromMaybe db mdb
+csAndHud' = runHudWith ivb db' hs csPadded
+hc0 = cs & set styleBox' (Just ivb)
+
+-- projectWith
+new = ivb
+old = fromMaybe one $ view styleBox' csPadded
+csPaddeds = toListOf charts' csPadded & mconcat
+pwData = csPaddeds & over (each % #chartData) (projectChartDataWith new old)
+pwC = pwData & over (each % #style) (\s -> scaleStyle (scaleRatio (view #scaleP s) new old) s)
+pwRatio = scaleRatio (view #scaleP (head $ view #style <$> pwC)) new old
+pwStyle = view #style (head pwC)
+pwC' = unnamed pwC
+
+
+csp & view styleBox' & NH.traverse_ (show >>> ("co:" <>) >>> putStrLn)
+
+icanvas & (show >>> ("initial canvas:" <>) >>> putStrLn)
+cs & view styleBox' & NH.traverse_ (show >>> ("initial chart:" <>) >>> putStrLn)
+csAndHud & view styleBox' & NH.traverse_ (show >>> ("csAndHud:" <>) >>> putStrLn)
+viewbox & (show >>> ("final canvas:" <>) >>> putStrLn)
+csAndHudSingle & view styleBox' & NH.traverse_ (show >>> ("single proj:" <>) >>> putStrLn)
+csm & view styleBox' & NH.traverse_ (show >>> ("multi proj:" <>) >>> putStrLn)
+csPadded & view styleBox' & NH.traverse_ (show >>> ("padding:" <>) >>> putStrLn)
+ivb & (show >>> ("initial padded canvas:" <>) >>> putStrLn)
+hc0 & view styleBox' & NH.traverse_ (show >>> ("hc0:" <>) >>> putStrLn)
+csAndHud' & view styleBox' & NH.traverse_ (show >>> ("runHudWith:" <>) >>> putStrLn)
+
+-- projectWith
+ratio new & (show >>> ("ratio new:" <>) >>> putStrLn)
+ratio old & (show >>> ("ratio old:" <>) >>> putStrLn)
+pwRatio & (show >>> ("scale ratio:" <>) >>> putStrLn)
+
+db' & (show >>> ("data box padded:" <>) >>> putStrLn)
+
+svgViewbox (Rect x z y w) = (x, (-w), (z-x), (w-y))
+svgvb = svgViewbox <$> (view styleBox' csm)
+svgvb & NH.traverse_ (show >>> ("svg viewbox:" <>) >>> putStrLn)
+
+#+end_src
+
+#+RESULTS:
+#+begin_example
+True
+co:Rect -0.5000000000000002 0.5000000000000002 -0.5 0.5
+initial canvas:Rect -0.5 0.5 -0.5 0.5
+initial chart:Rect -5.4299999999999994e-2 5.4299999999999994e-2 -1.8300000000000004e-2 4.83e-2
+csAndHud:Rect -0.5 0.4999999999999999 -0.39373351251804295 0.2195261559902445
+final canvas:Rect -0.5 0.5 -0.5 0.5
+single proj:Rect -0.5000000000000002 0.5000000000000002 -0.5 0.5
+multi proj:Rect -0.5000000000000002 0.5000000000000002 -0.5 0.5
+padding:Rect -5.4299999999999994e-2 5.4299999999999994e-2 -1.8300000000000004e-2 4.83e-2
+initial padded canvas:Rect -0.5 0.5 -0.5 0.5
+hc0:Rect -0.5 0.4999999999999999 -0.39373351251804295 0.2195261559902445
+runHudWith:Rect -0.5 0.4999999999999999 -0.39373351251804295 0.2195261559902445
+ratio new:1.0
+ratio old:1.6306306306306302
+scale ratio:9.208103130755065
+data box padded:Rect -0.5 0.5 -0.5 0.5
+svg viewbox:(-0.5000000000000002,-0.5,1.0000000000000004,1.0)
+#+end_example
+
+** Done CanvasAspect + zero frame
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-11-26 Sun 12:08]
+- State "Done"       from "Next"       [2023-11-26 Sun 12:04]
+- State "Done"       from "Next"       [2023-11-26 Sun 07:59]
+- State "Done"       from              [2023-11-26 Sun 07:50]
+- State "Done"       from              [2023-11-24 Fri 18:03]
+:END:
+
+#+begin_src haskell-ng :results output
+co = jam & set (#markupOptions % #chartAspect) (CanvasAspect 1) & set #hudOptions mempty & set (#charts % charts' % each % #style % #scaleP) ScaleMinDim & set (#charts % charts' % each % #style % #anchor) AnchorMiddle & set (#hudOptions % #frames) [(100,defaultFrameOptions & set #buffer 0 & set #frame (Just $ blob (grey 0.5 0.1)))]
+display co
+
+asp = co & view (#markupOptions % #chartAspect)
+icanvas = initialCanvas asp Nothing
+cs = view #charts co
+csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+viewbox = finalCanvas asp (Just csAndHud)
+csAndHudSingle = set styleBox' (Just viewbox) csAndHud
+csm = set (styleBoxN' 10) (Just viewbox) csAndHud
+csp = projectChartWith (view (#markupOptions % #repeatAspect) co) (view (#markupOptions % #chartAspect) co) (view #hudOptions co) cs
+
+-- addHud
+ho = view #hudOptions co
+db = maybe one padSingletons (view box' cs)
+(mdb, hs) = toHuds ho db
+csPadded = cs <> maybe mempty (\r -> bool (named "datapadding" [BlankChart defaultStyle [r]]) mempty (r == db)) mdb
+ivb = initialCanvas asp (Just csPadded)
+db' = fromMaybe db mdb
+csAndHud' = runHudWith ivb db' hs csPadded
+hc0 = cs & set styleBox' (Just ivb)
+
+-- projectWith
+new = ivb
+old = fromMaybe one $ view styleBox' csPadded
+csPaddeds = toListOf charts' csPadded & mconcat
+pwData = csPaddeds & over (each % #chartData) (projectChartDataWith new old)
+pwC = pwData & over (each % #style) (\s -> scaleStyle (scaleRatio (view #scaleP s) new old) s)
+pwRatio = scaleRatio (view #scaleP (head $ view #style <$> pwC)) new old
+pwStyle = view #style (head pwC)
+pwC' = unnamed pwC
+
+
+csp & view styleBox' & NH.traverse_ (show >>> ("co:" <>) >>> putStrLn)
+
+icanvas & (show >>> ("initial canvas:" <>) >>> putStrLn)
+cs & view styleBox' & NH.traverse_ (show >>> ("initial chart:" <>) >>> putStrLn)
+csAndHud & view styleBox' & NH.traverse_ (show >>> ("csAndHud:" <>) >>> putStrLn)
+viewbox & (show >>> ("final canvas:" <>) >>> putStrLn)
+csAndHudSingle & view styleBox' & NH.traverse_ (show >>> ("single proj:" <>) >>> putStrLn)
+csm & view styleBox' & NH.traverse_ (show >>> ("multi proj:" <>) >>> putStrLn)
+csPadded & view styleBox' & NH.traverse_ (show >>> ("padding:" <>) >>> putStrLn)
+ivb & (show >>> ("initial padded canvas:" <>) >>> putStrLn)
+hc0 & view styleBox' & NH.traverse_ (show >>> ("hc0:" <>) >>> putStrLn)
+csAndHud' & view styleBox' & NH.traverse_ (show >>> ("runHudWith:" <>) >>> putStrLn)
+
+-- projectWith
+ratio new & (show >>> ("ratio new:" <>) >>> putStrLn)
+ratio old & (show >>> ("ratio old:" <>) >>> putStrLn)
+pwRatio & (show >>> ("scale ratio:" <>) >>> putStrLn)
+
+db' & (show >>> ("data box padded:" <>) >>> putStrLn)
+
+svgViewbox (Rect x z y w) = (x, (-w), (z-x), (w-y))
+svgvb = svgViewbox <$> (view styleBox' csm)
+svgvb & NH.traverse_ (show >>> ("svg viewbox:" <>) >>> putStrLn)
+
+#+end_src
+
+#+RESULTS:
+#+begin_example
+True
+co:Rect -0.8153153153153152 0.8153153153153152 -0.5 0.5
+initial canvas:Rect -0.5 0.5 -0.5 0.5
+initial chart:Rect -5.4299999999999994e-2 5.4299999999999994e-2 -1.8300000000000004e-2 4.83e-2
+csAndHud:Rect -0.5 0.4999999999999999 -0.39373351251804295 0.2195261559902445
+final canvas:Rect -0.8153153153153151 0.8153153153153151 -0.5 0.5
+single proj:Rect -0.8153153153153152 0.8153153153153152 -0.5 0.5
+multi proj:Rect -0.8153153153153152 0.8153153153153152 -0.5 0.5
+padding:Rect -5.4299999999999994e-2 5.4299999999999994e-2 -1.8300000000000004e-2 4.83e-2
+initial padded canvas:Rect -0.5 0.5 -0.5 0.5
+hc0:Rect -0.5 0.4999999999999999 -0.39373351251804295 0.2195261559902445
+runHudWith:Rect -0.5 0.4999999999999999 -0.39373351251804295 0.2195261559902445
+ratio new:1.0
+ratio old:1.6306306306306302
+scale ratio:9.208103130755065
+data box padded:Rect -0.5 0.5 -0.5 0.5
+svg viewbox:(-0.8153153153153152,-0.5,1.6306306306306304,1.0)
+#+end_example
+
+** styleBoxText
+:LOGBOOK:
+- State "Done"       from              [2023-11-26 Sun 07:37]
+:END:
+
+- Anchors ok
+- scaleps ok
+
+#+begin_src haskell-ng :results output
+s0 = defaultTextStyle & set #frame (Just $ defaultRectStyle) & set #anchor AnchorStart & set #scaleP NoScaleP
+r0 = styleBoxText s0 "jam" (Point 0 0)
+r1 = styleBoxText (scaleStyle 2 s0) "jam" (Point 0 0)
+r0
+r1
+(\x y -> x - 2 * y) <$> r1 <*> r0
+#+end_src
+
+#+RESULTS:
+: Rect -3.0e-4 0.10829999999999998 -1.8300000000000004e-2 4.83e-2
+: Rect -6.0e-4 0.21659999999999996 -3.660000000000001e-2 9.66e-2
+: Rect 0.0 0.0 0.0 0.0
+
+#+begin_src haskell-ng :results output
+import Data.Text qualified as Text
+t = "jam"
+o = s0
+p = Point 0 0
+s = o ^. #size
+h = o ^. #hsize
+v = o ^. #vsize
+n1 = o ^. #vshift
+x' = s * h * fromIntegral (Text.length t)
+y' = s * v
+n1' = (-s) * n1
+a' = case o ^. #anchor of; AnchorStart -> 0.5; AnchorEnd -> -0.5; AnchorMiddle -> 0.0
+mpad = maybe id (\f -> padRect (0.5 * view #borderSize f * view #size o)) (view #frame o)
+flat = Rect ((-x' / 2.0) + x' * a') (x' / 2 + x' * a') (-y' / 2 + n1') (y' / 2 + n1')
+mpad $ move p $ maybe flat (`rotationBound` flat) (o ^. #rotation)
+flat
+#+end_src
+
+#+RESULTS:
+: Rect -5.4299999999999994e-2 5.4299999999999994e-2 -1.8300000000000004e-2 4.83e-2
+: Rect -5.399999999999999e-2 5.399999999999999e-2 -1.8000000000000002e-2 4.8e-2
+
+#+begin_src haskell-ng :results output
+import Data.Text qualified as Text
+t = "jam"
+o = scaleStyle 2 s0
+p = Point 0 0
+s = o ^. #size
+h = o ^. #hsize
+v = o ^. #vsize
+n1 = o ^. #vshift
+x' = s * h * fromIntegral (Text.length t)
+y' = s * v
+n1' = (-s) * n1
+a' = case o ^. #anchor of; AnchorStart -> 0.5; AnchorEnd -> -0.5; AnchorMiddle -> 0.0
+mpad = maybe id (\f -> padRect (0.5 * view #borderSize f * view #size o)) (view #frame o)
+flat = Rect ((-x' / 2.0) + x' * a') (x' / 2 + x' * a') (-y' / 2 + n1') (y' / 2 + n1')
+mpad $ move p $ maybe flat (`rotationBound` flat) (o ^. #rotation)
+flat
+#+end_src
+
+#+RESULTS:
+: Rect -0.10859999999999999 0.10859999999999999 -3.660000000000001e-2 9.66e-2
+: Rect -0.10799999999999998 0.10799999999999998 -3.6000000000000004e-2 9.6e-2
+
+** markup manual checks
+
+- [X] initial padded canvas
+
+#+begin_src haskell-ng :results output
+view styleBox' csPadded & fmap (ratio * 0.5 >>> (== (let (Rect _ z _ _) = ivb in z)))
+#+end_src
+
+#+RESULTS:
+: Just False
+
+- [X] viewbox svg (x,y,width,height): -0.0003 -0.0483 0.1086 0.0666
+- [X] height: 300
+- [X] width: 489 = 0.1086 / 0.0666 * 300
+- [X] font-size: 0.06 * 15.015015015015013 = .9009
+- [X] border-size: 0.0090 (border-size 0.01 * font-size)
+- [X] text rect:  viewbox - 1/2 * border size
+
+#+begin_src haskell-ng :results output
+pPrint $ markupChartOptions co
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Markup
+    { elements =
+        [ Node
+            { rootLabel = OpenTag StartTag "svg"
+                [ Attr
+                    { attrName = "xmlns"
+                    , attrValue = "http://www.w3.org/2000/svg"
+                    }
+                , Attr
+                    { attrName = "xmlns:xlink"
+                    , attrValue = "http://www.w3.org/1999/xlink"
+                    }
+                , Attr
+                    { attrName = "width"
+                    , attrValue = "489"
+                    }
+                , Attr
+                    { attrName = "height"
+                    , attrValue = "300"
+                    }
+                , Attr
+                    { attrName = "viewBox"
+                    , attrValue = "-0.5000 -0.2195 1.0000 0.6133"
+                    }
+                ]
+            , subForest =
+                [ Node
+                    { rootLabel = OpenTag StartTag "style" []
+                    , subForest =
+                        [ Node
+                            { rootLabel = Content "svg {
+                                color-scheme: light dark;
+                              }
+                              {
+                                .canvas g, .title g, .axisbar g, .ticktext g, .tickglyph g, .ticklines g, .legendContent g text {
+                                  fill: rgb(5%, 5%, 5%);
+                                }
+                                .ticklines g, .tickglyph g, .legendBorder g {
+                                  stroke: rgb(5%, 5%, 5%);
+                                }
+                                .legendBorder g {
+                                  fill: rgb(94%, 94%, 94%);
+                                }
+                              }
+                              @media (prefers-color-scheme:dark) {
+                                .canvas g, .title g, .axisbar g, .ticktext g, .tickglyph g, .ticklines g, .legendContent g text {
+                                  fill: rgb(94%, 94%, 94%);
+                                }
+                                .ticklines g, .tickglyph g, .legendBorder g {
+                                  stroke: rgb(94%, 94%, 94%);
+                                }
+                                .legendBorder g {
+                                  fill: rgb(5%, 5%, 5%);
+                                }
+                              }"
+                            , subForest = []
+                            }
+                        ]
+                    }
+                , Node
+                    { rootLabel = OpenTag StartTag "g"
+                        [ Attr
+                            { attrName = "class"
+                            , attrValue = "chart"
+                            }
+                        ]
+                    , subForest =
+                        [ Node
+                            { rootLabel = OpenTag StartTag "g"
+                                [ Attr
+                                    { attrName = "stroke-width"
+                                    , attrValue = "0.0"
+                                    }
+                                , Attr
+                                    { attrName = "stroke"
+                                    , attrValue = "none"
+                                    }
+                                , Attr
+                                    { attrName = "fill"
+                                    , attrValue = "rgb(5%, 5%, 5%)"
+                                    }
+                                , Attr
+                                    { attrName = "fill-opacity"
+                                    , attrValue = "1.0"
+                                    }
+                                , Attr
+                                    { attrName = "font-size"
+                                    , attrValue = "0.5525"
+                                    }
+                                , Attr
+                                    { attrName = "text-anchor"
+                                    , attrValue = "middle"
+                                    }
+                                ]
+                            , subForest =
+                                [ Node
+                                    { rootLabel = OpenTag StartTag "g"
+                                        [ Attr
+                                            { attrName = "stroke-width"
+                                            , attrValue = "0.0055"
+                                            }
+                                        , Attr
+                                            { attrName = "stroke"
+                                            , attrValue = "rgb(2%, 29%, 48%)"
+                                            }
+                                        , Attr
+                                            { attrName = "stroke-opacity"
+                                            , attrValue = "1.0"
+                                            }
+                                        , Attr
+                                            { attrName = "fill"
+                                            , attrValue = "rgb(2%, 73%, 80%)"
+                                            }
+                                        , Attr
+                                            { attrName = "fill-opacity"
+                                            , attrValue = "0.1"
+                                            }
+                                        ]
+                                    , subForest =
+                                        [ Node
+                                            { rootLabel = OpenTag EmptyElemTag "rect"
+                                                [ Attr
+                                                    { attrName = "width"
+                                                    , attrValue = "0.9945"
+                                                    }
+                                                , Attr
+                                                    { attrName = "height"
+                                                    , attrValue = "0.6077"
+                                                    }
+                                                , Attr
+                                                    { attrName = "x"
+                                                    , attrValue = "-0.4972"
+                                                    }
+                                                , Attr
+                                                    { attrName = "y"
+                                                    , attrValue = "-0.2168"
+                                                    }
+                                                ]
+                                            , subForest = []
+                                            }
+                                        ]
+                                    }
+                                , Node
+                                    { rootLabel = OpenTag StartTag "text"
+                                        [ Attr
+                                            { attrName = "x"
+                                            , attrValue = "0"
+                                            }
+                                        , Attr
+                                            { attrName = "y"
+                                            , attrValue = "0.2252"
+                                            }
+                                        ]
+                                    , subForest =
+                                        [ Node
+                                            { rootLabel = Content "jam"
+                                            , subForest = []
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                , Node
+                    { rootLabel = OpenTag StartTag "g"
+                        [ Attr
+                            { attrName = "class"
+                            , attrValue = "hud"
+                            }
+                        ]
+                    , subForest = []
+                    }
+                ]
+            }
+        ]
+    }
+#+end_example
+
+* text and points
+
+#+begin_src haskell-ng :results output
 exampleText <- fmap T.pack <$> replicateM 2 (unwords <$> replicateM 3 word)
--- exampleText = ["illo vitae eius"]
+exampleText
+#+end_src
+
+#+RESULTS:
+: ["quia qui aut"]
+
+#+begin_src haskell-ng :results output
+exampleText <- fmap T.pack <$> replicateM 2 (unwords <$> replicateM 3 word)
 tsNoScale = defaultTextStyle & set #frame (Just $ defaultRectStyle) & set #anchor AnchorStart & set #scaleP NoScaleP
 tsScale = defaultTextStyle & set #frame (Just $ defaultRectStyle) & set #anchor AnchorStart & set #scaleP ScalePArea
 
@@ -250,361 +1557,28 @@ textNoScale = zipWith (\t x -> TextChart tsNoScale [(t, Point 0 x)]) exampleText
 textScale = zipWith (\t x -> TextChart tsScale [(t, Point 0 (x+0.2))]) exampleText [0..]
 points = Chart defaultGlyphStyle $ GlyphData ((CircleGlyph,) <$> (Point 0 0 :corners4 (Rect 0 1 (-0.5) 0.5)))
 cs = textScale <> [points]
+csNo = textNoScale <> [points]
 ct = unnamed cs
-co = mempty & #charts .~ ct & #markupOptions % #chartAspect .~ FixedAspect 2 :: ChartOptions
+tandp = mempty & #charts .~ ct & #markupOptions % #chartAspect .~ FixedAspect 1 :: ChartOptions
+tandpNo = mempty & #charts .~ unnamed csNo & #markupOptions % #chartAspect .~ FixedAspect 1 :: ChartOptions
+display tandpNo
+#+end_src
+
+#+RESULTS:
+: True
+
+* fonts
+
+system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+
+SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+
+* Non-singular Text
+
+#+begin_src haskell-ng :results output
+co = (mempty :: ChartOptions) & set #charts (unnamed [TextChart defaultTextStyle [("jim", Point 0 0), ("jam",Point 1 1)]]) & set (#charts % charts' % each % #style % #frame) (Just defaultRectStyle) & set #hudOptions defaultHudOptions & set (#charts % charts' % each % #style % #size) 0.2 & set (#charts % charts' % each % #style % #vshift) 0
 display co
 #+end_src
 
 #+RESULTS:
-
-**** singular version "jal"
-
-#+begin_src haskell :results output
--- exampleText <- fmap T.pack <$> replicateM 1 (unwords <$> replicateM 1 word)
-exampleText = ["jal"]
-tsNoScale = defaultTextStyle & set #frame (Just $ defaultRectStyle) & set #anchor AnchorStart & set #scaleP NoScaleP
-tsScale = defaultTextStyle & set #frame (Just $ defaultRectStyle) & set #anchor AnchorStart & set #scaleP ScalePArea
-
-textNoScale = zipWith (\t x -> TextChart tsNoScale [(t, Point 0 (x/4))]) exampleText [0..]
-textScale = zipWith (\t x -> TextChart tsScale [(t, Point 0 ((x+0.25)/4))]) exampleText [0..]
-points = Chart defaultGlyphStyle $ GlyphData ((CircleGlyph,) <$> (Point 0 0 :corners4 (Rect 0 1 0 1)))
-cs = textScale
-ct = unnamed cs
-co = mempty & #charts .~ ct & #markupOptions % #chartAspect .~ FixedAspect 1 :: ChartOptions
-display co
-#+end_src
-
-#+RESULTS:
-
-#+begin_src haskell :results output
-rOld = fromMaybe one $ view styleBox' ct
-sratio = scaleRatio ScalePArea (aspect 2) rOld
-sratio
-#+end_src
-
-#+RESULTS:
-: 8.314439450982071
-
-#+begin_src haskell :results output
-rOld
-#+end_src
-
-#+RESULTS:
-: Rect -6.0e-4 0.21659999999999996 2.5899999999999996e-2 0.1591
-
-**** Unscaled
-
-#+begin_src haskell :results output
-coUnscaled = co & #markupOptions % #chartAspect .~ UnscaledAspect
-display coUnscaled
-#+end_src
-
-#+RESULTS:
-
-**** scaling decomposition
-
-font
-
-#+begin_src haskell :results output
-toListOf (charts' % each % #style % #size) ct
-#+end_src
-
-#+RESULTS:
-: [0.12,0.12,3.0e-2]
-
-scalePArea
-
-#+begin_src haskell :results output
-area' (Rect x z y w) = (z-x)*(w-y)
-ratioArea r r' = (area' r) / (area' r')
-#+end_src
-
-#+RESULTS:
-
-#+begin_src haskell :results output
-ratio' = sqrt $ ratioArea (aspect 2) (fromMaybe one $ view styleBox' ct)
-ratio'
-0.12 * ratio'
-#+end_src
-
-#+RESULTS:
-: 1.1527102580008153
-: 0.13832523096009783
-
-
-
-#+begin_src haskell :results output
-toListOf (charts' % each) ct & fmap sbox
-#+end_src
-
-#+RESULTS:
-: [Just Rect -6.0e-4 1.4405999999999999 0.16340000000000002 0.29660000000000003,Just Rect -6.0e-4 1.4405999999999999 -3.660000000000001e-2 9.66e-2,Just Rect -1.65e-2 1.0165 -0.5165 0.5165]
-
-
-Length of text @ 0.12 size
-
-#+begin_src haskell :results output
-fromIntegral (T.length $ head exampleText) * 0.55 * 0.12 + 0.5 * 0.01 * 0.12
-#+end_src
-
-#+RESULTS:
-: 1.3205999999999998
-
-#+begin_src haskell :results output
-view (#style % #borderSize) <$> cs
-#+end_src
-
-#+RESULTS:
-: [1.0e-2,1.0e-2,3.0e-3]
-
-
-mempty results
-
-runHud [] should lead to the same charts:
-
-#+begin_src haskell :results output
-foldOf charts' (mergeHudChart (runHud [] ct)) == foldOf charts' ct
-#+end_src
-
-#+RESULTS:
 : True
-
-* legend guff
-
-#+begin_src haskell :results output
-display $ x1 & #charts .~ unnamed [blankChart1 one] & #hudOptions .~ (mempty & #legends .~ (view (#hudOptions % #legends) x1 & fmap (second (set (#textStyle % #frame %? #size) 0.1))))
-#+end_src
-
-#+RESULTS:
-: True
-
-#+begin_src haskell :results output
-view (#hudOptions % #legends) x1
-#+end_src
-
-#+RESULTS:
-: [(Priority {priority = 12.0},LegendOptions {size = 0.3, buffer = 0.1, vgap = 0.2, hgap = 0.1, textStyle = Style {size = 0.2, borderSize = 1.0e-2, color = Colour 0.05 0.05 0.05 1.00, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Just (Style {size = 0.1, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}), linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, innerPad = 0.1, outerPad = 2.0e-2, frame = Just (Style {size = 0.1, borderSize = 1.0e-2, color = Colour 0.99 0.99 0.99 1.00, borderColor = Colour 0.05 0.05 0.05 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}), place = PlaceAbsolute Point 0.3 -0.35, overallScale = 0.25, legendCharts = [("palette1 0",[Chart {style = Style {size = 1.5e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 1.00, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = LineData [[Point 0.0 1.0,Point 1.0 1.0,Point 2.0 5.0]]}]),("palette1 1",[Chart {style = Style {size = 1.5e-2, borderSize = 1.0e-2, color = Colour 0.02 0.29 0.48 1.00, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = LineData [[Point 0.0 0.0,Point 2.8 3.0]]}]),("palette1 2",[Chart {style = Style {size = 1.5e-2, borderSize = 1.0e-2, color = Colour 0.66 0.07 0.55 1.00, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.45, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = LineData [[Point 0.5 4.0,Point 0.5 0.0]]}])]})]
-
-
-#+begin_src haskell :results output
-display $ textExample & over (#charts % charts') (fmap (set (#style % #frame) (Just defaultRectStyle))) & over (#charts % charts') (fmap (over (#chartData % textData') (fmap (take 12))))
-#+end_src
-
-#+RESULTS:
-: True
-
-#+begin_src haskell :results output
-:t styleBoxText
-textExample & foldOf (#charts % charts') & head & set #chartData (TextData [("a", Point 0 0)]) & set (#style % #frame) (Just defaultRectStyle) & markupChart
-#+end_src
-
-#+RESULTS:
-: styleBoxText :: Style -
-: Text -
-: Point Double -
-: Rect Double
-: Markup {elements = [Node {rootLabel = OpenTag StartTag "g" [Attr {attrName = "stroke-width", attrValue = "0.0"},Attr {attrName = "stroke", attrValue = "none"},Attr {attrName = "fill", attrValue = "rgb(5%, 5%, 5%)"},Attr {attrName = "fill-opacity", attrValue = "1.0"},Attr {attrName = "font-size", attrValue = "0.25"},Attr {attrName = "text-anchor", attrValue = "middle"}], subForest = [Node {rootLabel = OpenTag StartTag "g" [Attr {attrName = "stroke-width", attrValue = "0.0025"},Attr {attrName = "stroke", attrValue = "rgb(2%, 29%, 48%)"},Attr {attrName = "stroke-opacity", attrValue = "1.0"},Attr {attrName = "fill", attrValue = "rgb(2%, 73%, 80%)"},Attr {attrName = "fill-opacity", attrValue = "0.1"}], subForest = [Node {rootLabel = OpenTag EmptyElemTag "rect" [Attr {attrName = "width", attrValue = "0.115"},Attr {attrName = "height", attrValue = "0.2775"},Attr {attrName = "x", attrValue = "-0.0575"},Attr {attrName = "y", attrValue = "-0.1388"}], subForest = []}]},Node {rootLabel = OpenTag StartTag "text" [Attr {attrName = "x", attrValue = "0"},Attr {attrName = "y", attrValue = "0"}], subForest = [Node {rootLabel = Content "a", subForest = []}]}]}]}
-
-#+begin_src haskell :results output
-s = textExample & foldOf (#charts % charts') & head & view #style
-styleBoxText s "a" (Point 0 0)
-view #vsize s * 0.25 * 0.5
-#+end_src
-
-#+RESULTS:
-: Rect -5.625e-2 5.625e-2 -0.1375 0.1375
-: 0.1375
-
-A rectangular chart created to surround text continues to undergo scaling, whilst the text itself does not. This is why markupText includes creation of a rectangualr frame.
-
-#+begin_src haskell :results output
-textExample & foldOf (#charts % charts') & fmap (view #chartData >>> (\(TextData xs)-> xs)) & mconcat & fmap (\x -> Chart s (TextData [x])) & unnamed & (\x -> x <> rectangularize defaultRectStyle x) & (\x -> textExample & set #charts x :: ChartOptions) & set (#markupOptions % #chartAspect) (FixedAspect 2) & display
-#+end_src
-
-#+RESULTS:
-#+begin_example
-<interactive>:173:71: warning: [GHC-62161] [-Wincomplete-uni-patterns]
-    Pattern match(es) are non-exhaustive
-    In a lambda abstraction:
-        Patterns of type ‘ChartData’ not matched:
-            RectData _
-            LineData _
-            GlyphData _
-            PathData _
-            ...
-True
-#+end_example
-
-* style unification
-
-similar to https://hackage.haskell.org/package/reanimate-svg-0.9.3.1/docs/Graphics-SvgTree-Types.html#v:drawAttributes
-
-old styles
-
-#+begin_src haskell :results output
-data RectStyle = RectStyle
-  { borderSize :: Double,
-    borderColor :: Colour,
-    color :: Colour,
-    scaleRect :: ScaleP
-  }
-data TextStyle = TextStyle
-  { size :: Double,
-    color :: Colour,
-    anchor :: Anchor,
-    hsize :: Double,
-    vsize :: Double,
-    vshift :: Double,
-    rotation :: Maybe Double,
-    scaleText :: ScaleP,
-    escapeText :: EscapeText,
-    frame :: Maybe RectStyle
-  }
-data GlyphStyle = GlyphStyle
-  { -- | glyph radius
-    size :: Double,
-    -- | fill color
-    color :: Colour,
-    -- | stroke color
-    borderColor :: Colour,
-    -- | stroke width (adds a bit to the bounding box)
-    borderSize :: Double,
-    shape :: GlyphShape,
-    rotation :: Maybe Double,
-    translate :: Maybe (Point Double),
-    scaleGlyph :: ScaleP
-  }
-data LineStyle = LineStyle
-  { size :: Double,
-    color :: Colour,
-    linecap :: Maybe LineCap,
-    linejoin :: Maybe LineJoin,
-    dasharray :: Maybe [Double],
-    dashoffset :: Maybe Double,
-    scaleLine :: ScaleP
-  }
-data PathStyle = PathStyle
-  { borderSize :: Double,
-    borderColor :: Colour,
-    color :: Colour,
-    scalePath' :: ScaleP
-  }
-#+end_src
-
-* chart-svg-dev: addHud refactor
-
-Removed from toHuds
-
-      #+begin_src haskell :results output
-      <> [ fromEffect (lastPriority o + 1) $
-             applyChartAspect asp
-         ]
-      #+end_src
-
-removed from runHudWith
-
-    #+begin_src haskell :results output
-    & (\x -> group (Just "chart") [view #chart x] <> group (Just "hud") [view #hud x])
-    #+end_src
-
-remove initial projection entirely.
-
-          #+begin_src haskell :results output
-          (cs & over chart' (projectWith cb (maybe one padSingletons $ view styleBox' cs)))
-          #+end_src
-
-removed:
-
-#+begin_src haskell :results output
--- | Apply a ChartAspect
-applyChartAspect :: ChartAspect -> State HudChart ()
-applyChartAspect fa = do
-  hc <- get
-  case fa of
-    UnscaledAspect -> pure ()
-    _ -> modify (set hudBox' (getHudBox fa hc))
-#+end_src
-
-* addHud decomp
-
-#+begin_src haskell :results output
--- | Decorate a ChartTree with HudOptions
-addHud :: ChartAspect -> HudOptions -> ChartTree -> ChartTree
-addHud asp ho cs =
-  runHudWith
-    (initialCanvas asp cs')
-    (fromMaybe db mdb)
-    hs
-    cs'
-  where
-    db = maybe one padSingletons (view box' cs)
-    (mdb, hs) = toHuds ho db
-    cs' = cs <> maybe mempty (\r -> bool ( named "datapadding" [BlankChart defaultStyle [r]] ) mempty (r==db) ) mdb
-#+end_src
-
-#+RESULTS:
-#+begin_example
-<interactive>:155:1-61: error: [GHC-39999]
-    • No instance for ‘Show
-                         (ChartAspect -> HudOptions -> ChartTree -> ChartTree)’
-        arising from a use of ‘print’
-        (maybe you haven't applied a function to enough arguments?)
-    • In a stmt of an interactive GHCi command: print it
-<interactive>:156:19: error: [GHC-58481]
-    parse error (possibly incorrect indentation or mismatched brackets)
-<interactive>:157:3-12: error: [GHC-39999]
-    • No instance for ‘Show
-                         (CanvasBox -> DataBox -> [Hud] -> ChartTree -> ChartTree)’
-        arising from a use of ‘print’
-        (maybe you haven't applied a function to enough arguments?)
-    • In a stmt of an interactive GHCi command: print it
-Rect -0.75 0.75 -0.5 0.5
-Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4
-<interactive>:160:5-6: error: [GHC-39999]
-    • No instance for ‘Show Hud’ arising from a use of ‘print’
-    • In a stmt of an interactive GHCi command: print it
-ChartTree {tree = Node {rootLabel = (Nothing,[]), subForest = [Node {rootLabel = (Just "unit",[Chart {style = Style {size = 6.0e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = NoScaleP, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = RectData [Rect -5.0e-4 5.0e-4 -5.0e-4 5.0e-4]}]), subForest = []},Node {rootLabel = (Just "datapadding",[Chart {style = Style {size = 6.0e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = NoScaleP, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = BlankData [Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4]}]), subForest = []}]}}
-<interactive>:162:3-7: error: [GHC-58481]
-    parse error on input ‘where’
-Rect -0.75 0.75 -0.5 0.5
-#+end_example
-
-#+begin_src haskell :results output
-asp = view (#markupOptions % #chartAspect) co
-asp
-ho = view #hudOptions co
-cs = view #charts co
-db = maybe one padSingletons (view box' cs)
-(mdb, hs) = toHuds ho db
-mdb
-cs' = cs <> maybe mempty (\r -> bool ( named "datapadding" [BlankChart defaultStyle [r]] ) mempty (r==db) ) mdb
-c0 = initialCanvas asp cs'
-c0
-db0 = fromMaybe db mdb
-db0
-#+end_src
-
-#+RESULTS:
-: FixedAspect 1.5
-: Just Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4
-: Rect -0.75 0.75 -0.5 0.5
-: Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4
-
-#+begin_src haskell :results output
-runHudWith c0 db0 hs cs'
-#+end_src
-
-    #+begin_src haskell :results output
-hc0 = HudChart (cs' & over chart' (projectWith c0 (maybe one padSingletons $ view styleBox' cs'))) mempty db0
-hc0
-    #+end_src
-
-#+RESULTS:
-: HudChart {chart = ChartTree {tree = Node {rootLabel = (Nothing,[]), subForest = [Node {rootLabel = (Just "unit",[Chart {style = Style {size = 6.0e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = NoScaleP, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = RectData [Rect -6.818181818181823e-2 6.818181818181834e-2 -4.545454545454547e-2 4.5454545454545525e-2]}]), subForest = []},Node {rootLabel = (Just "datapadding",[Chart {style = Style {size = 6.0e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = NoScaleP, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, linecap = Nothing, linejoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, shape = SquareGlyph}, chartData = BlankData [Rect -8.181818181818179e-2 8.181818181818179e-2 -5.454545454545451e-2 5.4545454545454564e-2]}]), subForest = []}]}}, hud = ChartTree {tree = Node {rootLabel = (Nothing,[]), subForest = []}}, dataBox = Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4}
-
-#+begin_src haskell :results output
-view box' cs'
-#+end_src
-
-#+RESULTS:
-: Just Rect -6.000000000000001e-4 6.000000000000001e-4 -6.000000000000001e-4 6.000000000000001e-4
