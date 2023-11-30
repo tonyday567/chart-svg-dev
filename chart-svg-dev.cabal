@@ -103,3 +103,28 @@ library
     markup-parse,
   exposed-modules:
     Lib
+
+common ghc-options-exe-stanza
+    ghc-options:
+        -fforce-recomp
+        -funbox-strict-fields
+        -rtsopts
+        -threaded
+        -with-rtsopts=-N
+
+executable chart-svg-example-diff
+    import: ghc-options-exe-stanza
+    import: ghc-options-stanza
+    import: ghc2021-stanza
+    main-is: diff.hs
+    hs-source-dirs: app
+    build-depends:
+        , chart-svg
+        , markup-parse
+        , numhask >=0.10 && <0.12
+        , tasty-golden
+        , base
+        , tasty
+        , tree-diff
+        , bytestring
+        , string-interpolate

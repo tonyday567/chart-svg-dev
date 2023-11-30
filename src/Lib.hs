@@ -11,7 +11,6 @@ module Lib
   , rvsp
   , toCT
   , sameProjection
-  , sameMulti
   ) where
 
 import Prelude
@@ -70,6 +69,7 @@ sameProjection co = (ct'==ct'', view styleBox' ct', view styleBox' ct'')
       ct' = projectChartTree viewbox csAndHud
       ct'' = set styleBox' (Just viewbox) csAndHud
 
+{-
 sameMulti :: ChartOptions -> (Bool, Maybe (Rect Double), Maybe (Rect Double))
 sameMulti co = (ct'==ct'', ct', ct'')
     where
@@ -78,3 +78,5 @@ sameMulti co = (ct'==ct'', ct', ct'')
       viewbox = finalCanvas asp (Just csAndHud)
       ct' = view styleBox' $ set (styleBoxN' 10) (Just viewbox) csAndHud
       ct'' = view styleBox' $ set styleBox' (Just viewbox) csAndHud
+
+    -}
