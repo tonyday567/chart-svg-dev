@@ -1,4 +1,5 @@
 packages:
   chart-svg-dev.cabal
+  ../numhask-space/numhask-space.cabal
   ../chart-svg/chart-svg.cabal
   ../prettychart/prettychart.cabal

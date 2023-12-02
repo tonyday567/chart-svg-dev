@@ -42,6 +42,20 @@ import MarkupParse
 : Ok, one module loaded.
 : Setting phasers to stun... (port 9160) (ctrl-c to quit)
 
+#+begin_src haskell-ng :results output
+writeAllExamples
+#+end_src
+
+#+RESULTS:
+: ok
+
+#+begin_src haskell-ng :results output
+display dateExample
+#+end_src
+
+#+RESULTS:
+: True
+
 * Next chart-svg mega cleanup checklist
 
 - [X] rerun whole org file and observe results
@@ -61,21 +75,22 @@ import MarkupParse
 - [X] code ToDos
 - [X] remove canvasStyleBox'
 - [X] remove multiple reboxing
-- [ ] palette1 ==> palette
-- [ ] move GlyphShape back to Style
-- [ ] #charts -> #chartTree
-- [ ] fix scalePath'
-- [ ] fix Rect show instance
-- [ ] check applyChartAspect usage
-- [ ] #hud --> #hudChart
-- [ ] switch to svg names for attributes
-- [ ] check named/unnamed usage in Huds
-- [ ] remove placeText
-- [ ] Fix up Ticks
-  - lenses
-- [ ] better names for tick elements
-- [ ] simplify :: ChartTree -> ChartTree
-  descend, combining unnamed nodes
+- [X] palette1 ==> palette
+- [X] #charts -> #chartTree
+- [X] move GlyphShape back to Style
+- [X] fix Rect show instance
+- [X] priority refactor
+- [X] buffered
+- [X] better names for tick elements
+- [X] remove placeText
+- [X] tick lenses
+- [-] remove Buffered, TextTickStyle, LineTickStyle
+- [-] FrameOption anchorTo
+- [-] review ScaleP
+- [-] look at mempty examples for redundant markup snippets
+  - [-] mempty & set #hudOptions defaultHudOptions & set #chartTree mempty produces a hud still?
+- [-] replace .~ ~% ^.
+- [ ] standard checklist
 
 * chart-svg examples
 
@@ -87,7 +102,7 @@ writeAllExamples
 : ok
 
 #+begin_src haskell-ng :results output
-display $ dateExample & set #charts (blank (Rect 0 1 0 1))
+display $ dateExample & set #chartTree (blank (Rect 0 1 0 1))
 #+end_src
 
 #+RESULTS:
@@ -125,7 +140,8 @@ display co'
 - [X] move text
 
 #+begin_src haskell-ng :results output
-display pathExample
+display $ pathExample & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #anchorTo) CanvasStyleSection & set (#hudOptions % #axes % each % #item % #bar %? #anchorTo) CanvasStyleSection
+
 #+end_src
 
 #+RESULTS:
@@ -515,18 +531,36 @@ barTexts bo (view #barData barDataExample')
 - [X] quad
 - [X] cubic
 
-** Done text
+** Done textExample
 :LOGBOOK:
+- State "Done"       from "Next"       [2023-12-02 Sat 16:00]
 - State "Done"       from              [2023-11-23 Thu 21:02]
 :END:
 
+- [X] bad y axis ticks
+- [X] funny axis bar
+
 #+begin_src haskell-ng :results output
-co = textExample --  & set (#charts % charts' % each % #style % #size) 0.1
+co = textExample
 display co
 #+end_src
 
 #+RESULTS:
 : True
+
+#+begin_src haskell-ng :results output
+co & view #chartTree & view box'
+#+end_src
+
+#+RESULTS:
+: Just Rect 0.0 0.9995736030415051 0.0 25.0
+
+#+begin_src haskell-ng :results output
+forgetHud co & toListOf (#chartTree % charts' % each % #style % #scaleP)
+#+end_src
+
+#+RESULTS:
+: [ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea]
 
 ** higher number of ticks
 
@@ -551,7 +585,6 @@ display $ dateExample & set (#hudOptions % #frames) [(100,defaultFrameOptions & 
 
 #+RESULTS:
 : True
-
 
 * Exact reproduction of proportionate scaling
 
@@ -1693,9 +1726,10 @@ display co
 #+RESULTS:
 : True
 
-* ToDo HudChart lens audit
-
-- [ ] doctests
+* Done HudChart lens audit
+:LOGBOOK:
+- State "Done"       from "ToDo"       [2023-12-02 Sat 15:53]
+:END:
 
 canvasBox'
   makeAxisBar
@@ -1744,3 +1778,153 @@ display $ glyphsExample & set (#markupOptions % #chartAspect) (FixedAspect 6) & 
       In the second argument of ‘(&)’, namely
         ‘over (#charts % charts' % _last) (fmap id)’
 #+end_example
+
+* Done HudChartSection
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-12-02 Sat 16:31]
+:END:
+
+- [X] axis bar
+  - [X] lens with AnchoredTo option
+- [X] distortion in tickGlyphs due to NoScaleP
+- [X] glyph ticks are a consistent hair away from the axis bar
+- [X] textExample and others are a long way away
+- [X] decide on axis bar and glyph tick buffers and section anchors
+  0.01 0.015
+
+#+begin_src haskell-ng :results output
+display $ unitExample & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #buffer) 0.01 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #anchorTo) CanvasSection
+#+end_src
+
+#+RESULTS:
+: True
+
+** decomp
+
+UnscaledAspect is perfect, and then ChartAspect stuffs everything up:
+
+#+begin_src haskell-ng :results output
+sec = CanvasStyleSection
+asp = UnscaledAspect
+co = unitExample & set (#hudOptions % #axes % each % #item % #bar %? #buffer) 0.0 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #buffer) 0.0 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #anchorTo) sec & set (#markupOptions % #chartAspect) asp  & set (#hudOptions % #axes % each % #item % #ticks % #style % tickExtend' % _Just) TickExtend & set (#hudOptions % #axes % each % #item % #bar %? #anchorTo) sec & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #size) 0.10 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #shape) SquareGlyph & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #scaleP) NoScaleP & set (#hudOptions % #axes % each % #item % #ticks % #lineTick) Nothing & set (#hudOptions % #axes % each % #item % #ticks % #textTick) Nothing & set (#hudOptions % #frames) []
+display co
+
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+co & view (#hudOptions % #frames)
+#+end_src
+
+#+begin_src haskell-ng :results output
+:set -Wno-incomplete-uni-patterns
+-- pPrint $ (forgetHud co) & view (#chartTree % #tree) & fmap (second (toListOf (each % #chartData)))
+co' = forgetHud co
+display co'
+xs = filter (/=[]) $ (forgetHud co) & toListOf (#chartTree % charts') & fmap (fmap (view #chartData))
+(Just b') = view styleBox' (view #chartTree co')
+(Just bca') = view styleBox' (view #chartTree (forgetHud $ co & set (#markupOptions % #chartAspect) ChartAspect))
+b'
+bca'
+ratio b'
+ratio bca'
+csUnscaled = addHud UnscaledAspect (view #hudOptions co) (view #chartTree co)
+csChartScaled = addHud ChartAspect (view #hudOptions co) (view #chartTree co)
+view styleBox' csUnscaled
+view styleBox' csChartScaled
+(initialCanvas UnscaledAspect (Just (view #chartTree co)))
+(initialCanvas ChartAspect (Just (view #chartTree co)))
+#+end_src
+
+unscaled runHudWith breakup
+
+#+begin_src haskell-ng :results output
+cs = view #chartTree co
+ho = view #hudOptions co
+asp = UnscaledAspect
+    db = maybe one padSingletons (view box' cs)
+    (mdb, hs) = toHuds ho db
+    cs' = cs <> maybe mempty (\r -> bool (named "datapadding" [BlankChart defaultStyle [r]]) mempty (r == db)) mdb
+    asp0 = initialCanvas asp (Just cs')
+    csAndHud = runHudWith asp0 hs cs'
+view styleBox' cs'
+asp0
+view styleBox' csAndHud
+unscaledCSsAndHud = csAndHud
+#+end_src
+
+#+RESULTS:
+: Just Rect (-0.6000000000000001) 0.6000000000000001 (-0.6000000000000001) 0.6000000000000001
+: Rect (-0.6000000000000001) 0.6000000000000001 (-0.6000000000000001) 0.6000000000000001
+: Just Rect (-0.7040000000000002) 0.6520000000000001 (-0.7040000000000002) 0.6520000000000001
+
+ChartAspect runHudWith breakup
+
+#+begin_src haskell-ng :results output
+cs = view #chartTree co
+ho = view #hudOptions co
+asp = ChartAspect
+    db = maybe one padSingletons (view box' cs)
+    (mdb, hs) = toHuds ho db
+    cs' = cs <> maybe mempty (\r -> bool (named "datapadding" [BlankChart defaultStyle [r]]) mempty (r == db)) mdb
+    asp0 = initialCanvas asp (Just cs')
+    csAndHud = runHudWith asp0 hs cs'
+view styleBox' cs'
+asp0
+view styleBox' csAndHud
+vb = finalCanvas asp (Just csAndHud)
+vb
+view styleBox' (projectChartWith asp ho cs)
+display $ (mempty :: ChartOptions) & set #chartTree csAndHud & set (#markupOptions % #chartAspect) UnscaledAspect
+#+end_src
+
+#+RESULTS:
+: Just Rect (-0.6000000000000001) 0.6000000000000001 (-0.6000000000000001) 0.6000000000000001
+: Rect (-0.5) 0.5 (-0.5) 0.5
+: Just Rect (-0.6040000000000001) 0.552 (-0.6040000000000001) 0.552
+: Rect (-0.5) 0.5 (-0.5) 0.5
+: Just Rect (-0.49999999999999994) 0.49999999999999994 (-0.49999999999999994) 0.49999999999999994
+: True
+
+
+The problem is in the final set styleBox', which is operating on NoScaleP styled charts:
+
+#+begin_src haskell-ng :results output
+ctFinal = set styleBox' (Just vb) $ csAndHud & set (charts' % each % #style % #scaleP) ScalePY
+display $ (mempty :: ChartOptions) & set #chartTree ctFinal & set (#markupOptions % #chartAspect) (FixedAspect 1.5)
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+csAndHud & toListOf (charts' % each % #style % #scaleP)
+#+end_src
+
+#+RESULTS:
+: [NoScaleP,NoScaleP,NoScaleP,NoScaleP,NoScaleP,NoScaleP]
+
+** solution
+
+Scale the xaxis by ScalePX etc:
+
+
+#+begin_src haskell-ng :results output
+sec = CanvasSection
+asp = FixedAspect 1.5
+co = unitExample & set (#hudOptions % #axes % each % #item % #bar %? #buffer) 0.0 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #buffer) 0.0 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #anchorTo) sec & set (#markupOptions % #chartAspect) asp  & set (#hudOptions % #axes % each % #item % #ticks % #style % tickExtend' % _Just) TickExtend & set (#hudOptions % #axes % each % #item % #bar %? #anchorTo) sec & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #size) 0.10 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #shape) SquareGlyph & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #scaleP) NoScaleP & set (#hudOptions % #axes % each % #item % #ticks % #lineTick) Nothing & set (#hudOptions % #axes % each % #item % #ticks % #textTick) Nothing & set (#hudOptions % #frames) [] & set (#hudOptions % #axes % ix 0 % #item % #ticks % #glyphTick %? #style % #item % #scaleP) ScalePX & set (#hudOptions % #axes % ix 1 % #item % #ticks % #glyphTick %? #style % #item % #scaleP) ScalePY
+display co
+
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+display $ unitExample & set (#markupOptions % #chartAspect) UnscaledAspect
+#+end_src
+
+#+RESULTS:
+: True

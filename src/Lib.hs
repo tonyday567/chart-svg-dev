@@ -58,13 +58,13 @@ rvsp n c g = do
 runG = runStateGen_ (mkStdGen 69)
 
 toCT :: ChartOptions -> ChartTree
-toCT co = view #charts $ forgetHud co
+toCT co = view #chartTree $ forgetHud co
 
 sameProjection :: ChartOptions -> (Bool, Maybe (Rect Double), Maybe (Rect Double))
 sameProjection co = (ct'==ct'', view styleBox' ct', view styleBox' ct'')
     where
       asp = co & view (#markupOptions % #chartAspect)
-      csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+      csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #chartTree co)
       viewbox = finalCanvas asp (Just csAndHud)
       ct' = projectChartTree viewbox csAndHud
       ct'' = set styleBox' (Just viewbox) csAndHud
@@ -74,7 +74,7 @@ sameMulti :: ChartOptions -> (Bool, Maybe (Rect Double), Maybe (Rect Double))
 sameMulti co = (ct'==ct'', ct', ct'')
     where
       asp = co & view (#markupOptions % #chartAspect)
-      csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+      csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #chartTree co)
       viewbox = finalCanvas asp (Just csAndHud)
       ct' = view styleBox' $ set (styleBoxN' 10) (Just viewbox) csAndHud
       ct'' = view styleBox' $ set styleBox' (Just viewbox) csAndHud
