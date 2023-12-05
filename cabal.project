@@ -1,5 +1,23 @@
 packages:
   chart-svg-dev.cabal
-  ../numhask-space/numhask-space.cabal
   ../chart-svg/chart-svg.cabal
   ../prettychart/prettychart.cabal
+
+allow-newer:
+  string-interpolate:bytestring,
+  string-interpolate:template-haskell,
+  string-interpolate:text,
+  prettychart:text,
+  formatn:text,
+  web-rep:text,
+  web-rep:scotty,
+  scotty:text,
+  websockets:text,
+  websockets:bytestring,
+  websockets:attoparsec,
+  box-socket:text,
+  box-socket:bytestring,
+  box-socket:optparse-generic,
+  optparse-generic:text,
+  optparse-generic:bytestring,
+  box:text,

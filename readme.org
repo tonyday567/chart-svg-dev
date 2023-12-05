@@ -40,7 +40,7 @@ import MarkupParse
 
 #+RESULTS:
 : Ok, one module loaded.
-: Setting phasers to stun... (port 9160) (ctrl-c to quit)
+: Setting phasers to stun... (port 9g1h6c0i)>  (ctrl-c to quit)
 
 #+begin_src haskell-ng :results output
 writeAllExamples
@@ -56,77 +56,133 @@ display dateExample
 #+RESULTS:
 : True
 
-* Next chart-svg mega cleanup checklist
+* Next chart-svg repo checklist
 
-- [X] rerun whole org file and observe results
-- [X] styleBox' versus projectChartTree
-- [X] text box bug
-- [X] scaling text example
-- [X] examples audit
-- [X] NoScaleP needs to be the default for HudOption elements
-- [X] audit ScaleP usage
-- [X] toggle to switch to ScalePArea when the hud is forgotten
-- [X] surface legend
-- [X] check & fix examples
-- [X] fix compound code and compoundExample
-- [X] v06candidate1
-- [X] Revisit anal [[file:~/haskell/anal/readme.org::*all in one][all in one]]
-- [X] diff test back
-- [X] code ToDos
-- [X] remove canvasStyleBox'
-- [X] remove multiple reboxing
-- [X] palette1 ==> palette
-- [X] #charts -> #chartTree
-- [X] move GlyphShape back to Style
-- [X] fix Rect show instance
-- [X] priority refactor
-- [X] buffered
-- [X] better names for tick elements
-- [X] remove placeText
-- [X] tick lenses
-- [-] remove Buffered, TextTickStyle, LineTickStyle
-- [-] FrameOption anchorTo
-- [-] review ScaleP
-- [-] look at mempty examples for redundant markup snippets
-  - [-] mempty & set #hudOptions defaultHudOptions & set #chartTree mempty produces a hud still?
-- [-] replace .~ ~% ^.
-- [ ] standard checklist
+- [X] upgrade Haskell
+- [X] cabal.project check
+- [X] upstream publishings
+- [X] cabal update
+- [X] cabal build
+- [X] cabal outdated
+- [X] cabal gen-bounds
+- [X] cabal-fix
+- [X] cabal build --ghc-options=-Wunused-packages
+- [ ] cabal build --prefer-oldest
+- [X] FIXMEs & TODOs
+- [X] dots in cabal file
+- [X] pragma cleanup
+- [X] cabal-docspec
+- [X] cabal test
+- [X] cabal bench
+- [X] ormolu
+- [X] hlint
+- [X] bump version
+- [X] CI upgrade
+- [ ] push & check CI
+- [ ] haddock
+- [ ] readme
+- [ ] magit range
+- [ ] ChangeLog
+- [X] PR to main
+- [ ] merge PR
+- [ ] immediate checkout and pull main
+- [ ] exact version bump
+- [ ] hkgr tagdist
+- [ ] hkgr publish
 
-* chart-svg examples
+* v06 Changes
 
-#+begin_src haskell-ng :results output
-writeAllExamples
-#+end_src
+Chart.Compound
 
-#+RESULTS:
-: ok
+barTexts
+barTextCharts
+textShiftVert
 
-#+begin_src haskell-ng :results output
-display $ dateExample & set #chartTree (blank (Rect 0 1 0 1))
-#+end_src
+- singletonGuard
++ isSingleton
 
-#+RESULTS:
-: True
+- HudBox
+- CanvasBox
 
-#+begin_src haskell-ng :results output
-co = lineExample
-writeChartOptions "other/line.svg" co
-display co
-#+end_src
++ ChartBox
 
-#+RESULTS:
-: True
+- hudchart box lenses
++ HudChartSection
++ hudChartBox'
 
-** variance data range test
+- runHud
++ finalCanvas
 
-#+begin_src haskell-ng :results output
-co = unitExample & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _1 % #frame) (Just defaultRectStyle) & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _2) 0
-co' = co & over (#charts % charts' % each % #chartData) (scaleChartData 1)
-display co'
-#+end_src
+removed State from Hud concept
 
-#+RESULTS:
-: True
+defaultXAxisOptions
+
+flipPlace
+- placeText
+
+TickStyle
+Tick
+
+defaultGlyphTickStyle etc
+defaultXTicks
+
+axis --> axisHud
+title --> titleHud
+legend --> legendHud
+
+legendChart
+ freezeAxes,
++    freezeTicks,
++    formatN',
++    numTicks',
++    tickExtend',
++    projectChartTreeWith,
++    placeLegend,
++    fromHudChart,
++    makeHuds,
++    legendText,
++    legendEntry,
++    legendizeChart,
+
+Priority change
+
++projectChartTreeWith :: ChartAspect -> HudOptions -> ChartTree -> ChartTree
+
+Ticks element names
+
+tick lenses
+
+scaleP
+
+Primitive
+
+Chart patterns and chart data lenses
+
+.~ removal
+
+scaleChartData
+colourStyle
+
++ safeBox'
+- overText
+
+blankChart
+projectChartTreeN
+
+palette paletteO
+
+-    surfaceLegendChart,
+-    surfaceAxisOptions,
++    surfaceLegendAxisOptions,
++    gridReferenceChart,
+
++ ScaleP
++ scaleratio
+
+Style consolidation
+EscapeText
+
+** ToDo component dot graph
 
 * Done example problems
 :LOGBOOK:
@@ -473,7 +529,7 @@ display $ mempty & set #charts (stack 4 0.1 (replicate 16 $ (view #charts $ (set
 :END:
 
 - [X] numbers are badly placed on both X and Y axis
-  - [X] Not due to negative
+- [X] Not due to negative
 - [X] numbers a bit small
 - [X] vgap on legend
 - [X] legend skewif
@@ -1928,3 +1984,206 @@ display $ unitExample & set (#markupOptions % #chartAspect) UnscaledAspect
 
 #+RESULTS:
 : True
+
+* Done mempty
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-12-02 Sat 19:07]
+:END:
+
+#+begin_src haskell-ng :results output
+display $ mempty & set #chartTree (view #chartTree unitExample)
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+pPrint $ mempty & set #chartTree (view #chartTree unitExample) & markupChartOptions
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Markup
+    { elements =
+        [ Node
+            { rootLabel = OpenTag StartTag "svg"
+                [ Attr
+                    { attrName = "xmlns"
+                    , attrValue = "http://www.w3.org/2000/svg"
+                    }
+                , Attr
+                    { attrName = "xmlns:xlink"
+                    , attrValue = "http://www.w3.org/1999/xlink"
+                    }
+                , Attr
+                    { attrName = "width"
+                    , attrValue = "449"
+                    }
+                , Attr
+                    { attrName = "height"
+                    , attrValue = "300"
+                    }
+                , Attr
+                    { attrName = "viewBox"
+                    , attrValue = "-0.7500 -0.5000 1.5000 1.0000"
+                    }
+                ]
+            , subForest =
+                [ Node
+                    { rootLabel = OpenTag StartTag "style" []
+                    , subForest =
+                        [ Node
+                            { rootLabel = Content "svg {
+                                color-scheme: light dark;
+                              }
+                              {
+                                .canvas g, .title g, .axisbar g, .ticktext g, .tickglyph g, .ticklines g, .legendContent g text {
+                                  fill: rgb(5%, 5%, 5%);
+                                }
+                                .ticklines g, .tickglyph g, .legendBorder g {
+                                  stroke: rgb(5%, 5%, 5%);
+                                }
+                                .legendBorder g {
+                                  fill: rgb(94%, 94%, 94%);
+                                }
+                              }
+                              @media (prefers-color-scheme:dark) {
+                                .canvas g, .title g, .axisbar g, .ticktext g, .tickglyph g, .ticklines g, .legendContent g text {
+                                  fill: rgb(94%, 94%, 94%);
+                                }
+                                .ticklines g, .tickglyph g, .legendBorder g {
+                                  stroke: rgb(94%, 94%, 94%);
+                                }
+                                .legendBorder g {
+                                  fill: rgb(5%, 5%, 5%);
+                                }
+                              }
+                              svg { font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+                              }
+
+                              ticktext { font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+                              }
+
+                              "
+                            , subForest = []
+                            }
+                        ]
+                    }
+                , Node
+                    { rootLabel = OpenTag StartTag "g"
+                        [ Attr
+                            { attrName = "class"
+                            , attrValue = "chart"
+                            }
+                        ]
+                    , subForest =
+                        [ Node
+                            { rootLabel = OpenTag StartTag "g"
+                                [ Attr
+                                    { attrName = "class"
+                                    , attrValue = "unit"
+                                    }
+                                ]
+                            , subForest =
+                                [ Node
+                                    { rootLabel = OpenTag StartTag "g"
+                                        [ Attr
+                                            { attrName = "stroke-width"
+                                            , attrValue = "0.0100"
+                                            }
+                                        , Attr
+                                            { attrName = "stroke"
+                                            , attrValue = "rgb(2%, 29%, 48%)"
+                                            }
+                                        , Attr
+                                            { attrName = "stroke-opacity"
+                                            , attrValue = "1.0"
+                                            }
+                                        , Attr
+                                            { attrName = "fill"
+                                            , attrValue = "rgb(2%, 73%, 80%)"
+                                            }
+                                        , Attr
+                                            { attrName = "fill-opacity"
+                                            , attrValue = "0.1"
+                                            }
+                                        ]
+                                    , subForest =
+                                        [ Node
+                                            { rootLabel = OpenTag EmptyElemTag "rect"
+                                                [ Attr
+                                                    { attrName = "width"
+                                                    , attrValue = "1.4900"
+                                                    }
+                                                , Attr
+                                                    { attrName = "height"
+                                                    , attrValue = "0.9900"
+                                                    }
+                                                , Attr
+                                                    { attrName = "x"
+                                                    , attrValue = "-0.7450"
+                                                    }
+                                                , Attr
+                                                    { attrName = "y"
+                                                    , attrValue = "-0.4950"
+                                                    }
+                                                ]
+                                            , subForest = []
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                , Node
+                    { rootLabel = OpenTag StartTag "g"
+                        [ Attr
+                            { attrName = "class"
+                            , attrValue = "hud"
+                            }
+                        ]
+                    , subForest = []
+                    }
+                ]
+            }
+        ]
+    }
+#+end_example
+* Done chart-svg mega cleanup checklist
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-12-03 Sun 08:02]
+:END:
+
+- [X] rerun whole org file and observe results
+- [X] styleBox' versus projectChartTree
+- [X] text box bug
+- [X] scaling text example
+- [X] examples audit
+- [X] NoScaleP needs to be the default for HudOption elements
+- [X] audit ScaleP usage
+- [X] toggle to switch to ScalePArea when the hud is forgotten
+- [X] surface legend
+- [X] check & fix examples
+- [X] fix compound code and compoundExample
+- [X] v06candidate1
+- [X] Revisit anal [[file:~/haskell/anal/readme.org::*all in one][all in one]]
+- [X] diff test back
+- [X] code ToDos
+- [X] remove canvasStyleBox'
+- [X] remove multiple reboxing
+- [X] palette1 ==> palette
+- [X] #charts -> #chartTree
+- [X] move GlyphShape back to Style
+- [X] fix Rect show instance
+- [X] priority refactor
+- [X] buffered
+- [X] better names for tick elements
+- [X] remove placeText
+- [X] tick lenses
+- [X] remove Buffered, TextTickStyle, LineTickStyle
+- [X] FrameOption anchorTo
+- [X] review ScaleP
+- [X] look at mempty examples for redundant markup snippets
+  - [X] mempty & set #hudOptions defaultHudOptions & set #chartTree mempty produces a hud still?
+- [X] replace .~ ~% ^.
