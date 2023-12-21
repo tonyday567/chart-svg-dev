@@ -7,8 +7,6 @@ allow-newer:
   string-interpolate:bytestring,
   string-interpolate:template-haskell,
   string-interpolate:text,
-  prettychart:text,
-  formatn:text,
   web-rep:text,
   web-rep:scotty,
   scotty:text,
@@ -20,4 +18,3 @@ allow-newer:
   box-socket:optparse-generic,
   optparse-generic:text,
   optparse-generic:bytestring,
-  box:text,
