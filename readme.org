@@ -56,7 +56,7 @@ display dateExample
 #+RESULTS:
 : True
 
-* Next chart-svg repo checklist
+* chart-svg repo checklist
 
 - [X] upgrade Haskell
 - [X] cabal.project check
@@ -182,18 +182,9 @@ palette paletteO
 Style consolidation
 EscapeText
 
-** ToDo component dot graph
+* example problems
 
-* Done example problems
-:LOGBOOK:
-- State "Done"       from "ToDo"       [2023-11-30 Thu 11:12]
-:END:
-
-** Done pathExample
-:LOGBOOK:
-- State "Done"       from "ToDo"       [2023-11-30 Thu 11:12]
-:END:
-- [X] move text
+** pathExample
 
 #+begin_src haskell-ng :results output
 display $ pathExample & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #anchorTo) CanvasStyleSection & set (#hudOptions % #axes % each % #item % #bar %? #anchorTo) CanvasStyleSection
@@ -217,11 +208,7 @@ display $ mempty & #charts .~ named "path" [path', c0] <> named "pathtext" [t0] 
 #+RESULTS:
 : True
 
-** Done lineExample
-:LOGBOOK:
-- State "Done"       from              [2023-11-30 Thu 10:59]
-:END:
-
+** lineExample
 
 #+begin_src haskell-ng :results output
 co = lineExample & set (#hudOptions % #legends % each % _2 % #size) 0.2 & set (#hudOptions % #legends % each % _2 % #frame) (Just defaultRectStyle) & set (#hudOptions % #legends % each % _2 % #vgap) 0 & set (#hudOptions % #legends % each % _2 % #outerPad) 0 & set (#hudOptions % #legends % each % _2 % #innerPad) 0 & set (#hudOptions % #legends % each % _2 % #textStyle % #frame) (Just defaultRectStyle) & set (#hudOptions % #legends % each % _2 % #overallScale) 0.5 & set (#hudOptions % #legends % each % _2 % #scaleP) ScalePX
@@ -231,11 +218,7 @@ display co
 
 #+RESULTS:
 : True
-** Done legends
-:LOGBOOK:
-- State "Done"       from "ToDo"       [2023-11-30 Thu 10:59]
-- State "Done"       from "Next"       [2023-11-27 Mon 14:45]
-:END:
+** legends
 
 *** frame bug
 - [X] add scaleP for legendoptions
@@ -268,7 +251,7 @@ display $ (mempty :: ChartOptions) & set #charts c0 & set (#markupOptions % #cha
 : Just Rect -0.5 0.5 -0.5 0.5
 : True
 
-*** Done large text bug
+*** large text bug
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-11-30 Thu 10:59]
 :END:
@@ -323,10 +306,7 @@ display $ (mempty :: ChartOptions) & set #charts x2 & set (#markupOptions % #cha
 : 0.7212000000000001
 : True
 
-** Done surface legend
-:LOGBOOK:
-- State "Done"       from "Next"       [2023-11-28 Tue 14:25]
-:END:
+** surface legend
 
 #+begin_src haskell-ng :results output
 display surfaceExample
@@ -442,10 +422,7 @@ display $ (mempty :: ChartOptions) & set #charts cs' & set #markupOptions (defau
 #+RESULTS:
 : True
 
-** Done compoundExample
-:LOGBOOK:
-- State "Done"       from              [2023-11-30 Thu 10:58]
-:END:
+** compoundExample
 
 #+begin_src haskell-ng :results output
 display compoundExample
@@ -510,10 +487,7 @@ display co
 #+RESULTS:
 : True
 
-** Done stackExample
-:LOGBOOK:
-- State "Done"       from "ToDo"       [2023-11-24 Fri 06:41]
-:END:
+** stackExample
 
 #+begin_src haskell-ng :results output
 display $ mempty & set #charts (stack 4 0.1 (replicate 16 $ (view #charts $ (set (#charts % charts' % each % #style % #scaleP) ScalePArea) $ forgetHud lineExample)))
@@ -522,11 +496,7 @@ display $ mempty & set #charts (stack 4 0.1 (replicate 16 $ (view #charts $ (set
 #+RESULTS:
 : True
 
-** Done bar & sbar
-:LOGBOOK:
-- State "Done"       from "ToDo"       [2023-11-27 Mon 18:28]
-- State "Done"       from "Next"       [2023-11-23 Thu 20:51]
-:END:
+** bar & sbar
 
 - [X] numbers are badly placed on both X and Y axis
 - [X] Not due to negative
@@ -578,20 +548,13 @@ barRects bo (view #barData barDataExample')
 barTexts bo (view #barData barDataExample')
 #+end_src
 
-** Done ellipse & quad & cubic
-:LOGBOOK:
-- State "Done"       from "Next"       [2023-11-27 Mon 14:52]
-:END:
+** ellipse & quad & cubic
 - [X] title
 - [X] yaxis ticks
 - [X] quad
 - [X] cubic
 
-** Done textExample
-:LOGBOOK:
-- State "Done"       from "Next"       [2023-12-02 Sat 16:00]
-- State "Done"       from              [2023-11-23 Thu 21:02]
-:END:
+** textExample
 
 - [X] bad y axis ticks
 - [X] funny axis bar
@@ -628,10 +591,7 @@ display co
 #+RESULTS:
 : True
 
-** Done dateExample
-:LOGBOOK:
-- State "Done"       from "Next"       [2023-11-30 Thu 14:46]
-:END:
+** dateExample
 
 - [X] y axis ticks being cut off
 
@@ -831,7 +791,7 @@ display jam
 #+RESULTS:
 : True
 
-** Done unscaled + no hud
+** unscaled + no hud
 :LOGBOOK:
 - State "Done"       from              [2023-11-24 Fri 18:03]
 :END:
@@ -918,7 +878,7 @@ data box padded:Rect -0.5 0.5 -0.5 0.5
 svg viewbox:(-3.0e-4,-4.83e-2,0.10859999999999997,6.66e-2)
 #+end_example
 
-** Done unscaled + zero frame
+** unscaled + zero frame
 :LOGBOOK:
 - State "Done"       from              [2023-11-24 Fri 18:03]
 :END:
@@ -1005,7 +965,7 @@ data box padded:Rect -0.5 0.5 -0.5 0.5
 svg viewbox:(-3.0e-4,-4.83e-2,0.10859999999999997,6.66e-2)
 #+end_example
 
-** Done ChartAspect + no hud
+** ChartAspect + no hud
 :LOGBOOK:
 - State "Done"       from              [2023-11-26 Sun 07:50]
 - State "Done"       from              [2023-11-24 Fri 18:03]
@@ -1095,7 +1055,7 @@ data box padded:Rect -0.5 0.5 -0.5 0.5
 svg viewbox:(-0.8153153153153152,-0.5,1.6306306306306304,1.0)
 #+end_example
 
-** Done ChartAspect + zero frame
+** ChartAspect + zero frame
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-11-26 Sun 07:59]
 - State "Done"       from              [2023-11-26 Sun 07:50]
@@ -1184,7 +1144,7 @@ data box padded:Rect -0.5 0.5 -0.5 0.5
 svg viewbox:(-0.8153153153153152,-0.5,1.6306306306306304,1.0)
 #+end_example
 
-** Done FixedAspect + no hud
+** FixedAspect + no hud
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-11-26 Sun 12:04]
 - State "Done"       from "Next"       [2023-11-26 Sun 07:59]
@@ -1286,7 +1246,7 @@ exp1 = csPaddeds & over (each % #chartData) id & over (each % #style) (\s -> sca
 : [TextData [("jam",Point -5.551115123125783e-17 -0.2252252252252252)]]
 : True
 
-** Done FixedAspect + zero frame
+** FixedAspect + zero frame
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-11-26 Sun 12:08]
 - State "Done"       from "Next"       [2023-11-26 Sun 12:04]
@@ -1376,7 +1336,7 @@ data box padded:Rect -0.5 0.5 -0.5 0.5
 svg viewbox:(-0.5000000000000002,-0.5,1.0000000000000004,1.0)
 #+end_example
 
-** Done CanvasAspect + zero frame
+** CanvasAspect + zero frame
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-11-26 Sun 12:08]
 - State "Done"       from "Next"       [2023-11-26 Sun 12:04]
@@ -1782,10 +1742,7 @@ display co
 #+RESULTS:
 : True
 
-* Done HudChart lens audit
-:LOGBOOK:
-- State "Done"       from "ToDo"       [2023-12-02 Sat 15:53]
-:END:
+* HudChart lens audit
 
 canvasBox'
   makeAxisBar
@@ -1804,7 +1761,7 @@ hudBox'
   tickGlyph
   makeTick
 
-* Done ScaleBorder removal
+* ScaleBorder removal
 :LOGBOOK:
 - State "Done"       from              [2023-11-30 Thu 14:36]
 :END:
@@ -1835,7 +1792,7 @@ display $ glyphsExample & set (#markupOptions % #chartAspect) (FixedAspect 6) & 
         ‘over (#charts % charts' % _last) (fmap id)’
 #+end_example
 
-* Done HudChartSection
+* HudChartSection
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-12-02 Sat 16:31]
 :END:
@@ -1985,7 +1942,7 @@ display $ unitExample & set (#markupOptions % #chartAspect) UnscaledAspect
 #+RESULTS:
 : True
 
-* Done mempty
+* mempty
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-12-02 Sat 19:07]
 :END:
@@ -2150,7 +2107,7 @@ Markup
         ]
     }
 #+end_example
-* Done chart-svg mega cleanup checklist
+* chart-svg mega cleanup checklist
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-12-03 Sun 08:02]
 :END:
