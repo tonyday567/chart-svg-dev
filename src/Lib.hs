@@ -46,7 +46,7 @@ rvs n g = replicateM n (standard g)
 
 -- | rvsPair generates a list of correlated random variate tuples
 --
--- >>> rvsp gen 3 0.8
+-- > rvsp gen 3 0.8
 -- [(1.8005943761746166e-2,7.074509906249835e-2),(0.36444481359059255,-0.7073208451897444),(-1.2939898115295387,-0.643930709405127)]
 --
 rvsp n c g = do

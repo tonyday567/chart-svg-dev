@@ -50,137 +50,175 @@ writeAllExamples
 : ok
 
 #+begin_src haskell-ng :results output
-display dateExample
+display arcFlagsExample
 #+end_src
 
 #+RESULTS:
 : True
 
-* chart-svg repo checklist
+#+begin_src haskell-ng :results output
+co = rectExample
+asp = view (#markupOptions % #chartAspect) co
+csAndHud = addHud asp (view #hudOptions co) (view #chartTree co)
+viewbox = finalCanvas asp (Just csAndHud)
+ctFinal = set styleBox' (Just viewbox) csAndHud
+view box' ctFinal
+view styleBox' ctFinal
+view safeBox' ctFinal
+view safeStyleBox' ctFinal
+padSingletons <$> view styleBox' ctFinal
+viewbox
+#+end_src
 
-- [X] upgrade Haskell
-- [X] cabal.project check
-- [X] upstream publishings
-- [X] cabal update
-- [X] cabal build
-- [X] cabal outdated
-- [X] cabal gen-bounds
-- [X] cabal-fix
-- [X] cabal build --ghc-options=-Wunused-packages
-- [ ] cabal build --prefer-oldest
-- [X] FIXMEs & TODOs
-- [X] dots in cabal file
-- [X] pragma cleanup
-- [X] cabal-docspec
-- [X] cabal test
-- [X] cabal bench
-- [X] ormolu
-- [X] hlint
-- [X] bump version
-- [X] CI upgrade
-- [ ] push & check CI
-- [ ] haddock
-- [ ] readme
-- [ ] magit range
-- [ ] ChangeLog
-- [X] PR to main
-- [ ] merge PR
-- [ ] immediate checkout and pull main
-- [ ] exact version bump
-- [ ] hkgr tagdist
-- [ ] hkgr publish
+#+RESULTS:
+: Just Rect (-0.7286821705426356) 0.7286821705426356 (-0.48917944093778176) 0.5
+: Just Rect (-0.7507441860465116) 0.7507441860465116 (-0.5011794409377818) 0.5
+: Rect (-0.7286821705426356) 0.7286821705426356 (-0.48917944093778176) 0.5
+: Rect (-0.7286821705426356) 0.7286821705426356 (-0.48917944093778176) 0.5
+: Just Rect (-0.7507441860465116) 0.7507441860465116 (-0.5011794409377818) 0.5
+: Rect (-0.75) 0.75 (-0.5) 0.5
 
 * v06 Changes
 
 Chart.Compound
 
-barTexts
+Chart.Bar
+
 barTextCharts
 textShiftVert
 
-- singletonGuard
-+ isSingleton
+Chart.Hud
 
+- defaultPriority
 - HudBox
 - CanvasBox
+- ChartBox
 
-+ ChartBox
-
-- hudchart box lenses
-+ HudChartSection
-+ hudChartBox'
-
+- canvasBox'
+- canvasStyleBox'
+- hudBox'
+- hudStyleBox'
 - runHud
+- HudChartSection
+- hudChartBox'
+
+- closes
+- fromEffect
+- applyChartAspect
+- getHudBox
+
++ appendHud
++ makeHuds
++ projectChartTreeWith
++ addHud
 + finalCanvas
 
-removed State from Hud concept
+- defaultAxisOptions
++ defaultXAxisOptions
++ defaultYAxisOptions
 
-defaultXAxisOptions
-
-flipPlace
 - placeText
++ flipPlace
 
-TickStyle
-Tick
+Title ==> TitleOptions
 
-defaultGlyphTickStyle etc
-defaultXTicks
+- defaultGlyphTick
++ defaultGlyphTickStyleX
++ defaultGlyphTickStyleY
 
-axis --> axisHud
-title --> titleHud
-legend --> legendHud
+- defaultTicks
++ defaultXTicks
 
-legendChart
- freezeAxes,
-+    freezeTicks,
-+    formatN',
-+    numTicks',
-+    tickExtend',
-+    projectChartTreeWith,
-+    placeLegend,
-+    fromHudChart,
-+    makeHuds,
-+    legendText,
-+    legendEntry,
-+    legendizeChart,
+- defaultTick
 
-Priority change
+TickStyle ==> Tick
 
-+projectChartTreeWith :: ChartAspect -> HudOptions -> ChartTree -> ChartTree
+formatN'
+numTicks'
+tickExtend'
 
-Ticks element names
++ axisHud
++ titleHud
 
-tick lenses
+- legend
+- legendFrame
 
-scaleP
++ freezeAxes
++ freezeTicks
+
+Priority refactor
+Hud refactor
+
+
+Chart.Markup
+
++ forgetHud
+
+CssPreferColorScheme ==> PreferColorScheme
+CssShapeRendering ==> ShapeRendering
++ defaultCssFontFamilies
 
 Primitive
 
-Chart patterns and chart data lenses
++    ChartData (..),
++    rectData',
++    lineData',
++    glyphData',
++    textData',
++    pathData',
++    blankData',
++    pattern RectChart,
++    pattern LineChart,
++    pattern GlyphChart,
++    pattern TextChart,
++    pattern PathChart,
++    pattern BlankChart,
++    pattern LineChart1,
 
-.~ removal
-
-scaleChartData
-colourStyle
++ scaleP
++ projectChartDataWith
+-    scaleStyle,
+-    colourChart,
++    scaleChartData,
++ colourStyle
 
 + safeBox'
++ safeStyleBox'
 - overText
++ blankChart
 
-blankChart
-projectChartTreeN
 
-palette paletteO
+Chart.Style
+
++ Style (..),
++ defaultStyle,
++ scaleStyle,
+
+gpalette <== gpalette1
++ ScaleP
++ scaleRatio
+
+Data.Colour
+
+palette <== palette1
+paletteO <== palette1a
+
+Chart.Surface
 
 -    surfaceLegendChart,
 -    surfaceAxisOptions,
 +    surfaceLegendAxisOptions,
 +    gridReferenceChart,
++    addSurfaceLegend,
 
-+ ScaleP
-+ scaleratio
+Chart.Data
 
-Style consolidation
-EscapeText
+- singletonGuard
++ isSingleton
+
+axis --> axisHud
+title --> titleHud
+legend --> legendHud
 
 * example problems
 
@@ -2144,3 +2182,339 @@ Markup
 - [X] look at mempty examples for redundant markup snippets
   - [X] mempty & set #hudOptions defaultHudOptions & set #chartTree mempty produces a hud still?
 - [X] replace .~ ~% ^.
+
+* AST
+
+** ChartOptions
+
+#+begin_src haskell-ng :results output
+data ChartOptions = ChartOptions
+  { markupOptions :: MarkupOptions,
+    hudOptions :: HudOptions,
+    chartTree :: ChartTree
+  }
+#+end_src
+
+** MarkupOptions
+
+#+begin_src haskell-ng :results output
+data MarkupOptions = MarkupOptions
+  { markupHeight :: Maybe Double,
+    chartAspect :: ChartAspect,
+    cssOptions :: CssOptions,
+    renderStyle :: RenderStyle
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data ChartAspect
+  = FixedAspect Double
+  | CanvasAspect Double
+  | ChartAspect
+  | UnscaledAspect
+#+end_src
+
+#+begin_src haskell-ng :results output
+data CssOptions = CssOptions
+  { shapeRendering :: CssShapeRendering,
+    preferColorScheme :: CssPreferColorScheme,
+    fontFamilies :: ByteString,
+    cssExtra :: ByteString}
+#+end_src
+
+#+begin_src haskell-ng :results output
+data RenderStyle = Compact | Indented Int
+#+end_src
+
+#+begin_src haskell-ng :results output
+data CssShapeRendering = UseGeometricPrecision | UseCssCrisp | NoShapeRendering
+#+end_src
+
+#+begin_src haskell-ng :results output
+data CssPreferColorScheme
+  = -- | includes css that switches approriate hud elements between light and dark.
+    PreferHud
+  | PreferDark
+  | PreferLight
+  | PreferNormal
+#+end_src
+
+** HudOptions
+
+#+begin_src haskell-ng :results output
+data HudOptions = HudOptions
+  { axes :: [Priority AxisOptions],
+    frames :: [Priority FrameOptions],
+    legends :: [Priority LegendOptions],
+    titles :: [Priority Title]
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Priority a = Priority {priority :: Double, item :: a}
+#+end_src
+
+*** AxisOptions
+
+#+begin_src haskell-ng :results output
+data AxisOptions = AxisOptions
+  { bar :: Maybe AxisBar,
+    adjust :: Maybe Adjustments,
+    ticks :: Ticks,
+    place :: Place
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data AxisBar = AxisBar
+  { style :: Style,
+    size :: Double,
+    buffer :: Double,
+    overhang :: Double,
+    anchorTo :: HudChartSection
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data HudChartSection = CanvasSection | CanvasStyleSection | HudSection | HudStyleSection deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Adjustments = Adjustments
+  { maxXRatio :: Double,
+    maxYRatio :: Double,
+    angledRatio :: Double,
+    allowDiagonal :: Bool
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Ticks = Ticks
+  { tick :: Tick,
+    glyphTick :: Maybe TickStyle,
+    textTick :: Maybe TickStyle,
+    lineTick :: Maybe TickStyle
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Tick
+  = TickNone
+  | TickLabels [Text]
+  | TickRound FormatN Int TickExtend
+  | TickExact FormatN Int
+  | TickPlaced [(Double, Text)]
+#+end_src
+
+#+begin_src haskell-ng :results output
+data FormatN = FormatN {fstyle :: FStyle, sigFigs :: Maybe Int, maxDistinguishIterations :: Int, addLPad :: Bool, cutRightZeros :: Bool} deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data FStyle
+  = FSDecimal
+  | FSExponent (Maybe Int)
+  | FSComma
+  | FSFixed Int
+  | FSPercent
+  | FSDollar
+  | FSPrec
+  | FSCommaPrec
+  | FSNone
+#+end_src
+
+#+begin_src haskell-ng :results output
+data TickExtend = TickExtend | NoTickExtend deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data TickStyle = TickStyle
+  { style :: Style,
+    anchorTo :: HudChartSection,
+    buffer :: Double
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Place
+  = PlaceLeft
+  | PlaceRight
+  | PlaceTop
+  | PlaceBottom
+  | PlaceAbsolute (Point Double)
+#+end_src
+
+*** FrameOptions
+
+#+begin_src haskell-ng :results output
+data FrameOptions = FrameOptions
+  { frame :: Maybe Style,
+    anchorTo :: HudChartSection,
+    buffer :: Double
+  }
+#+end_src
+
+*** LegendOptions
+
+#+begin_src haskell-ng :results output
+data LegendOptions = LegendOptions
+  { size :: Double,
+    buffer :: Double,
+    vgap :: Double,
+    hgap :: Double,
+    textStyle :: Style,
+    innerPad :: Double,
+    outerPad :: Double,
+    frame :: Maybe Style,
+    place :: Place,
+    overallScale :: Double,
+    scaleP :: ScaleP,
+    legendCharts :: [(Text, [Chart])]
+  }
+#+end_src
+
+*** Title
+
+#+begin_src haskell-ng :results output
+data Title = Title
+  { text :: Text,
+    style :: Style,
+    place :: Place,
+    anchor :: Anchor,
+    buffer :: Double
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Anchor = AnchorMiddle | AnchorStart | AnchorEnd
+#+end_src
+
+** ChartTree
+
+#+begin_src haskell-ng :results output
+newtype ChartTree = ChartTree {tree :: Tree (Maybe Text, [Chart])} deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Chart = Chart {style :: Style, chartData :: ChartData} deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data ChartData
+  = RectData [Rect Double]
+  | LineData [[Point Double]]
+  | GlyphData [Point Double]
+  | TextData [(Text, Point Double)]
+  | PathData [PathData Double]
+  | BlankData [Rect Double]
+#+end_src
+
+#+begin_src haskell-ng :results output
+newtype Rect a = Rect' (Compose Point Range a)
+
+-- | pattern of Rect lowerx upperx lowery uppery
+pattern Rect :: a -> a -> a -> a -> Rect a
+pattern Rect a b c d = Rect' (Compose (Point (Range a b) (Range c d)))
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Point a = Point
+  { _x :: a,
+    _y :: a
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Range a = Range a a
+#+end_src
+
+#+begin_src haskell-ng :results output
+data PathData a
+  = StartP (Point a)
+  | LineP (Point a)
+  | CubicP (Point a) (Point a) (Point a)
+  | QuadP (Point a) (Point a)
+  | ArcP (ArcInfo a) (Point a)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data ArcInfo a = ArcInfo
+  { radii :: Point a,
+    phi :: a,
+    large :: Bool,
+    clockwise :: Bool
+  }
+#+end_src
+
+** Style
+
+#+begin_src haskell-ng :results output
+data Style = Style
+  { size :: Double,
+    borderSize :: Double,
+    color :: Colour,
+    borderColor :: Colour,
+    scaleP :: ScaleP,
+    anchor :: Anchor,
+    rotation :: Maybe Double,
+    translate :: Maybe (Point Double),
+    escapeText :: EscapeText,
+    frame :: Maybe Style,
+    linecap :: Maybe LineCap,
+    linejoin :: Maybe LineJoin,
+    dasharray :: Maybe [Double],
+    dashoffset :: Maybe Double,
+    hsize :: Double,
+    vsize :: Double,
+    vshift :: Double,
+    shape :: GlyphShape
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+newtype Colour = Colour'
+  { color' :: Color (Alpha RGB) Double
+  }
+
+pattern Colour :: Double -> Double -> Double -> Double -> Colour
+pattern Colour r g b a = Colour' (ColorRGBA r g b a)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data ScaleP
+  = NoScaleP
+  | ScalePX
+  | ScalePY
+  | ScalePMinDim
+  | ScalePArea
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Anchor = AnchorMiddle | AnchorStart | AnchorEnd
+#+end_src
+
+#+begin_src haskell-ng :results output
+data EscapeText = EscapeText | NoEscapeText
+#+end_src
+
+#+begin_src haskell-ng :results output
+data LineCap = LineCapButt | LineCapRound | LineCapSquare deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data LineJoin = LineJoinMiter | LineJoinBevel | LineJoinRound deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data GlyphShape
+  = CircleGlyph
+  | SquareGlyph
+  | EllipseGlyph Double
+  | RectSharpGlyph Double
+  | RectRoundedGlyph Double Double Double
+  | -- | line width is determined by borderSize
+    TriangleGlyph (Point Double) (Point Double) (Point Double)
+  | VLineGlyph
+  | HLineGlyph
+  | PathGlyph ByteString
+#+end_src
