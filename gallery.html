@@ -1,0 +1,506 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
+<head>
+<!-- 2023-11-29 Wed 19:22 -->
+<meta http-equiv="Content-Type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>gallery</title>
+<meta name="author" content="Tony Day" />
+<meta name="generator" content="Org Mode" />
+<style>
+  #content { max-width: 60em; margin: auto; }
+  .title  { text-align: center;
+             margin-bottom: .2em; }
+  .subtitle { text-align: center;
+              font-size: medium;
+              font-weight: bold;
+              margin-top:0; }
+  .todo   { font-family: monospace; color: red; }
+  .done   { font-family: monospace; color: green; }
+  .priority { font-family: monospace; color: orange; }
+  .tag    { background-color: #eee; font-family: monospace;
+            padding: 2px; font-size: 80%; font-weight: normal; }
+  .timestamp { color: #bebebe; }
+  .timestamp-kwd { color: #5f9ea0; }
+  .org-right  { margin-left: auto; margin-right: 0px;  text-align: right; }
+  .org-left   { margin-left: 0px;  margin-right: auto; text-align: left; }
+  .org-center { margin-left: auto; margin-right: auto; text-align: center; }
+  .underline { text-decoration: underline; }
+  #postamble p, #preamble p { font-size: 90%; margin: .2em; }
+  p.verse { margin-left: 3%; }
+  pre {
+    border: 1px solid #e6e6e6;
+    border-radius: 3px;
+    background-color: #f2f2f2;
+    padding: 8pt;
+    font-family: monospace;
+    overflow: auto;
+    margin: 1.2em;
+  }
+  pre.src {
+    position: relative;
+    overflow: auto;
+  }
+  pre.src:before {
+    display: none;
+    position: absolute;
+    top: -8px;
+    right: 12px;
+    padding: 3px;
+    color: #555;
+    background-color: #f2f2f299;
+  }
+  pre.src:hover:before { display: inline; margin-top: 14px;}
+  /* Languages per Org manual */
+  pre.src-asymptote:before { content: 'Asymptote'; }
+  pre.src-awk:before { content: 'Awk'; }
+  pre.src-authinfo::before { content: 'Authinfo'; }
+  pre.src-C:before { content: 'C'; }
+  /* pre.src-C++ doesn't work in CSS */
+  pre.src-clojure:before { content: 'Clojure'; }
+  pre.src-css:before { content: 'CSS'; }
+  pre.src-D:before { content: 'D'; }
+  pre.src-ditaa:before { content: 'ditaa'; }
+  pre.src-dot:before { content: 'Graphviz'; }
+  pre.src-calc:before { content: 'Emacs Calc'; }
+  pre.src-emacs-lisp:before { content: 'Emacs Lisp'; }
+  pre.src-fortran:before { content: 'Fortran'; }
+  pre.src-gnuplot:before { content: 'gnuplot'; }
+  pre.src-haskell:before { content: 'Haskell'; }
+  pre.src-hledger:before { content: 'hledger'; }
+  pre.src-java:before { content: 'Java'; }
+  pre.src-js:before { content: 'Javascript'; }
+  pre.src-latex:before { content: 'LaTeX'; }
+  pre.src-ledger:before { content: 'Ledger'; }
+  pre.src-lisp:before { content: 'Lisp'; }
+  pre.src-lilypond:before { content: 'Lilypond'; }
+  pre.src-lua:before { content: 'Lua'; }
+  pre.src-matlab:before { content: 'MATLAB'; }
+  pre.src-mscgen:before { content: 'Mscgen'; }
+  pre.src-ocaml:before { content: 'Objective Caml'; }
+  pre.src-octave:before { content: 'Octave'; }
+  pre.src-org:before { content: 'Org mode'; }
+  pre.src-oz:before { content: 'OZ'; }
+  pre.src-plantuml:before { content: 'Plantuml'; }
+  pre.src-processing:before { content: 'Processing.js'; }
+  pre.src-python:before { content: 'Python'; }
+  pre.src-R:before { content: 'R'; }
+  pre.src-ruby:before { content: 'Ruby'; }
+  pre.src-sass:before { content: 'Sass'; }
+  pre.src-scheme:before { content: 'Scheme'; }
+  pre.src-screen:before { content: 'Gnu Screen'; }
+  pre.src-sed:before { content: 'Sed'; }
+  pre.src-sh:before { content: 'shell'; }
+  pre.src-sql:before { content: 'SQL'; }
+  pre.src-sqlite:before { content: 'SQLite'; }
+  /* additional languages in org.el's org-babel-load-languages alist */
+  pre.src-forth:before { content: 'Forth'; }
+  pre.src-io:before { content: 'IO'; }
+  pre.src-J:before { content: 'J'; }
+  pre.src-makefile:before { content: 'Makefile'; }
+  pre.src-maxima:before { content: 'Maxima'; }
+  pre.src-perl:before { content: 'Perl'; }
+  pre.src-picolisp:before { content: 'Pico Lisp'; }
+  pre.src-scala:before { content: 'Scala'; }
+  pre.src-shell:before { content: 'Shell Script'; }
+  pre.src-ebnf2ps:before { content: 'ebfn2ps'; }
+  /* additional language identifiers per "defun org-babel-execute"
+       in ob-*.el */
+  pre.src-cpp:before  { content: 'C++'; }
+  pre.src-abc:before  { content: 'ABC'; }
+  pre.src-coq:before  { content: 'Coq'; }
+  pre.src-groovy:before  { content: 'Groovy'; }
+  /* additional language identifiers from org-babel-shell-names in
+     ob-shell.el: ob-shell is the only babel language using a lambda to put
+     the execution function name together. */
+  pre.src-bash:before  { content: 'bash'; }
+  pre.src-csh:before  { content: 'csh'; }
+  pre.src-ash:before  { content: 'ash'; }
+  pre.src-dash:before  { content: 'dash'; }
+  pre.src-ksh:before  { content: 'ksh'; }
+  pre.src-mksh:before  { content: 'mksh'; }
+  pre.src-posh:before  { content: 'posh'; }
+  /* Additional Emacs modes also supported by the LaTeX listings package */
+  pre.src-ada:before { content: 'Ada'; }
+  pre.src-asm:before { content: 'Assembler'; }
+  pre.src-caml:before { content: 'Caml'; }
+  pre.src-delphi:before { content: 'Delphi'; }
+  pre.src-html:before { content: 'HTML'; }
+  pre.src-idl:before { content: 'IDL'; }
+  pre.src-mercury:before { content: 'Mercury'; }
+  pre.src-metapost:before { content: 'MetaPost'; }
+  pre.src-modula-2:before { content: 'Modula-2'; }
+  pre.src-pascal:before { content: 'Pascal'; }
+  pre.src-ps:before { content: 'PostScript'; }
+  pre.src-prolog:before { content: 'Prolog'; }
+  pre.src-simula:before { content: 'Simula'; }
+  pre.src-tcl:before { content: 'tcl'; }
+  pre.src-tex:before { content: 'TeX'; }
+  pre.src-plain-tex:before { content: 'Plain TeX'; }
+  pre.src-verilog:before { content: 'Verilog'; }
+  pre.src-vhdl:before { content: 'VHDL'; }
+  pre.src-xml:before { content: 'XML'; }
+  pre.src-nxml:before { content: 'XML'; }
+  /* add a generic configuration mode; LaTeX export needs an additional
+     (add-to-list 'org-latex-listings-langs '(conf " ")) in .emacs */
+  pre.src-conf:before { content: 'Configuration File'; }
+
+  table { border-collapse:collapse; }
+  caption.t-above { caption-side: top; }
+  caption.t-bottom { caption-side: bottom; }
+  td, th { vertical-align:top;  }
+  th.org-right  { text-align: center;  }
+  th.org-left   { text-align: center;   }
+  th.org-center { text-align: center; }
+  td.org-right  { text-align: right;  }
+  td.org-left   { text-align: left;   }
+  td.org-center { text-align: center; }
+  dt { font-weight: bold; }
+  .footpara { display: inline; }
+  .footdef  { margin-bottom: 1em; }
+  .figure { padding: 1em; }
+  .figure p { text-align: center; }
+  .equation-container {
+    display: table;
+    text-align: center;
+    width: 100%;
+  }
+  .equation {
+    vertical-align: middle;
+  }
+  .equation-label {
+    display: table-cell;
+    text-align: right;
+    vertical-align: middle;
+  }
+  .inlinetask {
+    padding: 10px;
+    border: 2px solid gray;
+    margin: 10px;
+    background: #ffffcc;
+  }
+  #org-div-home-and-up
+   { text-align: right; font-size: 70%; white-space: nowrap; }
+  textarea { overflow-x: auto; }
+  .linenr { font-size: smaller }
+  .code-highlighted { background-color: #ffff00; }
+  .org-info-js_info-navigation { border-style: none; }
+  #org-info-js_console-label
+    { font-size: 10px; font-weight: bold; white-space: nowrap; }
+  .org-info-js_search-highlight
+    { background-color: #ffff00; color: #000000; font-weight: bold; }
+  .org-svg { }
+</style>
+</head>
+<body>
+<div id="content" class="content">
+<h1 class="title">gallery</h1>
+<div id="table-of-contents" role="doc-toc">
+<h2>Table of Contents</h2>
+<div id="text-table-of-contents" role="doc-toc">
+<ul>
+<li><a href="#orgc7e9392">1. Chart Gallery</a>
+<ul>
+<li><a href="#org5425549">1.1. unit</a></li>
+<li><a href="#org30c392c">1.2. hudoptions</a></li>
+<li><a href="#org0c6479f">1.3. line</a></li>
+<li><a href="#orgd7d0ced">1.4. rect</a></li>
+<li><a href="#org269417b">1.5. text</a></li>
+<li><a href="#orga3b5d2f">1.6. glyphs</a></li>
+<li><a href="#org1d396cd">1.7. path</a></li>
+<li><a href="#org04f4b99">1.8. bar</a></li>
+<li><a href="#org6925b64">1.9. sbar</a></li>
+<li><a href="#orgcd6db84">1.10. wave</a></li>
+<li><a href="#orgcaa4abf">1.11. surface</a></li>
+<li><a href="#orgc3adb07">1.12. arcflags</a></li>
+<li><a href="#org4363797">1.13. ellipse</a></li>
+<li><a href="#org06fa6d6">1.14. quad</a></li>
+<li><a href="#org277aae4">1.15. cubic</a></li>
+<li><a href="#org7cdaf48">1.16. venn</a></li>
+<li><a href="#orgf1f2962">1.17. arrow</a></li>
+<li><a href="#org916f5b6">1.18. date</a></li>
+<li><a href="#org812c73c">1.19. gradient</a></li>
+<li><a href="#org670ed12">1.20. wheel</a></li>
+<li><a href="#org0632e5c">1.21. debug</a></li>
+<li><a href="#orgbd41f6a">1.22. compound</a></li>
+<li><a href="#org95c195d">1.23. stack</a></li>
+<li><a href="#orgb9dd719">1.24. priorityv1</a></li>
+<li><a href="#orgca0a647">1.25. priorityv2</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
+<div id="outline-container-orgc7e9392" class="outline-2">
+<h2 id="orgc7e9392"><span class="section-number-2">1.</span> Chart Gallery</h2>
+<div class="outline-text-2" id="text-1">
+<p>
+All the example charts in <a href="https://github.com/tonyday567/chart-svg">chart-svg</a>.
+</p>
+</div>
+<div id="outline-container-org5425549" class="outline-3">
+<h3 id="org5425549"><span class="section-number-3">1.1.</span> unit</h3>
+<div class="outline-text-3" id="text-1-1">
+
+<div id="org9cdf275" class="figure">
+<p><img src="other/unit.svg" alt="unit.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org30c392c" class="outline-3">
+<h3 id="org30c392c"><span class="section-number-3">1.2.</span> hudoptions</h3>
+<div class="outline-text-3" id="text-1-2">
+
+<div id="orgeb7c4cf" class="figure">
+<p><img src="other/hudoptions.svg" alt="hudoptions.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org0c6479f" class="outline-3">
+<h3 id="org0c6479f"><span class="section-number-3">1.3.</span> line</h3>
+<div class="outline-text-3" id="text-1-3">
+
+<div id="org92789af" class="figure">
+<p><img src="other/line.svg" alt="line.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgd7d0ced" class="outline-3">
+<h3 id="orgd7d0ced"><span class="section-number-3">1.4.</span> rect</h3>
+<div class="outline-text-3" id="text-1-4">
+
+<div id="orga6c4d27" class="figure">
+<p><img src="other/rect.svg" alt="rect.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org269417b" class="outline-3">
+<h3 id="org269417b"><span class="section-number-3">1.5.</span> text</h3>
+<div class="outline-text-3" id="text-1-5">
+
+<div id="org8965bbc" class="figure">
+<p><img src="other/text.svg" alt="text.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orga3b5d2f" class="outline-3">
+<h3 id="orga3b5d2f"><span class="section-number-3">1.6.</span> glyphs</h3>
+<div class="outline-text-3" id="text-1-6">
+
+<div id="org9037021" class="figure">
+<p><img src="other/glyphs.svg" alt="glyphs.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org1d396cd" class="outline-3">
+<h3 id="org1d396cd"><span class="section-number-3">1.7.</span> path</h3>
+<div class="outline-text-3" id="text-1-7">
+
+<div id="org5028444" class="figure">
+<p><img src="other/path.svg" alt="path.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org04f4b99" class="outline-3">
+<h3 id="org04f4b99"><span class="section-number-3">1.8.</span> bar</h3>
+<div class="outline-text-3" id="text-1-8">
+
+<div id="orga360600" class="figure">
+<p><img src="other/bar.svg" alt="bar.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org6925b64" class="outline-3">
+<h3 id="org6925b64"><span class="section-number-3">1.9.</span> sbar</h3>
+<div class="outline-text-3" id="text-1-9">
+
+<div id="orgaeffde4" class="figure">
+<p><img src="other/sbar.svg" alt="sbar.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcd6db84" class="outline-3">
+<h3 id="orgcd6db84"><span class="section-number-3">1.10.</span> wave</h3>
+<div class="outline-text-3" id="text-1-10">
+
+<div id="orgc63f407" class="figure">
+<p><img src="other/wave.svg" alt="wave.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgcaa4abf" class="outline-3">
+<h3 id="orgcaa4abf"><span class="section-number-3">1.11.</span> surface</h3>
+<div class="outline-text-3" id="text-1-11">
+
+<div id="orgc5e2f26" class="figure">
+<p><img src="other/surface.svg" alt="surface.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgc3adb07" class="outline-3">
+<h3 id="orgc3adb07"><span class="section-number-3">1.12.</span> arcflags</h3>
+<div class="outline-text-3" id="text-1-12">
+
+<div id="orgce2db00" class="figure">
+<p><img src="other/arcflags.svg" alt="arcflags.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org4363797" class="outline-3">
+<h3 id="org4363797"><span class="section-number-3">1.13.</span> ellipse</h3>
+<div class="outline-text-3" id="text-1-13">
+
+<div id="orgd257e52" class="figure">
+<p><img src="other/ellipse.svg" alt="ellipse.svg" class="org-svg" />
+</p>
+</div>
+
+
+<div id="orga052d4c" class="figure">
+<p><img src="other/ellipse2.svg" alt="ellipse2.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org06fa6d6" class="outline-3">
+<h3 id="org06fa6d6"><span class="section-number-3">1.14.</span> quad</h3>
+<div class="outline-text-3" id="text-1-14">
+
+<div id="orge76f02f" class="figure">
+<p><img src="other/quad.svg" alt="quad.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org277aae4" class="outline-3">
+<h3 id="org277aae4"><span class="section-number-3">1.15.</span> cubic</h3>
+<div class="outline-text-3" id="text-1-15">
+
+<div id="org8ad7197" class="figure">
+<p><img src="other/cubic.svg" alt="cubic.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org7cdaf48" class="outline-3">
+<h3 id="org7cdaf48"><span class="section-number-3">1.16.</span> venn</h3>
+<div class="outline-text-3" id="text-1-16">
+
+<div id="org7cba71d" class="figure">
+<p><img src="other/venn.svg" alt="venn.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgf1f2962" class="outline-3">
+<h3 id="orgf1f2962"><span class="section-number-3">1.17.</span> arrow</h3>
+<div class="outline-text-3" id="text-1-17">
+
+<div id="org64f4920" class="figure">
+<p><img src="other/arrow.svg" alt="arrow.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org916f5b6" class="outline-3">
+<h3 id="org916f5b6"><span class="section-number-3">1.18.</span> date</h3>
+<div class="outline-text-3" id="text-1-18">
+
+<div id="orgc39c835" class="figure">
+<p><img src="other/date.svg" alt="date.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org812c73c" class="outline-3">
+<h3 id="org812c73c"><span class="section-number-3">1.19.</span> gradient</h3>
+<div class="outline-text-3" id="text-1-19">
+
+<div id="org86d9a08" class="figure">
+<p><img src="other/gradient.svg" alt="gradient.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org670ed12" class="outline-3">
+<h3 id="org670ed12"><span class="section-number-3">1.20.</span> wheel</h3>
+<div class="outline-text-3" id="text-1-20">
+
+<div id="orgfe8914e" class="figure">
+<p><img src="other/wheel.svg" alt="wheel.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org0632e5c" class="outline-3">
+<h3 id="org0632e5c"><span class="section-number-3">1.21.</span> debug</h3>
+<div class="outline-text-3" id="text-1-21">
+
+<div id="org6d96d29" class="figure">
+<p><img src="other/debug.svg" alt="debug.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgbd41f6a" class="outline-3">
+<h3 id="orgbd41f6a"><span class="section-number-3">1.22.</span> compound</h3>
+<div class="outline-text-3" id="text-1-22">
+
+<div id="org9af80ad" class="figure">
+<p><img src="other/compound.svg" alt="compound.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-org95c195d" class="outline-3">
+<h3 id="org95c195d"><span class="section-number-3">1.23.</span> stack</h3>
+<div class="outline-text-3" id="text-1-23">
+
+<div id="orgaae1be0" class="figure">
+<p><img src="other/stack.svg" alt="stack.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgb9dd719" class="outline-3">
+<h3 id="orgb9dd719"><span class="section-number-3">1.24.</span> priorityv1</h3>
+<div class="outline-text-3" id="text-1-24">
+
+<div id="orgd288716" class="figure">
+<p><img src="other/priorityv1.svg" alt="priorityv1.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+<div id="outline-container-orgca0a647" class="outline-3">
+<h3 id="orgca0a647"><span class="section-number-3">1.25.</span> priorityv2</h3>
+<div class="outline-text-3" id="text-1-25">
+
+<div id="orgff22b98" class="figure">
+<p><img src="other/priorityv2.svg" alt="priorityv2.svg" class="org-svg" />
+</p>
+</div>
+</div>
+</div>
+</div>
+</div>
+<div id="postamble" class="status">
+<p class="author">Author: Tony Day</p>
+<p class="date">Created: 2023-11-29 Wed 19:22</p>
+</div>
+</body>
+</html>

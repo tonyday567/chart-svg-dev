@@ -11,7 +11,6 @@ module Lib
   , rvsp
   , toCT
   , sameProjection
-  , sameMulti
   ) where
 
 import Prelude
@@ -47,7 +46,7 @@ rvs n g = replicateM n (standard g)
 
 -- | rvsPair generates a list of correlated random variate tuples
 --
--- >>> rvsp gen 3 0.8
+-- > rvsp gen 3 0.8
 -- [(1.8005943761746166e-2,7.074509906249835e-2),(0.36444481359059255,-0.7073208451897444),(-1.2939898115295387,-0.643930709405127)]
 --
 rvsp n c g = do
@@ -59,22 +58,25 @@ rvsp n c g = do
 runG = runStateGen_ (mkStdGen 69)
 
 toCT :: ChartOptions -> ChartTree
-toCT co = view #charts $ forgetHud co
+toCT co = view #chartTree $ forgetHud co
 
 sameProjection :: ChartOptions -> (Bool, Maybe (Rect Double), Maybe (Rect Double))
 sameProjection co = (ct'==ct'', view styleBox' ct', view styleBox' ct'')
     where
       asp = co & view (#markupOptions % #chartAspect)
-      csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+      csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #chartTree co)
       viewbox = finalCanvas asp (Just csAndHud)
       ct' = projectChartTree viewbox csAndHud
       ct'' = set styleBox' (Just viewbox) csAndHud
 
+{-
 sameMulti :: ChartOptions -> (Bool, Maybe (Rect Double), Maybe (Rect Double))
 sameMulti co = (ct'==ct'', ct', ct'')
     where
       asp = co & view (#markupOptions % #chartAspect)
-      csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #charts co)
+      csAndHud = addHud (view (#markupOptions % #chartAspect) co) (view #hudOptions co) (view #chartTree co)
       viewbox = finalCanvas asp (Just csAndHud)
       ct' = view styleBox' $ set (styleBoxN' 10) (Just viewbox) csAndHud
       ct'' = view styleBox' $ set styleBox' (Just viewbox) csAndHud
+
+    -}

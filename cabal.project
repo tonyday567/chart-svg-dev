@@ -2,3 +2,14 @@ packages:
   chart-svg-dev.cabal
   ../chart-svg/chart-svg.cabal
   ../prettychart/prettychart.cabal
+
+allow-newer:
+  string-interpolate:bytestring,
+  string-interpolate:template-haskell,
+  string-interpolate:text,
+  scotty:text,
+  websockets:text,
+  websockets:bytestring,
+  websockets:attoparsec,
+  box-socket:text,
+  box-socket:bytestring,

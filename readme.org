@@ -40,44 +40,7 @@ import MarkupParse
 
 #+RESULTS:
 : Ok, one module loaded.
-: Setting phasers to stun... (port 9160) (ctrl-c to quit)
-
-* ToDo chart-svg mega cleanup checklist
-
-- [X] rerun whole org file and observe results
-- [X] styleBox' versus projectChartTree
-- [X] text box bug
-- [X] scaling text example
-- [X] examples audit
-- [X] NoScaleP needs to be the default for HudOption elements
-- [X] audit ScaleP usage
-- [X] toggle to switch to ScalePArea when the hud is forgotten
-- [X] surface legend
-- [ ] check & fix examples
-- [ ] fix compound code and compoundExample
-- [ ] Revisit anal [[file:~/haskell/anal/readme.org::*all in one][all in one]]
-- [ ] code ToDos
-- [ ] remove multiple reboxing
-- [ ] move GlyphShape back to Style
-- [ ] switch to svg names for attributes
-- [ ] palette1 ==> palette
-- [ ] #charts -> #chartTree
-- [ ] fix scalePath'
-- [ ] fix Rect show instance
-- [ ] Fix up Ticks
-  - lenses
-- [ ] better names for tick elements
-- [ ] check applyChartAspect usage
-- [ ] remove placeText
-- [ ] simplify :: ChartTree -> ChartTree
-  descend, combining unnamed nodes
-- [ ] #hud --> #hudChart
-- [ ] check Name usage in Huds
-- [ ] remove canvasStyleBox'
-- [ ] paint order
-  [[https://developer.mozilla.org/en-US/docs/Web/SVG/Attribute/paint-order][paint-order - SVG: Scalable Vector Graphics | MDN]]
-
-* chart-svg examples
+: Setting phasers to stun... (port 9g1h6c0i)>  (ctrl-c to quit)
 
 #+begin_src haskell-ng :results output
 writeAllExamples
@@ -87,43 +50,201 @@ writeAllExamples
 : ok
 
 #+begin_src haskell-ng :results output
-display $ barChart (defaultBarOptions & set (#barTextStyles % each % #anchor) AnchorMiddle & set (#barTextStyles % each % #size) 0.03 & set #textGap 0.04 & set #textGapNegative 0.06)  barDataExample & set (#markupOptions % #chartAspect) (CanvasAspect 1.5) & set #hudOptions mempty
+display arcFlagsExample
 #+end_src
 
 #+RESULTS:
 : True
 
 #+begin_src haskell-ng :results output
-display $ ellipseExample (FixedAspect 1.5) & set (#hudOptions % #axes % ix 1 % _2 % #ticks % #ttick %? _2) 0.04 & set (#hudOptions % #axes % ix 1 % _2 % #ticks % #gtick %? _3) 0.01 & set (#hudOptions % #legends % ix 0 % _2 % #vgap) 0.3 & set (#hudOptions % #titles % ix 0 % _2 % #style % #size) 0.032
-
+co = rectExample
+asp = view (#markupOptions % #chartAspect) co
+csAndHud = addHud asp (view #hudOptions co) (view #chartTree co)
+viewbox = finalCanvas asp (Just csAndHud)
+ctFinal = set styleBox' (Just viewbox) csAndHud
+view box' ctFinal
+view styleBox' ctFinal
+view safeBox' ctFinal
+view safeStyleBox' ctFinal
+padSingletons <$> view styleBox' ctFinal
+viewbox
 #+end_src
 
 #+RESULTS:
-: True
+: Just Rect (-0.7286821705426356) 0.7286821705426356 (-0.48917944093778176) 0.5
+: Just Rect (-0.7507441860465116) 0.7507441860465116 (-0.5011794409377818) 0.5
+: Rect (-0.7286821705426356) 0.7286821705426356 (-0.48917944093778176) 0.5
+: Rect (-0.7286821705426356) 0.7286821705426356 (-0.48917944093778176) 0.5
+: Just Rect (-0.7507441860465116) 0.7507441860465116 (-0.5011794409377818) 0.5
+: Rect (-0.75) 0.75 (-0.5) 0.5
 
-#+begin_src haskell-ng :results output
-co = lineExample
-writeChartOptions "other/line.svg" co
-display co
-#+end_src
+* v06 Changes
 
-#+RESULTS:
-: True
+Chart.Compound
 
-** variance data range test
+Chart.Bar
 
-#+begin_src haskell-ng :results output
-co = unitExample & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _1 % #frame) (Just defaultRectStyle) & set (#hudOptions % #axes % each % _2 % #ticks % #ttick %? _2) 0
-co' = co & over (#charts % charts' % each % #chartData) (scaleChartData 1)
-display co'
-#+end_src
+barTextCharts
+textShiftVert
 
-#+RESULTS:
-: True
+Chart.Hud
+
+- defaultPriority
+- HudBox
+- CanvasBox
+- ChartBox
+
+- canvasBox'
+- canvasStyleBox'
+- hudBox'
+- hudStyleBox'
+- runHud
+- HudChartSection
+- hudChartBox'
+
+- closes
+- fromEffect
+- applyChartAspect
+- getHudBox
+
++ appendHud
++ makeHuds
++ projectChartTreeWith
++ addHud
++ finalCanvas
+
+- defaultAxisOptions
++ defaultXAxisOptions
++ defaultYAxisOptions
+
+- placeText
++ flipPlace
+
+Title ==> TitleOptions
+
+- defaultGlyphTick
++ defaultGlyphTickStyleX
++ defaultGlyphTickStyleY
+
+- defaultTicks
++ defaultXTicks
+
+- defaultTick
+
+TickStyle ==> Tick
+
+formatN'
+numTicks'
+tickExtend'
+
++ axisHud
++ titleHud
+
+- legend
+- legendFrame
+
++ freezeAxes
++ freezeTicks
+
+Priority refactor
+Hud refactor
+
+
+Chart.Markup
+
++ forgetHud
+
+CssPreferColorScheme ==> PreferColorScheme
+CssShapeRendering ==> ShapeRendering
++ defaultCssFontFamilies
+
+Primitive
+
++    ChartData (..),
++    rectData',
++    lineData',
++    glyphData',
++    textData',
++    pathData',
++    blankData',
++    pattern RectChart,
++    pattern LineChart,
++    pattern GlyphChart,
++    pattern TextChart,
++    pattern PathChart,
++    pattern BlankChart,
++    pattern LineChart1,
+
++ scaleP
++ projectChartDataWith
+-    scaleStyle,
+-    colourChart,
++    scaleChartData,
++ colourStyle
+
++ safeBox'
++ safeStyleBox'
+- overText
++ blankChart
+
+
+Chart.Style
+
++ Style (..),
++ defaultStyle,
++ scaleStyle,
+
+gpalette <== gpalette1
++ ScaleP
++ scaleRatio
+
+Data.Colour
+
+palette <== palette1
+paletteO <== palette1a
+
+Chart.Surface
+
+-    surfaceLegendChart,
+-    surfaceAxisOptions,
++    surfaceLegendAxisOptions,
++    gridReferenceChart,
++    addSurfaceLegend,
+
+Chart.Data
+
+- singletonGuard
++ isSingleton
+
+axis --> axisHud
+title --> titleHud
+legend --> legendHud
 
 * example problems
+
 ** pathExample
-- [ ] move text
+
+#+begin_src haskell-ng :results output
+display $ pathExample & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #anchorTo) CanvasStyleSection & set (#hudOptions % #axes % each % #item % #bar %? #anchorTo) CanvasStyleSection
+
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+ps = [ StartP (Point 0 0), LineP (Point 1 0), CubicP (Point 0.2 0) (Point 0.25 1) (Point 1 1), QuadP (Point (-1) 2) (Point 0 1), ArcP (ArcInfo (Point 1 1) (-pi / 6) False False) (Point 0 0)]
+ts = [ "StartP (Point 0 0)", "LineP (Point 1 0)", "CubicP (Point 0.2 0) (Point 0.25 1) (Point 1 1)", "QuadP (Point (-1) 2) (Point 0 1)", "ArcP (ArcInfo (Point 1 1) (-pi / 6) False False) (Point 0 0)"]
+path' = PathChart (defaultPathStyle & #color .~ palette1a 0 0.05 & #borderColor .~ palette1a 1 0.3) ps
+c0 = GlyphChart defaultGlyphStyle ((SquareGlyph,) . pointPath <$> ps)
+midp = Point 0 0 : zipWith (\(Point x y) (Point x' y') -> Point ((x + x') / 2) ((y + y') / 2)) (drop 1 (pointPath <$> ps)) (pointPath <$> ps)
+offp = [Point (-0.35) 0.05, Point 0 0.05, Point (-0.2) 0, Point (-0.1) 0.1, Point 0 (-0.1)]
+t0 = TextChart (defaultTextStyle & set #size 0.025) (zip ts (zipWith addp offp midp))
+display $ mempty & #charts .~ named "path" [path', c0] <> named "pathtext" [t0] & #hudOptions .~ defaultHudOptions & #markupOptions % #chartAspect .~ ChartAspect & #markupOptions % #cssOptions % #preferColorScheme .~ PreferHud & #markupOptions % #cssOptions % #cssExtra .~ fillSwitch (dark, light) "dark" "pathtext"
+#+end_src
+
+#+RESULTS:
+: True
 
 ** lineExample
 
@@ -135,11 +256,9 @@ display co
 
 #+RESULTS:
 : True
-** Done legend framing bug
-:LOGBOOK:
-- State "Done"       from "Next"       [2023-11-27 Mon 14:45]
-:END:
+** legends
 
+*** frame bug
 - [X] add scaleP for legendoptions
 
 lineExample legend with zero gaps and padding highlights that:
@@ -162,25 +281,70 @@ cs''' = placeLegend lo0 one cs'' & set (charts' % each % #style % #scaleP) Scale
 view styleBox' $ set styleBox' (Just one) (c0 <> cs''')
 
 -- automated construction via HudOptions
-display $ (mempty :: ChartOptions) & set #charts c0 & set (#markupOptions % #chartAspect) (FixedAspect 1) & set #hudOptions (mempty & set #legends [(100,lo0 & set #scaleP ScalePX)]) -- defaultHudOptions
+display $ (mempty :: ChartOptions) & set #charts c0 & set (#markupOptions % #chartAspect) ChartAspect & set #hudOptions (mempty & set #legends [(100,lo0 & set #scaleP ScalePArea)]) -- defaultHudOptions
 #+end_src
 
 #+RESULTS:
 : Just Rect -2.5e-3 1.6023999999999998 -9.129999999999999e-2 0.44650000000000006
+: Just Rect -0.5 0.5 -0.5 0.5
+: True
+
+*** large text bug
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-11-30 Thu 10:59]
+:END:
+
+
+
+Manual construction and placement for a legend, using ScalePX.
+
+A slight space opens up between the horizontal elements.
+
+#+begin_src haskell-ng :results output
+lo0 = defaultLegendOptions & set (#textStyle % #frame) (Just defaultRectStyle) & set (#textStyle % #size) 0.16 & set #vgap 0 & set #hgap 0 & set #outerPad 0 & set #innerPad 0 & set #overallScale 0.2 & set #size 0.2 & set #legendCharts (take 3 $ fromMaybe undefined $ preview (#hudOptions % #legends % ix 0 % _2 % #legendCharts) lineExample) & set #buffer 0 & set #scaleP ScalePX
+
+-- manual construction
+cs = legendChart lo0 & set (charts' % each % #style % #scaleP) (view #scaleP lo0)
+view styleBox' cs
+
+c0 = unnamed [RectChart defaultRectStyle [one]]
+cs'' = cs & over (charts' % each) (scaleChart 0.3)
+cs''' = placeLegend lo0 one cs''
+view styleBox' $ set styleBox' (Just one) (c0 <> cs''')
+
+display $ (mempty :: ChartOptions) & set #charts (c0 <> cs''') & set (#markupOptions % #chartAspect) (FixedAspect 1) & set #hudOptions defaultHudOptions
+#+end_src
+
+#+RESULTS:
+: Just Rect -2.5e-3 1.4024 -9.129999999999999e-2 0.44650000000000006
 : Just Rect -0.5 0.49999999999999994 -0.5 0.5
 : True
 
 #+begin_src haskell-ng :results output
-display $ lineExample & set (#markupOptions % #chartAspect) (FixedAspect 1.5) & set (#hudOptions % #legends % each % _2 % #scaleP) ScalePX
+:t legendEntry lo0 "palette #0"
+:t fmap (legendizeChart lo0) <$> (toListOf (#charts % charts') lineExample)
+:t view #legendCharts lo0
+:t legendText lo0
+l = defaultLegendOptions & set (#textStyle % #frame) (Just defaultRectStyle) & set (#textStyle % #size) 0.12 & set #vgap 0 & set #hgap 0 & set #outerPad 0 & set #innerPad 0 & set #overallScale 0.2 & set #size 0.2 & set #legendCharts (take 3 $ fromMaybe undefined $ preview (#hudOptions % #legends % ix 0 % _2 % #legendCharts) lineExample) & set #buffer 0
+es = reverse $ uncurry (legendEntry l) <$> view #legendCharts l
+twidth = maybe zero (\(Rect x z _ _) -> z - x) (styleBoxes (fst <$> es))
+gapwidth t = maybe 0 (\(Rect x z _ _) -> z - x) (sbox t)
+twidth
+x1 = vert 0 $ hori 0 <$> (\(t,a) -> [unnamed [t], unnamed a]) <$> es
+x2 = x1 & set (charts' % each % #style % #scaleP) ScalePArea
+display $ (mempty :: ChartOptions) & set #charts x2 & set (#markupOptions % #chartAspect) ChartAspect & set #hudOptions defaultHudOptions
 #+end_src
 
 #+RESULTS:
+: legendEntry lo0 "palette #0" :: [Chart] -> (Chart, [Chart])
+: fmap (legendizeChart lo0) <$> (toListOf (#charts % charts') lineExample)
+:   :: [[Chart]]
+: view #legendCharts lo0 :: [(Text, [Chart])]
+: legendText lo0 :: Text -> Chart
+: 0.7212000000000001
 : True
 
-** Done surface legend
-:LOGBOOK:
-- State "Done"       from "Next"       [2023-11-28 Tue 14:25]
-:END:
+** surface legend
 
 #+begin_src haskell-ng :results output
 display surfaceExample
@@ -283,13 +447,9 @@ display $ (mempty :: ChartOptions) & set #charts ctBoth & set #markupOptions (de
 addSurfaceLegend version
 
 #+begin_src haskell-ng :results output
-grain = Point 100 100
+grain = Point 20 20
 r = one
-f = fst . bimap ((-1.0) *) (fmap ((-1.0) *)) . rosenbrock 1 10
-evenColors = trimColour . over lightness' (const 0.55) . palette1 <$> [0 .. 5]
-so = defaultSurfaceOptions & #soGrain .~ grain & #soRange .~ r & #soStyle % #surfaceColors .~ evenColors
-(cs, rangef) = surfacef f so
-
+f = fst . bimap ((-1.0)
 slo = defaultSurfaceLegendOptions & set (#sloSurfaceStyle % #surfaceColors) evenColors & set (#sloDataRange) rangef
 
 cs' = addSurfaceLegend slo (unnamed cs)
@@ -300,37 +460,72 @@ display $ (mempty :: ChartOptions) & set #charts cs' & set #markupOptions (defau
 #+RESULTS:
 : True
 
+** compoundExample
 
 #+begin_src haskell-ng :results output
-display $ (mempty :: ChartOptions) & set #charts grcLegend & set (#markupOptions % #chartAspect) ChartAspect & set #hudOptions defaultHudOptions
+display compoundExample
 #+end_src
 
 #+RESULTS:
 : True
 
-list of valid SLOs
+- [X] try a no extend
+- [X] try a ScalePArea
+- [X] simplest decompose
 
-- [ ] sloAxisOptions
-- [ ] place
-- [ ] sloRect (in prop to normalised original chart as one)
-- [ ] sloResolution
-- [ ] sloColors
-- [ ] sloWidth
+*** original compoundExample
 
 #+begin_src haskell-ng :results output
-:t addHud
-:t forgetHud
+ts = TickRound (FormatN FSCommaPrec (Just 1) 4 True True) 5 TickExtend
+tsf = set (#hudOptions % #axes % each % _2 % #ticks % #style) ts
+sap = set (#charts % charts' % each % #style % #scaleP) ScalePArea
+co = compoundMerge [lineExample & tsf & sap, unitExample & tsf & sap & #hudOptions % #axes %~ fmap (_2 % #place %~ flipPlace)]
+display co
 #+end_src
 
 #+RESULTS:
-: addHud :: ChartAspect -> HudOptions -> ChartTree -> ChartTree
-: forgetHud :: ChartOptions -> ChartOptions
+: True
 
-** ToDo compoundExample
-** Done stackExample
-:LOGBOOK:
-- State "Done"       from "ToDo"       [2023-11-24 Fri 06:41]
-:END:
+*** simple experiment
+
+- [X] titles ok
+- [X] noextend axes ok
+- [X] extend axes
+
+
+
+#+begin_src haskell-ng :results output
+ts = TickRound (FormatN FSCommaPrec (Just 1) 4 True True) 4 NoTickExtend
+tse = TickRound (FormatN FSCommaPrec (Just 1) 4 True True) 4 TickExtend
+tsf = set (#axes % each % _2 % #ticks % #style)
+sap = set (#charts % charts' % each % #style % #scaleP) ScalePArea
+ho1 = (mempty :: HudOptions) & set #titles [(3,defaultTitle "chart1")] & set #axes [(2,defaultXAxisOptions), (2,defaultYAxisOptions)] & tsf ts & colourHudOptions (const (palette1 0))
+c1 = (mempty :: ChartOptions) & set #hudOptions ho1 & set #charts (named "c1" [Chart defaultRectStyle (RectData [fmap (2*) one])])
+
+ho2 = (mempty :: HudOptions) & set #titles [(3.1,defaultTitle "chart2")] & set #axes [(2,defaultXAxisOptions & set #place PlaceTop), (2,defaultYAxisOptions & set #place PlaceRight)] & tsf ts & colourHudOptions (const (palette1 3))
+c2 = (mempty :: ChartOptions) & set #hudOptions ho2 & set #charts (named "c2" [Chart (blob (set opac' 0.3 $ palette1 3)) (RectData [fmap (*0.8) one]), BlankChart defaultStyle [one]])
+co = compoundMerge [c1,c2]
+display co
+#+end_src
+
+#+RESULTS:
+: True
+*** new example
+
+#+begin_src haskell-ng :results output
+ho1 = (mempty :: HudOptions) & set #titles [(3,defaultTitle "chart1")] & set #axes [(2,defaultXAxisOptions), (2,defaultYAxisOptions)] & colourHudOptions (const (palette1 0))
+c1 = (mempty :: ChartOptions) & set #hudOptions ho1 & set #charts (named "c1" [Chart defaultRectStyle (RectData [fmap (2*) one])])
+
+ho2 = (mempty :: HudOptions) & set #titles [(3.1,defaultTitle "chart2")] & set #axes [(2,defaultXAxisOptions & set #place PlaceTop), (2,defaultYAxisOptions & set #place PlaceRight)] & colourHudOptions (const (palette1 3))
+c2 = (mempty :: ChartOptions) & set #hudOptions ho2 & set #charts (named "c2" [Chart (blob (set opac' 0.3 $ palette1 3)) (RectData [fmap (*0.8) one]), BlankChart defaultStyle [one]])
+co = compoundMerge [c1,c2]
+display co
+#+end_src
+
+#+RESULTS:
+: True
+
+** stackExample
 
 #+begin_src haskell-ng :results output
 display $ mempty & set #charts (stack 4 0.1 (replicate 16 $ (view #charts $ (set (#charts % charts' % each % #style % #scaleP) ScalePArea) $ forgetHud lineExample)))
@@ -339,14 +534,10 @@ display $ mempty & set #charts (stack 4 0.1 (replicate 16 $ (view #charts $ (set
 #+RESULTS:
 : True
 
-** Done bar & sbar
-:LOGBOOK:
-- State "Done"       from "ToDo"       [2023-11-27 Mon 18:28]
-- State "Done"       from "Next"       [2023-11-23 Thu 20:51]
-:END:
+** bar & sbar
 
 - [X] numbers are badly placed on both X and Y axis
-  - [X] Not due to negative
+- [X] Not due to negative
 - [X] numbers a bit small
 - [X] vgap on legend
 - [X] legend skewif
@@ -395,33 +586,55 @@ barRects bo (view #barData barDataExample')
 barTexts bo (view #barData barDataExample')
 #+end_src
 
-** Done ellipse & quad & cubic
-:LOGBOOK:
-- State "Done"       from "Next"       [2023-11-27 Mon 14:52]
-:END:
+** ellipse & quad & cubic
 - [X] title
 - [X] yaxis ticks
 - [X] quad
 - [X] cubic
 
-** Done text
-:LOGBOOK:
-- State "Done"       from              [2023-11-23 Thu 21:02]
-:END:
+** textExample
+
+- [X] bad y axis ticks
+- [X] funny axis bar
 
 #+begin_src haskell-ng :results output
-co = textExample --  & set (#charts % charts' % each % #style % #size) 0.1
+co = textExample
 display co
 #+end_src
 
 #+RESULTS:
 : True
 
+#+begin_src haskell-ng :results output
+co & view #chartTree & view box'
+#+end_src
+
+#+RESULTS:
+: Just Rect 0.0 0.9995736030415051 0.0 25.0
+
+#+begin_src haskell-ng :results output
+forgetHud co & toListOf (#chartTree % charts' % each % #style % #scaleP)
+#+end_src
+
+#+RESULTS:
+: [ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea,ScalePArea]
+
 ** higher number of ticks
 
 #+begin_src haskell-ng :results output
 co = unitExample & set (#hudOptions % #axes % each % _2 % #ticks % #style % numTicks') (Just 8) & over (#charts % charts' % each % #chartData) (scaleChartData 1)
 display co
+#+end_src
+
+#+RESULTS:
+: True
+
+** dateExample
+
+- [X] y axis ticks being cut off
+
+#+begin_src haskell-ng :results output
+display $ dateExample & set (#hudOptions % #frames) [(100,defaultFrameOptions & set #buffer 0.05)]
 #+end_src
 
 #+RESULTS:
@@ -560,14 +773,6 @@ pPrint $ filter ((\(x,_,_) -> not x) . snd) $ second (sameMulti) <$> pathChartOp
         )
     )
 ,
-    ( "other/bar.svg"
-    ,
-        ( False
-        , Just Rect -0.75 0.75 -0.5 0.5
-        , Just Rect -0.75 0.75 -0.49999999999999994 0.5
-        )
-    )
-,
     ( "other/sbar.svg"
     ,
         ( False
@@ -584,19 +789,11 @@ pPrint $ filter ((\(x,_,_) -> not x) . snd) $ second (sameMulti) <$> pathChartOp
         )
     )
 ,
-    ( "other/path.svg"
+    ( "other/quad.svg"
     ,
         ( False
-        , Just Rect -0.4682206444223888 0.4682206444223888 -0.5 0.5
-        , Just Rect -0.4682206444223888 0.4682206444223888 -0.5 0.4999999999999999
-        )
-    )
-,
-    ( "other/date.svg"
-    ,
-        ( False
-        , Just Rect -0.75 0.7500000000000001 -0.5 0.4999999999999999
-        , Just Rect -0.75 0.7500000000000001 -0.49999999999999994 0.5
+        , Just Rect -0.75 0.75 -0.5 0.5
+        , Just Rect -0.75 0.7499999999999998 -0.5 0.5
         )
     )
 ,
@@ -632,7 +829,7 @@ display jam
 #+RESULTS:
 : True
 
-** Done unscaled + no hud
+** unscaled + no hud
 :LOGBOOK:
 - State "Done"       from              [2023-11-24 Fri 18:03]
 :END:
@@ -719,7 +916,7 @@ data box padded:Rect -0.5 0.5 -0.5 0.5
 svg viewbox:(-3.0e-4,-4.83e-2,0.10859999999999997,6.66e-2)
 #+end_example
 
-** Done unscaled + zero frame
+** unscaled + zero frame
 :LOGBOOK:
 - State "Done"       from              [2023-11-24 Fri 18:03]
 :END:
@@ -806,7 +1003,7 @@ data box padded:Rect -0.5 0.5 -0.5 0.5
 svg viewbox:(-3.0e-4,-4.83e-2,0.10859999999999997,6.66e-2)
 #+end_example
 
-** Done ChartAspect + no hud
+** ChartAspect + no hud
 :LOGBOOK:
 - State "Done"       from              [2023-11-26 Sun 07:50]
 - State "Done"       from              [2023-11-24 Fri 18:03]
@@ -896,7 +1093,7 @@ data box padded:Rect -0.5 0.5 -0.5 0.5
 svg viewbox:(-0.8153153153153152,-0.5,1.6306306306306304,1.0)
 #+end_example
 
-** Done ChartAspect + zero frame
+** ChartAspect + zero frame
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-11-26 Sun 07:59]
 - State "Done"       from              [2023-11-26 Sun 07:50]
@@ -985,7 +1182,7 @@ data box padded:Rect -0.5 0.5 -0.5 0.5
 svg viewbox:(-0.8153153153153152,-0.5,1.6306306306306304,1.0)
 #+end_example
 
-** Done FixedAspect + no hud
+** FixedAspect + no hud
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-11-26 Sun 12:04]
 - State "Done"       from "Next"       [2023-11-26 Sun 07:59]
@@ -1087,7 +1284,7 @@ exp1 = csPaddeds & over (each % #chartData) id & over (each % #style) (\s -> sca
 : [TextData [("jam",Point -5.551115123125783e-17 -0.2252252252252252)]]
 : True
 
-** Done FixedAspect + zero frame
+** FixedAspect + zero frame
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-11-26 Sun 12:08]
 - State "Done"       from "Next"       [2023-11-26 Sun 12:04]
@@ -1177,7 +1374,7 @@ data box padded:Rect -0.5 0.5 -0.5 0.5
 svg viewbox:(-0.5000000000000002,-0.5,1.0000000000000004,1.0)
 #+end_example
 
-** Done CanvasAspect + zero frame
+** CanvasAspect + zero frame
 :LOGBOOK:
 - State "Done"       from "Next"       [2023-11-26 Sun 12:08]
 - State "Done"       from "Next"       [2023-11-26 Sun 12:04]
@@ -1582,3 +1779,742 @@ display co
 
 #+RESULTS:
 : True
+
+* HudChart lens audit
+
+canvasBox'
+  makeAxisBar
+  tickGlyph
+  tickText
+  tickLine
+
+hudStyleBox'
+  frameHud
+  makeAxisBar
+  title
+  tickText
+  legendHud
+
+hudBox'
+  tickGlyph
+  makeTick
+
+* ScaleBorder removal
+:LOGBOOK:
+- State "Done"       from              [2023-11-30 Thu 14:36]
+:END:
+
+#+begin_src haskell-ng :results output
+display $ glyphsExample & set (#markupOptions % #chartAspect) (FixedAspect 6) & set (#markupOptions % #markupHeight) (Just 200)
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+:t glyphsExample & over (#charts % charts' % _last) (fmap id) -- ((\(PathGlyph p _, pt) -> (PathGlyph p NoScaleBorder,pt))))
+#+end_src
+
+#+RESULTS:
+#+begin_example
+<interactive>:1:43: error:
+    • Couldn't match type ‘f0 a0’ with ‘Chart’
+        arising from a functional dependency between:
+          constraint ‘Snoc [Chart] [Chart] (f0 a0) (f0 a0)’
+            arising from a use of ‘_last’
+          instance ‘Snoc [a] [b] a b’ at <no location info>
+    • In the second argument of ‘(%)’, namely ‘_last’
+      In the first argument of ‘over’, namely
+        ‘(#charts % charts' % _last)’
+      In the second argument of ‘(&)’, namely
+        ‘over (#charts % charts' % _last) (fmap id)’
+#+end_example
+
+* HudChartSection
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-12-02 Sat 16:31]
+:END:
+
+- [X] axis bar
+  - [X] lens with AnchoredTo option
+- [X] distortion in tickGlyphs due to NoScaleP
+- [X] glyph ticks are a consistent hair away from the axis bar
+- [X] textExample and others are a long way away
+- [X] decide on axis bar and glyph tick buffers and section anchors
+  0.01 0.015
+
+#+begin_src haskell-ng :results output
+display $ unitExample & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #buffer) 0.01 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #anchorTo) CanvasSection
+#+end_src
+
+#+RESULTS:
+: True
+
+** decomp
+
+UnscaledAspect is perfect, and then ChartAspect stuffs everything up:
+
+#+begin_src haskell-ng :results output
+sec = CanvasStyleSection
+asp = UnscaledAspect
+co = unitExample & set (#hudOptions % #axes % each % #item % #bar %? #buffer) 0.0 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #buffer) 0.0 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #anchorTo) sec & set (#markupOptions % #chartAspect) asp  & set (#hudOptions % #axes % each % #item % #ticks % #style % tickExtend' % _Just) TickExtend & set (#hudOptions % #axes % each % #item % #bar %? #anchorTo) sec & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #size) 0.10 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #shape) SquareGlyph & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #scaleP) NoScaleP & set (#hudOptions % #axes % each % #item % #ticks % #lineTick) Nothing & set (#hudOptions % #axes % each % #item % #ticks % #textTick) Nothing & set (#hudOptions % #frames) []
+display co
+
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+co & view (#hudOptions % #frames)
+#+end_src
+
+#+begin_src haskell-ng :results output
+:set -Wno-incomplete-uni-patterns
+-- pPrint $ (forgetHud co) & view (#chartTree % #tree) & fmap (second (toListOf (each % #chartData)))
+co' = forgetHud co
+display co'
+xs = filter (/=[]) $ (forgetHud co) & toListOf (#chartTree % charts') & fmap (fmap (view #chartData))
+(Just b') = view styleBox' (view #chartTree co')
+(Just bca') = view styleBox' (view #chartTree (forgetHud $ co & set (#markupOptions % #chartAspect) ChartAspect))
+b'
+bca'
+ratio b'
+ratio bca'
+csUnscaled = addHud UnscaledAspect (view #hudOptions co) (view #chartTree co)
+csChartScaled = addHud ChartAspect (view #hudOptions co) (view #chartTree co)
+view styleBox' csUnscaled
+view styleBox' csChartScaled
+(initialCanvas UnscaledAspect (Just (view #chartTree co)))
+(initialCanvas ChartAspect (Just (view #chartTree co)))
+#+end_src
+
+unscaled runHudWith breakup
+
+#+begin_src haskell-ng :results output
+cs = view #chartTree co
+ho = view #hudOptions co
+asp = UnscaledAspect
+    db = maybe one padSingletons (view box' cs)
+    (mdb, hs) = toHuds ho db
+    cs' = cs <> maybe mempty (\r -> bool (named "datapadding" [BlankChart defaultStyle [r]]) mempty (r == db)) mdb
+    asp0 = initialCanvas asp (Just cs')
+    csAndHud = runHudWith asp0 hs cs'
+view styleBox' cs'
+asp0
+view styleBox' csAndHud
+unscaledCSsAndHud = csAndHud
+#+end_src
+
+#+RESULTS:
+: Just Rect (-0.6000000000000001) 0.6000000000000001 (-0.6000000000000001) 0.6000000000000001
+: Rect (-0.6000000000000001) 0.6000000000000001 (-0.6000000000000001) 0.6000000000000001
+: Just Rect (-0.7040000000000002) 0.6520000000000001 (-0.7040000000000002) 0.6520000000000001
+
+ChartAspect runHudWith breakup
+
+#+begin_src haskell-ng :results output
+cs = view #chartTree co
+ho = view #hudOptions co
+asp = ChartAspect
+    db = maybe one padSingletons (view box' cs)
+    (mdb, hs) = toHuds ho db
+    cs' = cs <> maybe mempty (\r -> bool (named "datapadding" [BlankChart defaultStyle [r]]) mempty (r == db)) mdb
+    asp0 = initialCanvas asp (Just cs')
+    csAndHud = runHudWith asp0 hs cs'
+view styleBox' cs'
+asp0
+view styleBox' csAndHud
+vb = finalCanvas asp (Just csAndHud)
+vb
+view styleBox' (projectChartWith asp ho cs)
+display $ (mempty :: ChartOptions) & set #chartTree csAndHud & set (#markupOptions % #chartAspect) UnscaledAspect
+#+end_src
+
+#+RESULTS:
+: Just Rect (-0.6000000000000001) 0.6000000000000001 (-0.6000000000000001) 0.6000000000000001
+: Rect (-0.5) 0.5 (-0.5) 0.5
+: Just Rect (-0.6040000000000001) 0.552 (-0.6040000000000001) 0.552
+: Rect (-0.5) 0.5 (-0.5) 0.5
+: Just Rect (-0.49999999999999994) 0.49999999999999994 (-0.49999999999999994) 0.49999999999999994
+: True
+
+
+The problem is in the final set styleBox', which is operating on NoScaleP styled charts:
+
+#+begin_src haskell-ng :results output
+ctFinal = set styleBox' (Just vb) $ csAndHud & set (charts' % each % #style % #scaleP) ScalePY
+display $ (mempty :: ChartOptions) & set #chartTree ctFinal & set (#markupOptions % #chartAspect) (FixedAspect 1.5)
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+csAndHud & toListOf (charts' % each % #style % #scaleP)
+#+end_src
+
+#+RESULTS:
+: [NoScaleP,NoScaleP,NoScaleP,NoScaleP,NoScaleP,NoScaleP]
+
+** solution
+
+Scale the xaxis by ScalePX etc:
+
+
+#+begin_src haskell-ng :results output
+sec = CanvasSection
+asp = FixedAspect 1.5
+co = unitExample & set (#hudOptions % #axes % each % #item % #bar %? #buffer) 0.0 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #buffer) 0.0 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #anchorTo) sec & set (#markupOptions % #chartAspect) asp  & set (#hudOptions % #axes % each % #item % #ticks % #style % tickExtend' % _Just) TickExtend & set (#hudOptions % #axes % each % #item % #bar %? #anchorTo) sec & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #size) 0.10 & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #shape) SquareGlyph & set (#hudOptions % #axes % each % #item % #ticks % #glyphTick %? #style % #item % #scaleP) NoScaleP & set (#hudOptions % #axes % each % #item % #ticks % #lineTick) Nothing & set (#hudOptions % #axes % each % #item % #ticks % #textTick) Nothing & set (#hudOptions % #frames) [] & set (#hudOptions % #axes % ix 0 % #item % #ticks % #glyphTick %? #style % #item % #scaleP) ScalePX & set (#hudOptions % #axes % ix 1 % #item % #ticks % #glyphTick %? #style % #item % #scaleP) ScalePY
+display co
+
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+display $ unitExample & set (#markupOptions % #chartAspect) UnscaledAspect
+#+end_src
+
+#+RESULTS:
+: True
+
+* mempty
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-12-02 Sat 19:07]
+:END:
+
+#+begin_src haskell-ng :results output
+display $ mempty & set #chartTree (view #chartTree unitExample)
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+pPrint $ mempty & set #chartTree (view #chartTree unitExample) & markupChartOptions
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Markup
+    { elements =
+        [ Node
+            { rootLabel = OpenTag StartTag "svg"
+                [ Attr
+                    { attrName = "xmlns"
+                    , attrValue = "http://www.w3.org/2000/svg"
+                    }
+                , Attr
+                    { attrName = "xmlns:xlink"
+                    , attrValue = "http://www.w3.org/1999/xlink"
+                    }
+                , Attr
+                    { attrName = "width"
+                    , attrValue = "449"
+                    }
+                , Attr
+                    { attrName = "height"
+                    , attrValue = "300"
+                    }
+                , Attr
+                    { attrName = "viewBox"
+                    , attrValue = "-0.7500 -0.5000 1.5000 1.0000"
+                    }
+                ]
+            , subForest =
+                [ Node
+                    { rootLabel = OpenTag StartTag "style" []
+                    , subForest =
+                        [ Node
+                            { rootLabel = Content "svg {
+                                color-scheme: light dark;
+                              }
+                              {
+                                .canvas g, .title g, .axisbar g, .ticktext g, .tickglyph g, .ticklines g, .legendContent g text {
+                                  fill: rgb(5%, 5%, 5%);
+                                }
+                                .ticklines g, .tickglyph g, .legendBorder g {
+                                  stroke: rgb(5%, 5%, 5%);
+                                }
+                                .legendBorder g {
+                                  fill: rgb(94%, 94%, 94%);
+                                }
+                              }
+                              @media (prefers-color-scheme:dark) {
+                                .canvas g, .title g, .axisbar g, .ticktext g, .tickglyph g, .ticklines g, .legendContent g text {
+                                  fill: rgb(94%, 94%, 94%);
+                                }
+                                .ticklines g, .tickglyph g, .legendBorder g {
+                                  stroke: rgb(94%, 94%, 94%);
+                                }
+                                .legendBorder g {
+                                  fill: rgb(5%, 5%, 5%);
+                                }
+                              }
+                              svg { font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+                              }
+
+                              ticktext { font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+                              }
+
+                              "
+                            , subForest = []
+                            }
+                        ]
+                    }
+                , Node
+                    { rootLabel = OpenTag StartTag "g"
+                        [ Attr
+                            { attrName = "class"
+                            , attrValue = "chart"
+                            }
+                        ]
+                    , subForest =
+                        [ Node
+                            { rootLabel = OpenTag StartTag "g"
+                                [ Attr
+                                    { attrName = "class"
+                                    , attrValue = "unit"
+                                    }
+                                ]
+                            , subForest =
+                                [ Node
+                                    { rootLabel = OpenTag StartTag "g"
+                                        [ Attr
+                                            { attrName = "stroke-width"
+                                            , attrValue = "0.0100"
+                                            }
+                                        , Attr
+                                            { attrName = "stroke"
+                                            , attrValue = "rgb(2%, 29%, 48%)"
+                                            }
+                                        , Attr
+                                            { attrName = "stroke-opacity"
+                                            , attrValue = "1.0"
+                                            }
+                                        , Attr
+                                            { attrName = "fill"
+                                            , attrValue = "rgb(2%, 73%, 80%)"
+                                            }
+                                        , Attr
+                                            { attrName = "fill-opacity"
+                                            , attrValue = "0.1"
+                                            }
+                                        ]
+                                    , subForest =
+                                        [ Node
+                                            { rootLabel = OpenTag EmptyElemTag "rect"
+                                                [ Attr
+                                                    { attrName = "width"
+                                                    , attrValue = "1.4900"
+                                                    }
+                                                , Attr
+                                                    { attrName = "height"
+                                                    , attrValue = "0.9900"
+                                                    }
+                                                , Attr
+                                                    { attrName = "x"
+                                                    , attrValue = "-0.7450"
+                                                    }
+                                                , Attr
+                                                    { attrName = "y"
+                                                    , attrValue = "-0.4950"
+                                                    }
+                                                ]
+                                            , subForest = []
+                                            }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    }
+                , Node
+                    { rootLabel = OpenTag StartTag "g"
+                        [ Attr
+                            { attrName = "class"
+                            , attrValue = "hud"
+                            }
+                        ]
+                    , subForest = []
+                    }
+                ]
+            }
+        ]
+    }
+#+end_example
+* chart-svg mega cleanup checklist
+:LOGBOOK:
+- State "Done"       from "Next"       [2023-12-03 Sun 08:02]
+:END:
+
+- [X] rerun whole org file and observe results
+- [X] styleBox' versus projectChartTree
+- [X] text box bug
+- [X] scaling text example
+- [X] examples audit
+- [X] NoScaleP needs to be the default for HudOption elements
+- [X] audit ScaleP usage
+- [X] toggle to switch to ScalePArea when the hud is forgotten
+- [X] surface legend
+- [X] check & fix examples
+- [X] fix compound code and compoundExample
+- [X] v06candidate1
+- [X] Revisit anal [[file:~/haskell/anal/readme.org::*all in one][all in one]]
+- [X] diff test back
+- [X] code ToDos
+- [X] remove canvasStyleBox'
+- [X] remove multiple reboxing
+- [X] palette1 ==> palette
+- [X] #charts -> #chartTree
+- [X] move GlyphShape back to Style
+- [X] fix Rect show instance
+- [X] priority refactor
+- [X] buffered
+- [X] better names for tick elements
+- [X] remove placeText
+- [X] tick lenses
+- [X] remove Buffered, TextTickStyle, LineTickStyle
+- [X] FrameOption anchorTo
+- [X] review ScaleP
+- [X] look at mempty examples for redundant markup snippets
+  - [X] mempty & set #hudOptions defaultHudOptions & set #chartTree mempty produces a hud still?
+- [X] replace .~ ~% ^.
+
+* AST
+
+** ChartOptions
+
+#+begin_src haskell-ng :results output
+data ChartOptions = ChartOptions
+  { markupOptions :: MarkupOptions,
+    hudOptions :: HudOptions,
+    chartTree :: ChartTree
+  }
+#+end_src
+
+** MarkupOptions
+
+#+begin_src haskell-ng :results output
+data MarkupOptions = MarkupOptions
+  { markupHeight :: Maybe Double,
+    chartAspect :: ChartAspect,
+    cssOptions :: CssOptions,
+    renderStyle :: RenderStyle
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data ChartAspect
+  = FixedAspect Double
+  | CanvasAspect Double
+  | ChartAspect
+  | UnscaledAspect
+#+end_src
+
+#+begin_src haskell-ng :results output
+data CssOptions = CssOptions
+  { shapeRendering :: CssShapeRendering,
+    preferColorScheme :: CssPreferColorScheme,
+    fontFamilies :: ByteString,
+    cssExtra :: ByteString}
+#+end_src
+
+#+begin_src haskell-ng :results output
+data RenderStyle = Compact | Indented Int
+#+end_src
+
+#+begin_src haskell-ng :results output
+data CssShapeRendering = UseGeometricPrecision | UseCssCrisp | NoShapeRendering
+#+end_src
+
+#+begin_src haskell-ng :results output
+data CssPreferColorScheme
+  = -- | includes css that switches approriate hud elements between light and dark.
+    PreferHud
+  | PreferDark
+  | PreferLight
+  | PreferNormal
+#+end_src
+
+** HudOptions
+
+#+begin_src haskell-ng :results output
+data HudOptions = HudOptions
+  { axes :: [Priority AxisOptions],
+    frames :: [Priority FrameOptions],
+    legends :: [Priority LegendOptions],
+    titles :: [Priority Title]
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Priority a = Priority {priority :: Double, item :: a}
+#+end_src
+
+*** AxisOptions
+
+#+begin_src haskell-ng :results output
+data AxisOptions = AxisOptions
+  { bar :: Maybe AxisBar,
+    adjust :: Maybe Adjustments,
+    ticks :: Ticks,
+    place :: Place
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data AxisBar = AxisBar
+  { style :: Style,
+    size :: Double,
+    buffer :: Double,
+    overhang :: Double,
+    anchorTo :: HudChartSection
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data HudChartSection = CanvasSection | CanvasStyleSection | HudSection | HudStyleSection deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Adjustments = Adjustments
+  { maxXRatio :: Double,
+    maxYRatio :: Double,
+    angledRatio :: Double,
+    allowDiagonal :: Bool
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Ticks = Ticks
+  { tick :: Tick,
+    glyphTick :: Maybe TickStyle,
+    textTick :: Maybe TickStyle,
+    lineTick :: Maybe TickStyle
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Tick
+  = TickNone
+  | TickLabels [Text]
+  | TickRound FormatN Int TickExtend
+  | TickExact FormatN Int
+  | TickPlaced [(Double, Text)]
+#+end_src
+
+#+begin_src haskell-ng :results output
+data FormatN = FormatN {fstyle :: FStyle, sigFigs :: Maybe Int, maxDistinguishIterations :: Int, addLPad :: Bool, cutRightZeros :: Bool} deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data FStyle
+  = FSDecimal
+  | FSExponent (Maybe Int)
+  | FSComma
+  | FSFixed Int
+  | FSPercent
+  | FSDollar
+  | FSPrec
+  | FSCommaPrec
+  | FSNone
+#+end_src
+
+#+begin_src haskell-ng :results output
+data TickExtend = TickExtend | NoTickExtend deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data TickStyle = TickStyle
+  { style :: Style,
+    anchorTo :: HudChartSection,
+    buffer :: Double
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Place
+  = PlaceLeft
+  | PlaceRight
+  | PlaceTop
+  | PlaceBottom
+  | PlaceAbsolute (Point Double)
+#+end_src
+
+*** FrameOptions
+
+#+begin_src haskell-ng :results output
+data FrameOptions = FrameOptions
+  { frame :: Maybe Style,
+    anchorTo :: HudChartSection,
+    buffer :: Double
+  }
+#+end_src
+
+*** LegendOptions
+
+#+begin_src haskell-ng :results output
+data LegendOptions = LegendOptions
+  { size :: Double,
+    buffer :: Double,
+    vgap :: Double,
+    hgap :: Double,
+    textStyle :: Style,
+    innerPad :: Double,
+    outerPad :: Double,
+    frame :: Maybe Style,
+    place :: Place,
+    overallScale :: Double,
+    scaleP :: ScaleP,
+    legendCharts :: [(Text, [Chart])]
+  }
+#+end_src
+
+*** Title
+
+#+begin_src haskell-ng :results output
+data Title = Title
+  { text :: Text,
+    style :: Style,
+    place :: Place,
+    anchor :: Anchor,
+    buffer :: Double
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Anchor = AnchorMiddle | AnchorStart | AnchorEnd
+#+end_src
+
+** ChartTree
+
+#+begin_src haskell-ng :results output
+newtype ChartTree = ChartTree {tree :: Tree (Maybe Text, [Chart])} deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Chart = Chart {style :: Style, chartData :: ChartData} deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data ChartData
+  = RectData [Rect Double]
+  | LineData [[Point Double]]
+  | GlyphData [Point Double]
+  | TextData [(Text, Point Double)]
+  | PathData [PathData Double]
+  | BlankData [Rect Double]
+#+end_src
+
+#+begin_src haskell-ng :results output
+newtype Rect a = Rect' (Compose Point Range a)
+
+-- | pattern of Rect lowerx upperx lowery uppery
+pattern Rect :: a -> a -> a -> a -> Rect a
+pattern Rect a b c d = Rect' (Compose (Point (Range a b) (Range c d)))
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Point a = Point
+  { _x :: a,
+    _y :: a
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Range a = Range a a
+#+end_src
+
+#+begin_src haskell-ng :results output
+data PathData a
+  = StartP (Point a)
+  | LineP (Point a)
+  | CubicP (Point a) (Point a) (Point a)
+  | QuadP (Point a) (Point a)
+  | ArcP (ArcInfo a) (Point a)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data ArcInfo a = ArcInfo
+  { radii :: Point a,
+    phi :: a,
+    large :: Bool,
+    clockwise :: Bool
+  }
+#+end_src
+
+** Style
+
+#+begin_src haskell-ng :results output
+data Style = Style
+  { size :: Double,
+    borderSize :: Double,
+    color :: Colour,
+    borderColor :: Colour,
+    scaleP :: ScaleP,
+    anchor :: Anchor,
+    rotation :: Maybe Double,
+    translate :: Maybe (Point Double),
+    escapeText :: EscapeText,
+    frame :: Maybe Style,
+    linecap :: Maybe LineCap,
+    linejoin :: Maybe LineJoin,
+    dasharray :: Maybe [Double],
+    dashoffset :: Maybe Double,
+    hsize :: Double,
+    vsize :: Double,
+    vshift :: Double,
+    shape :: GlyphShape
+  }
+#+end_src
+
+#+begin_src haskell-ng :results output
+newtype Colour = Colour'
+  { color' :: Color (Alpha RGB) Double
+  }
+
+pattern Colour :: Double -> Double -> Double -> Double -> Colour
+pattern Colour r g b a = Colour' (ColorRGBA r g b a)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data ScaleP
+  = NoScaleP
+  | ScalePX
+  | ScalePY
+  | ScalePMinDim
+  | ScalePArea
+#+end_src
+
+#+begin_src haskell-ng :results output
+data Anchor = AnchorMiddle | AnchorStart | AnchorEnd
+#+end_src
+
+#+begin_src haskell-ng :results output
+data EscapeText = EscapeText | NoEscapeText
+#+end_src
+
+#+begin_src haskell-ng :results output
+data LineCap = LineCapButt | LineCapRound | LineCapSquare deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data LineJoin = LineJoinMiter | LineJoinBevel | LineJoinRound deriving (Eq, Show, Generic)
+#+end_src
+
+#+begin_src haskell-ng :results output
+data GlyphShape
+  = CircleGlyph
+  | SquareGlyph
+  | EllipseGlyph Double
+  | RectSharpGlyph Double
+  | RectRoundedGlyph Double Double Double
+  | -- | line width is determined by borderSize
+    TriangleGlyph (Point Double) (Point Double) (Point Double)
+  | VLineGlyph
+  | HLineGlyph
+  | PathGlyph ByteString
+#+end_src
