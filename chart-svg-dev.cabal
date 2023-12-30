@@ -101,6 +101,8 @@ library
     pretty-simple,
     mwc-random,
     markup-parse,
+    dotparse,
+    string-interpolate,
   exposed-modules:
     Lib
 

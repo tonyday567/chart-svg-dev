@@ -15,6 +15,7 @@
 :set -XOverloadedLabels
 :set -XOverloadedStrings
 :set -XTupleSections
+:set -XQuasiQuotes
 import Lib
 import Prelude
 import Control.Category ((>>>))
@@ -35,12 +36,16 @@ import Data.Bifunctor
 import Prettyprinter
 import Text.Pretty.Simple
 import MarkupParse
+import DotParse
+import DotParse.Examples
+import Data.String.Interpolate
 (display, quit) <- startChartServer (Just "chart-svg-dev")
 #+end_src
 
 #+RESULTS:
 : Ok, one module loaded.
-: Setting phasers to stun... (port 9g1h6c0i)>  (ctrl-c to quit)
+: Setting phasers to stung.h.c.i >( port 9160) (ctrl-c to quit)
+
 
 #+begin_src haskell-ng :results output
 writeAllExamples
@@ -50,7 +55,7 @@ writeAllExamples
 : ok
 
 #+begin_src haskell-ng :results output
-display arcFlagsExample
+display lineExample
 #+end_src
 
 #+RESULTS:
@@ -70,13 +75,2295 @@ padSingletons <$> view styleBox' ctFinal
 viewbox
 #+end_src
 
+* dotparse debugging
+
+- [ ] check examples, nh, base
+- [X] nodeSize, nodeHeight
+- [X] boxes
+
+#+begin_src haskell-ng :results output
+cfg = defaultChartConfig
+exGraph = defaultGraph & addStatements (toStatements Directed (C.pack . show <$> exAGraph)) & set (attL NodeType (ID "shape")) (Just $ ID "box")
+exGraphAugmented <- processGraph exGraph
+exChart = graphToChartWith cfg (T.pack . label) exGraphAugmented & set (#markupOptions % #chartAspect) ChartAspect
+display exChart
+#+end_src
+
 #+RESULTS:
-: Just Rect (-0.7286821705426356) 0.7286821705426356 (-0.48917944093778176) 0.5
-: Just Rect (-0.7507441860465116) 0.7507441860465116 (-0.5011794409377818) 0.5
-: Rect (-0.7286821705426356) 0.7286821705426356 (-0.48917944093778176) 0.5
-: Rect (-0.7286821705426356) 0.7286821705426356 (-0.48917944093778176) 0.5
-: Just Rect (-0.7507441860465116) 0.7507441860465116 (-0.5011794409377818) 0.5
-: Rect (-0.75) 0.75 (-0.5) 0.5
+: True
+
+#+begin_src haskell-ng :results output
+pPrint defaultChartConfig
+#+end_src
+
+
+#+begin_src haskell-ng :results output
+pPrint exGraphAugmented
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Graph
+    { strict = Last { getLast = Just NoMergeEdges }
+    , directed = Last { getLast = Just Directed }
+    , graphid = Last { getLast = Nothing }
+    , nodeAttributes = fromList
+        [
+            ( ID "height"
+            , IDDouble 0.5
+            )
+        ,
+            ( ID "label"
+            , IDQuoted "\N"
+            )
+        ,
+            ( ID "shape"
+            , ID "circle"
+            )
+        ]
+    , graphAttributes = fromList
+        [
+            ( ID "bb"
+            , IDQuoted "0,0,436.13,489.31"
+            )
+        ,
+            ( ID "overlap"
+            , ID "false"
+            )
+        ,
+            ( ID "rankdir"
+            , ID "TB"
+            )
+        ,
+            ( ID "size"
+            , IDQuoted "1!"
+            )
+        ,
+            ( ID "splines"
+            , ID "spline"
+            )
+        ]
+    , edgeAttributes = fromList
+        [
+            ( ID "arrowsize"
+            , IDDouble 0.5
+            )
+        ]
+    , globalAttributes = fromList []
+    , nodes =
+        [ NodeStatement
+            { nodeID = IDInt 1
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "388,172.66"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 12
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "height"
+                    , IDDouble 0.5592
+                    )
+                ,
+                    ( ID "pos"
+                    , IDQuoted "332,172.66"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5592
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 13
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "height"
+                    , IDDouble 0.5592
+                    )
+                ,
+                    ( ID "pos"
+                    , IDQuoted "416,96.393"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5592
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 14
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "height"
+                    , IDDouble 0.5592
+                    )
+                ,
+                    ( ID "pos"
+                    , IDQuoted "215,20.131"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5592
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 18
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "height"
+                    , IDDouble 0.5592
+                    )
+                ,
+                    ( ID "pos"
+                    , IDQuoted "157,20.131"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5592
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 19
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "height"
+                    , IDDouble 0.5592
+                    )
+                ,
+                    ( ID "pos"
+                    , IDQuoted "99,20.131"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5592
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 2
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "209,96.393"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 15
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "height"
+                    , IDDouble 0.5592
+                    )
+                ,
+                    ( ID "pos"
+                    , IDQuoted "112,96.393"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5592
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 3
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "138,471.31"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 10
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "height"
+                    , IDDouble 0.5592
+                    )
+                ,
+                    ( ID "pos"
+                    , IDQuoted "389,325.18"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5592
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 16
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "height"
+                    , IDDouble 0.5592
+                    )
+                ,
+                    ( ID "pos"
+                    , IDQuoted "331,325.18"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5592
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 4
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "303,399.31"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 0
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "360,248.92"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 11
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "height"
+                    , IDDouble 0.5592
+                    )
+                ,
+                    ( ID "pos"
+                    , IDQuoted "304,248.92"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5592
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 17
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "height"
+                    , IDDouble 0.5592
+                    )
+                ,
+                    ( ID "pos"
+                    , IDQuoted "246,248.92"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5592
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 5
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "275,325.18"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 6
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "276,172.66"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 7
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "360,96.393"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 8
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "271,20.131"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5
+                    )
+                ]
+            }
+        , NodeStatement
+            { nodeID = IDInt 9
+            , port = Nothing
+            , nodeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "18,399.31"
+                    )
+                ,
+                    ( ID "width"
+                    , IDDouble 0.5
+                    )
+                ]
+            }
+        ]
+    , edges =
+        [ EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 0 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 1 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,381.84,189.99 366.08,231.8 370.05,221.27 375.29,207.37 379.65,195.8"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 0 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 12 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,338.85,191.83 353.92,231.8 350.18,221.87 345.3,208.94 341.1,197.8"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 0 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 6 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,289.31,185.42 346.88,236.31 332.66,223.74 309.88,203.61 294,189.57"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 1 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 13 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,409.15,115.56 394.08,155.54 397.82,145.61 402.7,132.68 406.9,121.54"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 1 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 2 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,226.5,102.07 374.16,160.78 370.07,157.86 365.48,154.87 361,152.52 317.81,129.92 263.28,112.62 232.66,103.82"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 1 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 7 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,366.16,113.73 381.92,155.54 377.95,145.01 372.71,131.11 368.35,119.54"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 15 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 18 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,146.83,37.916 122.21,78.542 128.54,68.098 136.74,54.565 143.59,43.262"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 15 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 19 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,102.38,40.449 108.65,76.269 107.07,67.244 105.16,56.347 103.46,46.631"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 18 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 3 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,142.24,453.57 157.64,40.614 158.52,69.304 160,124.61 160,171.66 160,326.18 160,326.18 160,326.18 160,369.48 150.18,419.27 143.66,\
+                      447.54"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 19 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 3 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,126.11,457.54 91.917,39.352 81.69,67.346 64,122.83 64,171.66 64,326.18 64,326.18 64,326.18 64,376.55 100.2,426.97 121.97,452.73"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 2 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 14 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,213.43,40.618 210.39,78.169 211.14,68.873 212.08,57.213 212.92,46.861"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 2 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 18 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,168.26,37.211 198.97,81.075 191.28,70.085 180.53,54.741 171.84,42.329"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 2 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 19 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,115.39,32.195 194.16,85.378 175.24,72.604 142.38,50.415 120.66,35.751"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 2 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 3 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,149.17,456.69 206.93,114.52 203.74,142.42 198,199.44 198,247.92 198,326.18 198,326.18 198,326.18 198,368.06 191.35,379.19 174,\
+                      417.31 168.48,429.44 160.24,441.83 153.04,451.57"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 2 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 8 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,260.01,34.293 220.08,82.117 230.14,70.078 245.03,52.238 256.12,38.959"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 3 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 15 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,113.06,116.87 133.95,453.56 127.85,426.81 117,372.71 117,326.18 117,326.18 117,326.18 117,247.92 117,204.16 114.86,153.29 113.38,\
+                      123.3"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 3 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 4 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,286.64,407.25 154.42,463.34 184.2,450.71 247.11,424.02 280.72,409.76"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 3 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 9 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,33.454,409.33 122.8,461.45 101.55,449.05 62.873,426.49 38.915,412.51"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 4 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 10 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,373.92,338.83 316.44,387.04 330.57,375.19 352.95,356.42 369.12,342.86"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 4 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 16 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,323.88,344.51 309.35,381.94 312.97,372.63 317.56,360.79 321.59,350.42"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 4 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 5 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,281.33,342.48 296.65,381.94 292.78,371.98 287.79,359.13 283.58,348.28"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 5 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 0 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,346.81,261.44 288.28,312.58 302.75,299.93 325.98,279.64 342.07,265.58"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 5 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 11 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,296.9,268.09 281.29,308.07 285.17,298.13 290.22,285.21 294.57,274.06"
+                    )
+                ]
+            }
+        , EdgeStatement
+            { edgeOp = EdgeDirected
+            , leftEdge = EdgeID
+                ( IDInt 5 ) Nothing
+            , rightEdges = EdgeID
+                ( IDInt 17 ) Nothing :| []
+            , edgeAttrs = fromList
+                [
+                    ( ID "pos"
+                    , IDQuoted "e,253.1,268.09 268.71,308.07 264.83,298.13 259.78,285.21 255.43,274.06"
+                    )
+                ]
+            }
+        ]
+    , subgraphs = []
+    }
+#+end_example
+
+** simpler example
+- [X] simpler example
+- [X] direct
+
+#+begin_src haskell-ng :results output
+:{
+ex1 = [i|
+digraph {
+    node [height=0.5;shape=circle]
+    graph [overlap=false;size="1!";splines=spline]
+    edge [arrowsize=0.5]
+    rankdir="TB"
+    1
+    2
+    1 -> 2
+    }
+|]
+:}
+#+end_src
+
+#+RESULTS:
+
+Graph
+
+#+begin_src haskell-ng :results output
+g1 = runDotParser ex1 :: Graph
+g1
+#+end_src
+
+#+RESULTS:
+: Graph {strict = Last {getLast = Just NoMergeEdges}, directed = Last {getLast = Just Directed}, graphid = Last {getLast = Nothing}, nodeAttributes = fromList [(ID "height",IDDouble 0.5),(ID "shape",ID "circle")], graphAttributes = fromList [(ID "overlap",ID "false"),(ID "size",IDQuoted "1!"),(ID "splines",ID "spline")], edgeAttributes = fromList [(ID "arrowsize",IDDouble 0.5)], globalAttributes = fromList [(ID "rankdir",IDQuoted "TB")], nodes = [NodeStatement {nodeID = IDInt 2, port = Nothing, nodeAttrs = fromList []},NodeStatement {nodeID = IDInt 1, port = Nothing, nodeAttrs = fromList []}], edges = [EdgeStatement {edgeOp = EdgeDirected, leftEdge = EdgeID (IDInt 1) Nothing, rightEdges = EdgeID (IDInt 2) Nothing :| [], edgeAttrs = fromList []}], subgraphs = []}
+
+#+begin_src haskell-ng :results output
+g1' <- processGraph g1
+pPrint $ dotPrint defaultDotConfig g1'
+#+end_src
+
+#+RESULTS:
+: "digraph {
+:     node [height=0.5;label="\N";shape=circle]
+:     graph [bb="0,0,36,108";overlap=false;rankdir=TB;size="1!";splines=spline]
+:     edge [arrowsize=0.5]
+:     1 [pos="18,90";width=0.5]
+:     2 [pos="18,18";width=0.5]
+:     1 -> 2 [pos="e,18,36.104 18,71.697 18,62.881 18,52.032 18,42.474"]
+:     }"
+
+#+begin_src haskell-ng :results output
+c1 = graphToChartWith defaultChartConfig g1' & set (#markupOptions % #chartAspect) ChartAspect & set (#chartTree % charts' % each % #chartStyle % #scaleP) ScalePArea
+display c1
+pPrint c1
+#+end_src
+
+#+RESULTS:
+#+begin_example
+True
+ChartOptions
+    { markupOptions = MarkupOptions
+        { markupHeight = Just 500.0
+        , chartAspect = ChartAspect
+        , cssOptions = CssOptions
+            { shapeRendering = NoShapeRendering
+            , preferColorScheme = PreferHud
+            , fontFamilies = "
+              svg { font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+              }
+
+              ticktext { font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+              }
+
+              "
+            , cssExtra = ""
+            }
+        , renderStyle = Compact
+        }
+    , hudOptions = HudOptions
+        { axes = []
+        , frames = []
+        , legends = []
+        , titles = []
+        }
+    , chartTree = ChartTree
+        { tree = Node
+            { rootLabel =
+                ( Nothing
+                , []
+                )
+            , subForest =
+                [ Node
+                    { rootLabel =
+                        ( Just "edges"
+                        ,
+                            [ Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour -0.51 0.30 0.37 1.00
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 18.0 71.697
+                                    , CubicP Point 18.0 62.881 Point 18.0 52.032 Point 18.0 42.474
+                                    , LineP Point 18.0 36.104
+                                    ]
+                                }
+                            ]
+                        )
+                    , subForest = []
+                    }
+                , Node
+                    { rootLabel =
+                        ( Nothing
+                        , []
+                        )
+                    , subForest =
+                        [ Node
+                            { rootLabel =
+                                ( Just "shapes"
+                                ,
+                                    [ Chart
+                                        { chartStyle = Style
+                                            { size = 36.0
+                                            , borderSize = 0.5
+                                            , color = Colour 0.02 0.73 0.80 0.20
+                                            , borderColor = Colour -0.51 0.30 0.37 1.00
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = CircleGlyph
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 18.0 90.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 36.0
+                                            , borderSize = 0.5
+                                            , color = Colour 0.02 0.73 0.80 0.20
+                                            , borderColor = Colour -0.51 0.30 0.37 1.00
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = CircleGlyph
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 18.0 18.0 ]
+                                        }
+                                    ]
+                                )
+                            , subForest = []
+                            }
+                        , Node
+                            { rootLabel =
+                                ( Just "labels"
+                                ,
+                                    [ Chart
+                                        { chartStyle = Style
+                                            { size = 14.0
+                                            , borderSize = 1.0e-2
+                                            , color = Colour -0.51 0.30 0.37 1.00
+                                            , borderColor = Colour 0.02 0.29 0.48 1.00
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = NoEscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = SquareGlyph
+                                            }
+                                        , chartData = TextData
+                                            [
+                                                ( "1"
+                                                , Point 18.0 86.3
+                                                )
+                                            ,
+                                                ( "2"
+                                                , Point 18.0 14.3
+                                                )
+                                            ]
+                                        }
+                                    ]
+                                )
+                            , subForest = []
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+#+end_example
+
+
+#+begin_src haskell-ng :results output
+-- :t c1 & view #chartTree & view safeStyleBox'
+c1 & forgetHud & view #chartTree & view safeStyleBox'
+#+end_src
+
+#+RESULTS:
+: Rect (-0.16820276497695852) 0.16820276497695852 (-0.5) 0.5
+
+** testAll
+
+#+begin_src haskell-ng :results output
+import Data.Proxy
+testDotParser (Proxy :: Proxy Graph) defaultDotConfig ex0
+testAll
+#+end_src
+
+#+RESULTS:
+#+begin_example
+ex0
+ex1
+ex2
+ex3
+ex4
+ex5
+ex6
+ex7
+ex8
+ex9
+ex10
+ex11
+ex12
+ex13
+ex14
+ex15
+#+end_example
+
+** nh
+
+#+begin_src haskell-ng :results output
+import DotParse.Examples.NumHask qualified as NH
+g <- processGraph (NH.dotGraphNH Directed)
+display $ (graphToChartWith defaultChartConfig NH.toLink g)
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+import DotParse.Examples.NumHask qualified as NH
+g <- processGraph (NH.dotGraphNH Directed)
+display $ (graphToChartWith (defaultChartConfig & set #textSize 12 & set #chartVshift (-4)) (T.pack . label) g)
+#+end_src
+
+#+RESULTS:
+: True
+
+toLink
+
+#+begin_src haskell-ng :results output
+import DotParse.Examples.NumHask qualified as NH
+g <- processGraph (NH.dotGraphNH Directed)
+cNH = graphToChartWith (defaultChartConfig & set #textSize 12 & set #vshift (-4)) NH.toLink g & over (#chartTree % charts' % each) (\c -> c & bool (set (#chartStyle % #size) 0) id (isNothing . view (#chartData % textData') $ c))
+cNH' = forgetHud cNH & set (#markupOptions % #chartAspect) UnscaledAspect & over (#chartTree % charts' % each) (\c -> c & bool (set (#chartStyle % #size) 0.03) id (isNothing . view (#chartData % textData') $ c))
+display cNH'
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+import DotParse.Examples.NumHask qualified as NH
+g <- processGraph (NH.dotGraphNH Directed)
+cNH = graphToChartWith (defaultChartConfig & set #textSize 12 & set #chartVshift (-4)) NH.toLinkNH g & set (#markupOptions % #chartAspect) ChartAspect
+display cNH
+#+end_src
+
+#+RESULTS:
+: True
+
+*** cNH deconstruction
+
+#+begin_src haskell-ng :results output
+ss = cNH & toListOf (#chartTree % charts' % each) & fmap sbox
+l = cNH & toListOf (#chartTree % charts' % each)
+z = reverse l & drop 1
+view styleBox' (unnamed z)
+sbox <$> take 1 z
+take 1 z
+#+end_src
+
+#+RESULTS:
+: Just Rect (-0.500160000000001) 373.00016 (-0.5) 324.5
+: [Just Rect (-0.500160000000001) 67.50016 (-0.5) 36.5]
+: [Chart {chartStyle = Style {size = 67.00032, borderSize = 1.0, color = Colour 0.50 0.50 0.50 0.20, borderColor = Colour 0.40 0.40 0.40 0.80, scaleP = ScalePArea, anchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, lineCap = Nothing, lineJoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, glyphShape = RectSharpGlyph 0.5373108665749656}, chartData = GlyphData [Point 33.5 18.0]}]
+
+#+begin_src haskell-ng :results output
+pPrint cNH
+#+end_src
+
+#+RESULTS:
+#+begin_example
+ChartOptions
+    { markupOptions = MarkupOptions
+        { markupHeight = Just 500.0
+        , chartAspect = ChartAspect
+        , cssOptions = CssOptions
+            { shapeRendering = NoShapeRendering
+            , preferColorScheme = PreferHud
+            , fontFamilies = "
+              svg { font-family: system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,"Noto Sans","Liberation Sans",sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol","Noto Color Emoji";
+              }
+
+              ticktext { font-family: SFMono-Regular,Menlo,Monaco,Consolas,"Liberation Mono","Courier New",monospace;
+              }
+
+              "
+            , cssExtra = ""
+            }
+        , renderStyle = Compact
+        }
+    , hudOptions = HudOptions
+        { axes = []
+        , frames = []
+        , legends = []
+        , titles = []
+        }
+    , chartTree = ChartTree
+        { tree = Node
+            { rootLabel =
+                ( Nothing
+                , []
+                )
+            , subForest =
+                [ Node
+                    { rootLabel =
+                        ( Just "edges"
+                        ,
+                            [ Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 226.42 180.3
+                                    , CubicP Point 218.3 189.63 Point 208.19 201.23 Point 199.53 211.17
+                                    , LineP Point 195.41 215.9
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 170.71 180.3
+                                    , CubicP Point 172.35 189.12 Point 174.37 199.97 Point 176.14 209.53
+                                    , LineP Point 177.32 215.9
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 111.24 180.3
+                                    , CubicP Point 123.74 189.81 Point 139.34 201.68 Point 152.57 211.75
+                                    , LineP Point 157.7 215.65
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 192.37 252.3
+                                    , CubicP Point 198.64 261.46 Point 206.42 272.81 Point 213.16 282.62
+                                    , LineP Point 216.77 287.9
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 162.95 252.3
+                                    , CubicP Point 153.41 261.71 Point 141.51 273.44 Point 131.37 283.44
+                                    , LineP Point 126.85 287.9
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 76.376 252.3
+                                    , CubicP Point 82.131 261.46 Point 89.263 272.81 Point 95.434 282.62
+                                    , LineP Point 98.749 287.9
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 180.86 36.303
+                                    , CubicP Point 175.81 45.374 Point 169.55 56.596 Point 164.12 66.35
+                                    , LineP Point 161.03 71.896
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 124.31 96.197
+                                    , CubicP Point 98.963 102.64 Point 62.591 116.35 Point 45.5 144.0
+                                    , CubicP Point 33.05 164.14 Point 41.968 191.12 Point 51.539 210.08
+                                    , LineP Point 54.508 215.68
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 178.63 101.79
+                                    , CubicP Point 204.65 112.24 Point 244.97 128.71 Point 279.5 144.0
+                                    , CubicP Point 280.37 144.38 Point 281.25 144.78 Point 282.13 145.18
+                                    , LineP Point 288.05 147.87
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 336.58 108.3
+                                    , CubicP Point 332.98 117.29 Point 328.55 128.39 Point 324.67 138.08
+                                    , LineP Point 322.34 143.9
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 252.78 36.483
+                                    , CubicP Point 231.94 47.292 Point 205.3 61.103 Point 184.58 71.849
+                                    , LineP Point 178.9 74.794
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 290.06 36.412
+                                    , CubicP Point 295.26 61.887 Point 304.96 109.37 Point 310.76 137.79
+                                    , LineP Point 312.01 143.89
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 122.14 36.303
+                                    , CubicP Point 127.19 45.374 Point 133.45 56.596 Point 138.88 66.35
+                                    , LineP Point 141.97 71.896
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 288.18 177.17
+                                    , CubicP Point 268.52 187.36 Point 241.71 201.26 Point 219.76 212.65
+                                    , LineP Point 214.0 215.63
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 312.29 180.3
+                                    , CubicP Point 310.65 189.12 Point 308.63 199.97 Point 306.86 209.53
+                                    , LineP Point 305.68 215.9
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 284.21 252.3
+                                    , CubicP Point 274.34 261.64 Point 262.05 273.26 Point 251.53 283.21
+                                    , LineP Point 246.84 287.65
+                                    ]
+                                }
+                            , Chart
+                                { chartStyle = Style
+                                    { size = 6.0e-2
+                                    , borderSize = 1.0
+                                    , color = Colour 0.00 0.00 0.00 0.00
+                                    , borderColor = Colour 0.40 0.40 0.40 0.80
+                                    , scaleP = ScalePArea
+                                    , anchor = AnchorMiddle
+                                    , rotation = Nothing
+                                    , translate = Nothing
+                                    , escapeText = EscapeText
+                                    , frame = Nothing
+                                    , lineCap = Nothing
+                                    , lineJoin = Nothing
+                                    , dasharray = Nothing
+                                    , dashoffset = Nothing
+                                    , hsize = 0.6
+                                    , vsize = 1.1
+                                    , vshift = -0.25
+                                    , glyphShape = SquareGlyph
+                                    }
+                                , chartData = PathData
+                                    [ StartP Point 62.972 36.483
+                                    , CubicP Point 79.923 46.539 Point 101.25 59.193 Point 118.73 69.561
+                                    , LineP Point 124.02 72.699
+                                    ]
+                                }
+                            ]
+                        )
+                    , subForest = []
+                    }
+                , Node
+                    { rootLabel =
+                        ( Nothing
+                        , []
+                        )
+                    , subForest =
+                        [ Node
+                            { rootLabel =
+                                ( Just "shapes"
+                                ,
+                                    [ Chart
+                                        { chartStyle = Style
+                                            { size = 58.00032
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.6206862306966582
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 241.5 162.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 63.24984
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.569171400275479
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 228.5 306.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 54.0
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.6666666666666666
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 167.5 162.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 67.00032
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.5373108665749656
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 88.5 162.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 80.5032
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.44718719255880507
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 180.5 234.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 61.75008
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.5829951961195841
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 65.5 234.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 65.49983999999999
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.5496196631930704
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 190.5 18.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 54.0
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.6666666666666666
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 151.5 90.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 58.00032
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.6206862306966582
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 343.5 90.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 93.24719999999999
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.38607057370087255
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 109.5 306.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 91.0008
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.39560091779412926
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 286.5 18.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 54.0
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.6666666666666666
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 112.5 18.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 54.0
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.6666666666666666
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 315.5 162.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 77.5008
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.4645113340765515
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 302.5 234.0 ]
+                                        }
+                                    , Chart
+                                        { chartStyle = Style
+                                            { size = 67.00032
+                                            , borderSize = 1.0
+                                            , color = Colour 0.50 0.50 0.50 0.20
+                                            , borderColor = Colour 0.40 0.40 0.40 0.80
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = EscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = RectSharpGlyph 0.5373108665749656
+                                            }
+                                        , chartData = GlyphData
+                                            [ Point 33.5 18.0 ]
+                                        }
+                                    ]
+                                )
+                            , subForest = []
+                            }
+                        , Node
+                            { rootLabel =
+                                ( Just "labels"
+                                ,
+                                    [ Chart
+                                        { chartStyle = Style
+                                            { size = 12.0
+                                            , borderSize = 1.0e-2
+                                            , color = Colour 0.40 0.40 0.40 0.80
+                                            , borderColor = Colour 0.02 0.29 0.48 1.00
+                                            , scaleP = ScalePArea
+                                            , anchor = AnchorMiddle
+                                            , rotation = Nothing
+                                            , translate = Nothing
+                                            , escapeText = NoEscapeText
+                                            , frame = Nothing
+                                            , lineCap = Nothing
+                                            , lineJoin = Nothing
+                                            , dasharray = Nothing
+                                            , dashoffset = Nothing
+                                            , hsize = 0.6
+                                            , vsize = 1.1
+                                            , vshift = -0.25
+                                            , glyphShape = SquareGlyph
+                                            }
+                                        , chartData = TextData
+                                            [
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Action.html#t:Actions">Actions</a>"
+                                                , Point 241.5 158.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Additive.html#t:Additive">Additive</a>"
+                                                , Point 228.5 302.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Metric.html#t:Basis">Basis</a>"
+                                                , Point 167.5 158.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Metric.html#t:Direction">Direction</a>"
+                                                , Point 88.5 158.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Distributive.html#t:Distributive">Distributive</a>"
+                                                , Point 180.5 230.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Multiplicative.html#t:Divisive">Divisive</a>"
+                                                , Point 65.5 230.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Field.html#t:ExpField">ExpField</a>"
+                                                , Point 190.5 14.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Field.html#t:Field">Field</a>"
+                                                , Point 151.5 86.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Data-Integral.html#t:Integral">Integral</a>"
+                                                , Point 343.5 86.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Multiplicative.html#t:Multiplicative">Multiplicative</a>"
+                                                , Point 109.5 302.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Field.html#t:QuotientField">QuotientField</a>"
+                                                , Point 286.5 14.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Data-Rational.html#t:Ratio">Ratio</a>"
+                                                , Point 112.5 14.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Ring.html#t:Ring">Ring</a>"
+                                                , Point 315.5 158.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Additive.html#t:Subtractive">Subtractive</a>"
+                                                , Point 302.5 230.0
+                                                )
+                                            ,
+                                                ( "<a href="https://hackage.haskell.org/package/numhask/docs/NumHask-Algebra-Field.html#t:TrigField">TrigField</a>"
+                                                , Point 33.5 14.0
+                                                )
+                                            ]
+                                        }
+                                    ]
+                                )
+                            , subForest = []
+                            }
+                        ]
+                    }
+                ]
+            }
+        }
+    }
+#+end_example
+
+
+** AST
+
+#+begin_src haskell-ng :results output
+import DotParse.Examples.AST
+gAST = dotAST allSC componentEdges
+C.writeFile "other/ast.dot" $ dotPrint defaultDotConfig gAST
+bsSvg <- processDotWith Directed ["-Tsvg"] (dotPrint defaultDotConfig gAST)
+C.writeFile "other/ast.svg" bsSvg
+#+end_src
+
+#+RESULTS:
+
+* chartSocketPage
+
+#+begin_src haskell-ng :results output
+showRGB light
+#+end_src
+
+#+RESULTS:
+: "rgb(94%, 94%, 94%)"
+
+#+begin_src haskell-ng :results output
+pPrint $ chartSocketPage (Just "test")
+#+end_src
+
+#+RESULTS:
+#+begin_example
+Page
+    { libsCss = Markup
+        { elements =
+            [ Node
+                { rootLabel = OpenTag StartTag "link"
+                    [ Attr
+                        { attrName = "rel"
+                        , attrValue = "stylesheet"
+                        }
+                    , Attr
+                        { attrName = "href"
+                        , attrValue = "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css"
+                        }
+                    , Attr
+                        { attrName = "integrity"
+                        , attrValue = "sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC"
+                        }
+                    , Attr
+                        { attrName = "crossorigin"
+                        , attrValue = "anonymous"
+                        }
+                    ]
+                , subForest = []
+                }
+            ]
+        }
+    , libsJs = Markup
+        { elements =
+            [ Node
+                { rootLabel = OpenTag StartTag "script"
+                    [ Attr
+                        { attrName = "src"
+                        , attrValue = "https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.bundle.min.js"
+                        }
+                    , Attr
+                        { attrName = "integrity"
+                        , attrValue = "sha384-MrcW6ZMFYlzcLA8Nl+NtUVF0sA7MsXsP1UyJoMp4YLEuNSfAP+JcXn/tWtIaxVXM"
+                        }
+                    , Attr
+                        { attrName = "crossorigin"
+                        , attrValue = "anonymous"
+                        }
+                    ]
+                , subForest = []
+                }
+            , Node
+                { rootLabel = OpenTag StartTag "script"
+                    [ Attr
+                        { attrName = "src"
+                        , attrValue = "https://code.jquery.com/jquery-3.3.1.slim.min.js"
+                        }
+                    , Attr
+                        { attrName = "integrity"
+                        , attrValue = "sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo"
+                        }
+                    , Attr
+                        { attrName = "crossorigin"
+                        , attrValue = "anonymous"
+                        }
+                    ]
+                , subForest = []
+                }
+            ]
+        }
+    , cssBody = Css
+        { cssByteString = "
+        {
+          color-scheme: light dark;
+        }
+        {
+          body {
+            background-color: #000;
+          }
+        }
+        @media (prefers-color-scheme:dark) {
+          body {
+            background-color: #fff;
+          }
+        }" }
+    , jsGlobal = Js
+        { jsByteString = "" }
+    , jsOnLoad = Js
+        { jsByteString = "
+        window.jsb = {ws: new WebSocket('ws://' + location.host + '/')};
+        jsb.event = function(ev) {
+            jsb.ws.send(JSON.stringify({event: ev}));
+        };
+        jsb.ws.onmessage = function(evt){
+            eval('(function(){' + evt.data + '})()');
+        };
+
+        function insertScript ($script) {
+          var s = document.createElement('script')
+          s.type = 'text/javascript'
+          if ($script.src) {
+            s.onload = callback
+            s.onerror = callback
+            s.src = $script.src
+          } else {
+            s.textContent = $script.innerText
+          }
+
+          // re-insert the script tag so it executes.
+          document.head.appendChild(s)
+
+          // clean-up
+          $script.parentNode.removeChild($script)
+        }
+
+        function runScripts ($container) {
+          // get scripts tags from a node
+          var $scripts = $container.querySelectorAll('script')
+          $scripts.forEach(function ($script) {
+            insertScript($script)
+          })
+        }
+
+        function refreshJsb () {
+          $('.jsbClassEventInput').off('input');
+          $('.jsbClassEventInput').on('input', (function(){
+            jsb.event({ 'element': this.id, 'value': this.value});
+          }));
+          $('.jsbClassEventChange').off('change');
+          $('.jsbClassEventChange').on('change', (function(){
+            jsb.event({ 'element': this.id, 'value': this.value});
+          }));
+          $('.jsbClassEventFocusout').off('focusout');
+          $('.jsbClassEventFocusout').on('focusout', (function(){
+            jsb.event({ 'element': this.id, 'value': this.value});
+          }));
+          $('.jsbClassEventButton').off('click');
+          $('.jsbClassEventButton').on('click', (function(){
+            jsb.event({ 'element': this.id, 'value': this.value});
+          }));
+          $('.jsbClassEventToggle').off('click');
+          $('.jsbClassEventToggle').on('click', (function(){
+            jsb.event({ 'element': this.id, 'value': ('true' !== this.getAttribute('aria-pressed')).toString()});
+          }));
+          $('.jsbClassEventCheckbox').off('click');
+          $('.jsbClassEventCheckbox').on('click', (function(){
+            jsb.event({ 'element': this.id, 'value': this.checked.toString()});
+          }));
+          $('.jsbClassEventChooseFile').off('input');
+          $('.jsbClassEventChooseFile').on('input', (function(){
+            jsb.event({ 'element': this.id, 'value': this.files[0].name});
+          }));
+          $('.jsbClassEventShowSum').off('change');
+          $('.jsbClassEventShowSum').on('change', (function(){
+            var v = this.value;
+            $(this).parent('.sumtype-group').siblings('.subtype').each(function(i) {
+              if (this.dataset.sumtype === v) {
+                this.style.display = 'block';
+                } else {
+                this.style.display = 'none';
+              }
+            })
+          }));
+          $('.jsbClassEventChangeMultiple').off('change');
+          $('.jsbClassEventChangeMultiple').on('change', (function(){
+            jsb.event({ 'element': this.id, 'value': [...this.options].filter(option => option.selected).map(option => option.value).join(',')});
+          }));
+        };
+        " }
+    , htmlHeader = Markup
+        { elements =
+            [ Node
+                { rootLabel = OpenTag StartTag "meta"
+                    [ Attr
+                        { attrName = "charset"
+                        , attrValue = "utf-8"
+                        }
+                    ]
+                , subForest = []
+                }
+            , Node
+                { rootLabel = OpenTag StartTag "meta"
+                    [ Attr
+                        { attrName = "name"
+                        , attrValue = "viewport"
+                        }
+                    , Attr
+                        { attrName = "content"
+                        , attrValue = "width=device-width, initial-scale=1, shrink-to-fit=no"
+                        }
+                    ]
+                , subForest = []
+                }
+            ]
+        }
+    , htmlBody = Markup
+        { elements =
+            [ Node
+                { rootLabel = OpenTag StartTag "div"
+                    [ Attr
+                        { attrName = "class"
+                        , attrValue = "container"
+                        }
+                    ]
+                , subForest =
+                    [ Node
+                        { rootLabel = OpenTag StartTag "row"
+                            [ Attr
+                                { attrName = "class"
+                                , attrValue = "col"
+                                }
+                            ]
+                        , subForest =
+                            [ Node
+                                { rootLabel = OpenTag StartTag "h4" []
+                                , subForest =
+                                    [ Node
+                                        { rootLabel = Content "test"
+                                        , subForest = []
+                                        }
+                                    ]
+                                }
+                            ]
+                        }
+                    , Node
+                        { rootLabel = OpenTag StartTag "div"
+                            [ Attr
+                                { attrName = "id"
+                                , attrValue = "prettychart"
+                                }
+                            ]
+                        , subForest = []
+                        }
+                    ]
+                }
+            ]
+        }
+    }
+#+end_example
 
 * v06 Changes
 

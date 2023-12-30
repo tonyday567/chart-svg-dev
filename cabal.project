@@ -1,15 +1,11 @@
 packages:
-  chart-svg-dev.cabal
-  ../chart-svg/chart-svg.cabal
+  ../chart-svg-dev.cabal
   ../prettychart/prettychart.cabal
+  ../web-rep/web-rep.cabal
+  ../dotparse/dotparse.cabal
 
 allow-newer:
-  string-interpolate:bytestring,
   string-interpolate:template-haskell,
   string-interpolate:text,
   scotty:text,
   websockets:text,
-  websockets:bytestring,
-  websockets:attoparsec,
-  box-socket:text,
-  box-socket:bytestring,
