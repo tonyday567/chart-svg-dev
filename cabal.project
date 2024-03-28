@@ -4,8 +4,3 @@ packages:
   ../web-rep/web-rep.cabal
   ../dotparse/dotparse.cabal
 
-allow-newer:
-  string-interpolate:template-haskell,
-  string-interpolate:text,
-  scotty:text,
-  websockets:text,
