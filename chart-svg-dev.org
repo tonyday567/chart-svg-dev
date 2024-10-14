@@ -43,8 +43,8 @@ import Data.String.Interpolate
 #+end_src
 
 #+RESULTS:
-: Ok, one module loaded.
-: Setting phasers to stung.h.c.i >( port 9160) (ctrl-c to quit)
+: Ok, one module reloaded.
+: Setting phasers to stun... (port 9160) (ctrl-c to quit)
 
 
 #+begin_src haskell-ng :results output
@@ -55,11 +55,26 @@ writeAllExamples
 : ok
 
 #+begin_src haskell-ng :results output
-display lineExample
+display $ lineExample
 #+end_src
 
 #+RESULTS:
 : True
+
+** ToDo bug 1 - text boxes are out
+
+#+begin_src haskell-ng :results output
+display $ lineExample & set (#hudOptions % #titles % each % #item % #style % #frame) (Just $ border 0.02 light)
+#+end_src
+
+#+RESULTS:
+: True
+
+** ToDo bug 2 - reversing titles changes the chart frame box
+
+see anal
+
+** rectExample breakdown
 
 #+begin_src haskell-ng :results output
 co = rectExample

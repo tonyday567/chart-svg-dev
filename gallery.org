@@ -89,7 +89,6 @@ All the example charts in [[https://github.com/tonyday567/chart-svg][chart-svg]]
 
 [[file:other/debug.svg]]
 
-
 ** compound
 
 [[file:other/compound.svg]]
@@ -102,3 +101,7 @@ All the example charts in [[https://github.com/tonyday567/chart-svg][chart-svg]]
 ** priorityv2
 
 [[file:other/priorityv2.svg]]
+
+** ast
+
+[[file:other/ast.svg]]

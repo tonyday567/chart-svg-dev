@@ -1,6 +1,5 @@
 packages:
   chart-svg-dev.cabal
+  ../chart-svg/chart-svg.cabal
   ../prettychart/prettychart.cabal
-  ../web-rep/web-rep.cabal
-  ../dotparse/dotparse.cabal
-
+  ../anal/anal.cabal

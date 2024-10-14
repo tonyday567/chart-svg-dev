@@ -1,6 +1,6 @@
 cabal-version: 3.4
 name:          chart-svg-dev
-version:       0.0.0.1
+version:       0.0.1.0
 synopsis: See readme
 description: See readme for description.
 category: project
@@ -17,68 +17,17 @@ source-repository head
   location: https://github.com/tonyday567/chart-svg-dev
 
 common ghc2021-stanza
-  if impl(ghc >=9.2)
-    default-language:
-      GHC2021
-  if impl(ghc <9.2)
-    default-language:
-      Haskell2010
-    default-extensions:
-      BangPatterns
-      BinaryLiterals
-      ConstrainedClassMethods
-      ConstraintKinds
-      DeriveDataTypeable
-      DeriveFoldable
-      DeriveFunctor
-      DeriveGeneric
-      DeriveLift
-      DeriveTraversable
-      DoAndIfThenElse
-      EmptyCase
-      EmptyDataDecls
-      EmptyDataDeriving
-      ExistentialQuantification
-      ExplicitForAll
-      FlexibleContexts
-      FlexibleInstances
-      ForeignFunctionInterface
-      GADTSyntax
-      GeneralisedNewtypeDeriving
-      HexFloatLiterals
-      ImplicitPrelude
-      InstanceSigs
-      KindSignatures
-      MonomorphismRestriction
-      MultiParamTypeClasses
-      NamedFieldPuns
-      NamedWildCards
-      NumericUnderscores
-      PatternGuards
-      PolyKinds
-      PostfixOperators
-      RankNTypes
-      RelaxedPolyRec
-      ScopedTypeVariables
-      StandaloneDeriving
-      StarIsType
-      TraditionalRecordSyntax
-      TupleSections
-      TypeApplications
-      TypeOperators
-      TypeSynonymInstances
-  if impl(ghc <9.2) && impl(ghc >=8.10)
-    default-extensions:
-      ImportQualifiedPost
-      StandaloneKindSignatures
+    default-language: GHC2021
 
 common ghc-options-stanza
-  ghc-options:
-    -Wall
-    -Wcompat
-    -Wincomplete-record-updates
-    -Wincomplete-uni-patterns
-    -Wredundant-constraints
+    ghc-options:
+        -Wall
+        -Wcompat
+        -Widentities
+        -Wincomplete-record-updates
+        -Wincomplete-uni-patterns
+        -Wpartial-fields
+        -Wredundant-constraints
 
 library
   import: ghc2021-stanza
