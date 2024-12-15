@@ -2,4 +2,5 @@ packages:
   chart-svg-dev.cabal
   ../chart-svg/chart-svg.cabal
   ../prettychart/prettychart.cabal
+  ../numhask-space/numhask-space.cabal
   ../anal/anal.cabal

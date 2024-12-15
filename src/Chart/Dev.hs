@@ -2,7 +2,7 @@
 {-# LANGUAGE OverloadedLabels #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 
-module Lib
+module Chart.Dev
   ( exampleTextChart
   , exampleText
   , exampleTextChart'
@@ -13,7 +13,8 @@ module Lib
   , sameProjection
   ) where
 
-import Prelude
+import NumHask.Prelude
+import qualified Prelude
 import Chart
 import Faker.Lorem
 import Data.Text qualified as T
@@ -27,7 +28,7 @@ import System.Random.MWC.Distributions
 exampleTextChart :: Int -> Int -> IO [Chart]
 exampleTextChart r c = do
   ts <- fmap T.pack <$> replicateM r (unwords <$> replicateM c word)
-  let s = defaultTextStyle & #anchor .~ AnchorStart
+  let s = defaultTextStyle & #textAnchor .~ AnchorStart
   pure $ zipWith (\t x -> TextChart s [(t, Point 0 x)]) ts [0..]
 
 exampleText :: Int -> Int -> IO [Text]
@@ -37,7 +38,7 @@ exampleText r c =
 exampleTextChart' :: Int -> Int -> Style -> IO [Chart]
 exampleTextChart' r c s = do
   ts <- fmap T.pack <$> replicateM r (unwords <$> replicateM c word)
-  let s' = s & #anchor .~ AnchorStart
+  let s' = s & #textAnchor .~ AnchorStart
   pure $ zipWith (\t x -> TextChart s' [(t, Point 0 x)]) ts [0..]
 
 -- | rvs creates a list of standard normal random variates.

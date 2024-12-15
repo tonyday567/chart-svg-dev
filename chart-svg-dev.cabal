@@ -44,6 +44,7 @@ library
     bytestring,
     text,
     numhask,
+    numhask-space,
     mtl,
     random,
     prettyprinter,
@@ -53,7 +54,7 @@ library
     dotparse,
     string-interpolate,
   exposed-modules:
-    Lib
+    Chart.Dev
 
 common ghc-options-exe-stanza
     ghc-options:
