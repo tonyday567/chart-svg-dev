@@ -45,13 +45,22 @@ import DotParse.Examples
 import Data.String.Interpolate
 (display, quit) <- startChartServer (Just "chart-svg-dev")
 disp x = display $ x & set (#markupOptions % #markupHeight) (Just 250) & set (#hudOptions % #frames % ix 1 % #item % #buffer) 0.1
-disp $ mempty & set #chartTree (view #chartTree lineExample)
+disp $ lineExample
 #+end_src
 
 #+RESULTS:
-: Ok, one module loaded.
+: Ok, one module reloaded.
 : Setting phasers to stun... (port 9160) (ctrl-c to quit)
 : True
+
+* examples
+
+#+begin_src haskell-ng :results output
+writeAllExamples
+#+end_src
+
+#+RESULTS:
+: ok
 
 * vert alignment
 
@@ -73,27 +82,24 @@ disp $ mempty & set #chartTree (view #chartTree lineExample)
     #+RESULTS:
     : True
 
+* vert experiments
 
-* ToDo vert experiments
-
-- single chart with no hud should be isomorphic.
+- single chart with no hud should be about isomorphic.
 
 #+begin_src haskell-ng :results output
 
-skinny = unitExample & set (#hudOptions) mempty & set (#markupOptions % #chartAspect) (CanvasAspect 4)
--- display skinny
+skinny = unitExample & set (#hudOptions) mempty & set (#markupOptions % #chartAspect) (CanvasAspect 1)
 
 display (vertCO NoAlign 0 [skinny])
 
-skinny
--- disp $ vertCO NoAlign 0 [skinny & set (#markupOptions % #chartAspect) (CanvasAspect 4)]
-vertCO NoAlign 0 [skinny]
+view (#chartTree % styleBox') skinny
+view (#chartTree % styleBox') (vertCO NoAlign 0 [skinny])
 #+end_src
 
 #+RESULTS:
 : True
-: ChartOptions {markupOptions = MarkupOptions {markupHeight = Just 300.0, chartAspect = CanvasAspect 4.0, cssOptions = CssOptions {shapeRendering = NoShapeRendering, preferColorScheme = PreferHud, fontFamilies = "\nsvg { font-family: system-ui,-apple-system,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",\"Liberation Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";\n}\n\nticktext { font-family: SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace;\n}\n\n", cssExtra = ""}, renderStyle = Compact}, hudOptions = HudOptions {axes = [], frames = [], legends = [], titles = []}, chartTree = ChartTree {tree = Node {rootLabel = (Just "unit",[Chart {chartStyle = Style {size = 6.0e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = NoScaleP, textAnchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, lineCap = Nothing, lineJoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, glyphShape = SquareGlyph}, chartData = RectData [Rect (-0.5) 0.5 (-0.5) 0.5]}]), subForest = []}}}
-: ChartOptions {markupOptions = MarkupOptions {markupHeight = Just 300.0, chartAspect = FixedAspect 1.5, cssOptions = CssOptions {shapeRendering = NoShapeRendering, preferColorScheme = PreferHud, fontFamilies = "\nsvg { font-family: system-ui,-apple-system,\"Segoe UI\",Roboto,\"Helvetica Neue\",Arial,\"Noto Sans\",\"Liberation Sans\",sans-serif,\"Apple Color Emoji\",\"Segoe UI Emoji\",\"Segoe UI Symbol\",\"Noto Color Emoji\";\n}\n\nticktext { font-family: SFMono-Regular,Menlo,Monaco,Consolas,\"Liberation Mono\",\"Courier New\",monospace;\n}\n\n", cssExtra = ""}, renderStyle = Compact}, hudOptions = HudOptions {axes = [], frames = [], legends = [], titles = []}, chartTree = ChartTree {tree = Node {rootLabel = (Nothing,[]), subForest = [Node {rootLabel = (Just "chart",[]), subForest = [Node {rootLabel = (Nothing,[]), subForest = [Node {rootLabel = (Just "unit",[Chart {chartStyle = Style {size = 6.0e-2, borderSize = 1.0e-2, color = Colour 0.02 0.73 0.80 0.10, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = ScalePArea, textAnchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, lineCap = Nothing, lineJoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, glyphShape = SquareGlyph}, chartData = RectData [Rect (-1.9801980198019802) 1.9801980198019797 (-0.49504950495049505) 0.49504950495049493]}]), subForest = []},Node {rootLabel = (Nothing,[]), subForest = []}]}]},Node {rootLabel = (Just "hud",[]), subForest = [Node {rootLabel = (Nothing,[]), subForest = []}]}]}}}
+: Just Rect (-0.505) 0.505 (-0.505) 0.505
+: Just Rect (-0.500049504950495) 0.5000495049504949 (-0.500049504950495) 0.5000495049504949
 
 #+begin_src haskell-ng :results output
 
@@ -111,7 +117,7 @@ disp (vertCO NoAlign 0 [unitExample, skinny])
 
 * bugs
 
-** ToDo text style box not right in below chart
+** text style box not right in below chart
 
 #+begin_src haskell-ng :results output
 disp $ mempty & set #chartTree (textChart (Just $ (addPoint (Point (1) (-0)) (aspect 2))) 0.4 (defaultTextStyle & set #size 0.2 & set #textAnchor AnchorEnd) ["line one", "line two"]) & set (#markupOptions % #chartAspect) (FixedAspect 1.5) & set (#markupOptions % #markupHeight) Nothing & set #hudOptions defaultHudOptions & over (#hudOptions % #frames) (<> [ Priority 200 (defaultFrameOptions & set #frame (Just defaultRectStyle) & set #anchorTo HudStyleSection )])
@@ -203,7 +209,6 @@ view safeStyleBox' ctFinal
 padSingletons <$> view styleBox' ctFinal
 viewbox
 #+end_src
-
 
 * Done adding anchor for legend
 
@@ -4991,4 +4996,98 @@ C.writeFile "other/ast.svg" bsSvg
 #+end_src
 
 #+RESULTS:
-* ToDo lineExample legend bad
+* lineExample legend bad
+
+#+begin_src haskell-ng :results output
+l = lineExample & preview (#hudOptions % #legends % ix 0 % #item) & fromMaybe defaultLegendOptions & set #vgap (0.1) & set (#textStyle % #scaleP) ScalePX
+es = reverse $ uncurry (legendEntry l) <$> view #legendCharts l
+twidth = maybe zero (\(Rect x z _ _) -> z - x) (styleBoxes (fst <$> es))
+gapwidth t = maybe 0 (\(Rect x z _ _) -> z - x) (sbox t)
+l' = stack (view #numStacks l) AlignLeft AlignMid (view #hgap l) ( ( \(t, a) -> hori AlignMid (view #vgap l + bool (twidth - gapwidth t) 0 (view #alignCharts l == AlignRight)) (fmap unnamed [[t], a])) <$> es)
+
+disp $ mempty @ChartOptions & (set #chartTree (legendFrame l l'))
+
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+disp $ lineExample & set (#hudOptions % #legends % each % #item % #vgap) (0)
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+:t l & set (#textStyle % #scaleP) ScalePX
+#+end_src
+
+#+RESULTS:
+: l & set (#textStyle % #scaleP) ScalePX :: LegendOptions
+
+#+begin_src haskell-ng :results output
+view #alignCharts l
+fr = frameChart (border 0 dark) 0
+es' = ((\(t,a) -> fmap unnamed [[t], a]) <$> es)
+x = mconcat $ hori AlignMid 0 <$> take 3 es'
+-- x = vert NoAlign 0 $ hori AlignMid 0 P.. (\(t,a) -> fmap unnamed [[t], a]) <$> es
+disp $ mempty @ChartOptions & set (#markupOptions % #chartAspect) (FixedAspect one) & set #hudOptions defaultHudOptions & set #chartTree x
+:t es'
+length es'
+#+end_src
+
+#+RESULTS:
+: AlignRight
+: True
+: es' :: [[ChartTree]]
+: 3
+
+
+#+begin_src haskell-ng :results output
+cs = es' !! 0
+gap = 0.2
+align = AlignMid
+:{
+  aligny x = case foldOf charts' x of
+      [] -> zero
+      xs -> case align of
+        AlignLeft -> maybe zero (\(Rect _ _ y' _) -> y') (styleBoxes xs)
+        AlignRight -> maybe zero (\(Rect _ _ _ y') -> y') (styleBoxes xs)
+        AlignMid -> maybe zero (\(Rect _ _ y' w') -> (y' + w') / 2) (styleBoxes xs)
+        NoAlign -> zero
+:}
+movex x c = maybe zero (-gap +) ( (-) <$> (rx <$> view styleBox' x) <*> (rz <$> view styleBox' c))
+step x c = x <> over chart' (moveChart (Point (movex x c) (aligny x - aligny c))) c
+xs' = foldl' step mempty (reverse cs)
+disp $ mempty @ChartOptions & set (#markupOptions % #chartAspect) ChartAspect & set #hudOptions defaultHudOptions & set #chartTree xs'
+#+end_src
+
+#+RESULTS:
+: ghci| ghci| ghci| ghci| ghci| ghci| ghci| ghci| ghci> ghci> ghci> ghci> True
+
+#+begin_src haskell-ng :results output
+view styleBox' <$> cs
+c0 = cs!!0 & set (chart' % #chartStyle % #frame) (Just defaultRectStyle)
+c1 = cs!!1
+acc = step mempty c1
+acc1 = over chart' (moveChart (Point (movex acc c0) (aligny acc - aligny c0))) c0
+view styleBox' c0
+view styleBox' acc1
+view styleBox' acc
+view styleBox' (acc <> acc1)
+aligny acc - aligny c0
+c0' = set (charts' % each % #chartStyle % #scaleP) ScalePX acc1
+view styleBox' c0'
+disp $ mempty @ChartOptions & set (#markupOptions % #chartAspect) ChartAspect & set #hudOptions defaultHudOptions & set #chartTree (c0' <> acc <> unnamed [RectChart defaultRectStyle [fromMaybe one (view styleBox' (c0' <> acc))]])
+#+end_src
+
+#+RESULTS:
+: [Just Rect 0.0 0.96 (-4.800000000000001e-2) 0.128,Just Rect (-3.0e-2) 0.63 0.27 0.32999999999999996]
+: Just Rect (-8.0e-4) 0.9608 (-4.880000000000001e-2) 0.1288
+: Just Rect (-1.1916) (-0.23000000000000012) (-8.879999999999999e-2) 8.88e-2
+: Just Rect (-3.0e-2) 0.63 (-3.0e-2) 3.0e-2
+: Just Rect (-1.1916) 0.63 (-8.879999999999999e-2) 8.88e-2
+: -3.9999999999999994e-2
+: Just Rect (-1.1916) (-0.23000000000000012) (-8.879999999999999e-2) 8.88e-2
+: True
