@@ -6,14 +6,18 @@ module Main (main) where
 import Control.Monad
 import Data.ByteString qualified as B
 import Data.Function
-import Data.TreeDiff
-import MarkupParse
-import MarkupParse.Patch
 import Test.Tasty (TestTree, defaultMain, testGroup)
 import Test.Tasty.Golden.Advanced (goldenTest)
 import Prelude
 import Chart
 import Chart.Examples
+import Data.Algorithm.DiffOutput
+import Data.Algorithm.Diff
+import Data.ByteString.Char8 qualified as C
+import MarkupParse
+import Data.Bool
+import Data.Bifunctor
+import Control.Category ((>>>))
 
 main :: IO ()
 main =
@@ -34,16 +38,8 @@ testExample :: (ChartOptions, FilePath) -> TestTree
 testExample (co, fp) =
   goldenTest
     fp
-    (getMarkupFile Xml fp)
-    (pure $ markupChartOptions co)
-    (\expected actual -> pure (show . ansiWlEditExpr <$> patch expected actual))
+    (B.readFile fp)
+    (pure $ markdown_ Compact Xml $ markupChartOptions co)
+    (\expected actual -> getDiff (C.lines expected) (C.lines actual) & fmap (bimap (C.unpack >>> pure) (C.unpack >>> pure)) & diffToLineRanges & prettyDiffs & (\xs -> bool (pure $ Just (show xs)) (pure Nothing) (xs==mempty)))
     (\_ -> pure ())
 
-getMarkupFile :: Standard -> FilePath -> IO Markup
-getMarkupFile s fp = do
-  bs <- B.readFile fp
-  pure $ warnError $ markup s bs
-
--- round trip markdown >>> markup
-isoMarkdownMarkup :: RenderStyle -> Standard -> Markup -> Markup
-isoMarkdownMarkup r s m = m & (markdown r s >=> markup s) & warnError

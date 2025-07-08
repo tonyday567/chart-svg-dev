@@ -1,6 +1,6 @@
 cabal-version: 3.4
 name:          chart-svg-dev
-version:       0.0.1.0
+version:       0.0.2.0
 synopsis: See readme
 description: See readme for description.
 category: project
@@ -11,13 +11,30 @@ license: BSD-3-Clause
 homepage: https://github.com/tonyday567/chart-svg-dev#readme
 bug-reports: https://github.com/tonyday567/chart-svg-dev/issues
 build-type: Simple
-tested-with: GHC == 9.6.2
+tested-with: GHC == 9.12.2
 source-repository head
   type: git
   location: https://github.com/tonyday567/chart-svg-dev
 
-common ghc2021-stanza
-    default-language: GHC2021
+common ghc2024-additions
+  default-extensions:
+    DataKinds
+    DerivingStrategies
+    DisambiguateRecordFields
+    ExplicitNamespaces
+    GADTs
+    LambdaCase
+    MonoLocalBinds
+    RoleAnnotations
+
+common ghc2024-stanza
+  if impl(ghc >=9.10)
+    default-language:
+      GHC2024
+  else
+    import: ghc2024-additions
+    default-language:
+      GHC2021
 
 common ghc-options-stanza
     ghc-options:
@@ -30,7 +47,7 @@ common ghc-options-stanza
         -Wredundant-constraints
 
 library
-  import: ghc2021-stanza
+  import: ghc2024-stanza
   import: ghc-options-stanza
   hs-source-dirs:
     src
@@ -44,7 +61,7 @@ library
     bytestring,
     text,
     numhask,
-    numhask-space >= 0.12 && <0.13,
+    numhask-space,
     mtl,
     random,
     prettyprinter,
@@ -67,16 +84,16 @@ common ghc-options-exe-stanza
 executable chart-svg-example-diff
     import: ghc-options-exe-stanza
     import: ghc-options-stanza
-    import: ghc2021-stanza
+    import: ghc2024-stanza
     main-is: diff.hs
     hs-source-dirs: app
     build-depends:
         , chart-svg
         , markup-parse
-        , numhask >=0.10 && <0.12
+        , numhask
         , tasty-golden
         , base
         , tasty
-        , tree-diff
+        , Diff
         , bytestring
         , string-interpolate

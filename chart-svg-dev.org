@@ -1,9 +1,6 @@
 
 * chart-svg-dev
 
-[[https://hackage.haskell.org/package/chart-svg-dev][https://img.shields.io/hackage/v/chart-svg-dev.svg]]
-[[https://github.com/tonyday567/chart-svg-dev/actions?query=workflow%3Ahaskell-ci][https://github.com/tonyday567/chart-svg-dev/workflows/haskell-ci/badge.svg]]
-
 ~chart-svg-dev~ is a development environment for chart-svg.
 
 * Imports
