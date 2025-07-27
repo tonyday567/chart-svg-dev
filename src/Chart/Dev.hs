@@ -1,5 +1,6 @@
 {-# OPTIONS_GHC -Wno-unused-imports #-}
 {-# LANGUAGE OverloadedLabels #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# OPTIONS_GHC -Wno-missing-signatures #-}
 
 module Chart.Dev
@@ -11,9 +12,12 @@ module Chart.Dev
   , rvsp
   , toCT
   , sameProjection
+  , gradientChart
+  , strip
   ) where
 
 import NumHask.Prelude
+import NumHask.Space
 import qualified Prelude
 import Chart
 import Faker.Lorem
@@ -81,3 +85,17 @@ sameMulti co = (ct'==ct'', ct', ct'')
       ct'' = view styleBox' $ set styleBox' (Just viewbox) csAndHud
 
     -}
+
+gradientChart :: Int -> LCHA -> LCHA -> [Chart]
+gradientChart grain c0 c1 =
+  (\(r, c) -> RectChart (defaultRectStyle & set #color c & set #borderSize 0) [r])
+    . (\x -> (Rect x (x + d) 0 1, view lcha2colour' (mixLCHA x c0 c1)))
+    <$> grid LowerPos (Range 0 1) grain
+  where
+    d = 1 / fromIntegral grain
+
+strip :: Rect Double -> Double -> Colour -> ChartTree
+strip r w c =
+        named
+          "strip"
+          [RectChart (defaultRectStyle & set #color transparent & set #borderSize w & set #borderColor c) [r]]

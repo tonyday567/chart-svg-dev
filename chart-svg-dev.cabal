@@ -57,6 +57,7 @@ library
     chart-svg,
     prettychart,
     faker,
+    lens,
     optics-core,
     bytestring,
     text,
