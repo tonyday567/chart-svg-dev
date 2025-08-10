@@ -19,7 +19,7 @@ import NumHask.Prelude as P
 import NumHask.Space as S
 import Prelude qualified
 import Control.Category ((>>>))
-import Data.Function
+import Data.Function hiding ((.))
 import Data.Maybe
 import Data.Bool
 import Data.List qualified as List
@@ -40,15 +40,102 @@ import MarkupParse
 import DotParse
 import DotParse.Examples
 import Data.String.Interpolate
-(display, quit) <- startChartServer (Just "chart-svg-dev")
-disp x = display $ x & set (#markupOptions % #markupHeight) (Just 250) & set (#hudOptions % #frames % ix 1 % #item % #buffer) 0.1
-disp $ lineExample
+-- (display, quit) <- startChartServer (Just "chart-svg-dev")
+-- disp $ lineExample
+import Box
+import Web.Rep
+import Control.Lens qualified as Lens
+import Data.Data.Lens qualified as Lens
+import Data.FormatN
 #+end_src
 
 #+RESULTS:
-: Ok, one module reloaded.
-: Setting phasers to stun... (port 9160) (cgthrcli->c  to quit)
+#+begin_example
+Configuration is affected by the following files:
+- cabal.project
+- cabal.project.local
+Build profile: -w ghc-9.12.2 -O1
+In order, the following will be built (use -v for more details):
+ - chart-svg-dev-0.0.2.0 (interactive) (lib) (file /Users/tonyday567/haskell/chart-svg-dev/dist-newstyle/build/aarch64-osx/ghc-9.12.2/chart-svg-0.8.2.1/cache/build changed)
+Preprocessing library for chart-svg-dev-0.0.2.0...
+GHCi, version 9.12.2: https://www.haskell.org/ghc/  :? for help
+[1 of 1] Compiling Chart.Dev        ( src/Chart/Dev.hs, interpreted )
+Ok, one module loaded.
+Ok, one module reloaded.
+#+end_example
+
+#+begin_src haskell-ng :results output
+(c,q) <- startChartServerWith (defaultSocketConfig & set #port 9166) (chartSocketPage Nothing)
+:t c
+#+end_src
+
+
+#+RESULTS:
+: Setting phasgehrcsi >t o stucn .::. . C(hpaorrttO p9t1i6o6n)s  (->c trIlO- c Btooo lq
+: uit)
+
+#+begin_src haskell-ng :results output
+c unitExample
+#+end_src
+
+#+RESULTS:
 : True
+
+
+* ToDo animate
+
+example 1 : chroma from zero to one: a two second animation
+
+#+begin_src haskell-ng :results output
+f x = over chroma' (const (0.3*x))
+glue (Committer c) <$|> animate 2 100 (\x -> Lens.transformOnOf Lens.template Lens.uniplate (f x) (unitExample & over #hudOptions (colourHudOptions (f x))))
+#+end_src
+
+#+RESULTS:
+
+example 2 : hue
+
+#+begin_src haskell-ng :results output
+f x = over hue' ((`modF` 360) . (+360*x))
+glue (Committer c) <$|> animate 5 100 (\x -> Lens.transformOnOf Lens.template Lens.uniplate (f x) (unitExample & over #hudOptions (colourHudOptions (f x))))
+#+end_src
+
+#+RESULTS:
+
+example 3 : lightness
+
+#+begin_src haskell-ng :results output
+f x = over lightness' (*x)
+glue (Committer c) <$|> animate 5 100 (\x -> Lens.transformOnOf Lens.template Lens.uniplate (f x) (unitExample & over #hudOptions (colourHudOptions (f x))))
+#+end_src
+
+#+RESULTS:
+
+#+begin_src haskell-ng :results output
+f x = over opac' (*x)
+glue (Committer c) <$|> animate 5 100 (\x -> Lens.transformOnOf Lens.template Lens.uniplate (f x) (unitExample & over #hudOptions (colourHudOptions (f x))))
+#+end_src
+
+#+RESULTS:
+
+combined
+
+#+begin_src haskell-ng :results output
+f x = over lightness' (*x) >>> over chroma' (const (min 0.02 (0.2*x))) >>> over hue' ((`modF` 360) . (+360*x))
+glue (Committer c) <$|> animate 2 100 (\x -> Lens.transformOnOf Lens.template Lens.uniplate (f x) (unitExample & over #hudOptions (colourHudOptions (f x))))
+#+end_src
+
+#+RESULTS:
+
+** animate stamp
+
+#+begin_src haskell-ng :results output
+f x = over opac' (*x) >>> over chroma' (const (max 0.02 (0.2*x))) >>> over hue' ((`modF` 360) . (+360*x))
+stamp x = TextChart defaultTextStyle [(fixed (Just 2) x, Point 0 0)]
+glue (Committer c) <$|> animate 4 100 (\x -> Lens.transformOnOf Lens.template Lens.uniplate (f x) (unitExample & over #chartTree (<> (unnamed $ pure $ stamp x))))
+#+end_src
+
+#+RESULTS:
 
 * lens conversion
 
@@ -62,45 +149,108 @@ display lineExample
 #+begin_src haskell-ng :results output
 import Control.Lens qualified as Lens
 import Data.Data.Lens qualified as Lens
-display $ Lens.transformOnOf Lens.template Lens.uniplate (over chroma' (*1) >>> over opac' (*0.2)) lineExample
-
+display $ Lens.transformOnOf Lens.template Lens.uniplate (over chroma' (*0.4) >>> over opac' (*2.2)) lineExample
 #+end_src
 
 #+RESULTS:
 : True
 
+#+begin_src haskell-ng :results output
+import Box
+:t gapEffect
+grain = grid OuterPos (Range 0 1) 100 :: [Double]
+ani = qList $ fmap (\x -> Lens.transformOnOf Lens.template Lens.uniplate (over chroma' (*(0.4 + x)) >>> over opac' (*2.2)) lineExample) grain
 
+:t display
+:t ani
+#+end_src
+
+#+RESULTS:
+: gapEffect :: Emitter IO (Gap, a) -> Emitter IO a
+: display :: ChartOptions -> IO Bool
+: ani :: CoEmitter IO ChartOptions
 
 
 #+begin_src haskell-ng :results output
-colourHudOptions :: (Colour -> Colour) -> HudOptions -> HudOptions
-colourHudOptions f o =
-  o
-    & over (#frames % each % #item) fFrame
-    & over (#titles % each % #item % #style % #color) f
-    & over (#axes % each % #item) fAxis
-    & over (#legends % each % #item) fLegend
-  where
-    fAxis :: AxisOptions -> AxisOptions
-    fAxis a =
-      a
-        & over (#axisBar %? #style % #color) f
-        & over (#ticks % #glyphTick %? #style % #color) f
-        & over (#ticks % #glyphTick %? #style % #borderColor) f
-        & over (#ticks % #textTick %? #style % #color) f
-        & over
-          (#ticks % #lineTick %? #style % #color)
-          f
-    fLegend :: LegendOptions -> LegendOptions
-    fLegend a =
-      a
-        & over #textStyle (over #color f)
-        & over #frame (fmap (over #color f . over #borderColor f))
-    fFrame :: FrameOptions -> FrameOptions
-    fFrame a =
-      a
-        & over (#frame % _Just) (over #color f . over #borderColor f)
+:t Committer display
+:t glue (Committer display)
+:t ani
 #+end_src
+
+#+RESULTS:
+: Committer display :: Committer IO ChartOptions
+: glue (Committer display) :: Emitter IO ChartOptions -> IO ()
+: ani :: CoEmitter IO ChartOptions
+
+#+begin_src haskell-ng :results output
+:t glue (Committer display) <$|> ani
+#+end_src
+
+#+RESULTS:
+: glue (Committer display) <$|> ani :: IO ()
+
+#+begin_src haskell-ng :results output
+:t gapEffect <$> fmap (0.1,) <$> ani
+#+end_src
+
+#+RESULTS:
+: gapEffect <$> fmap (0.1,) <$> ani
+:   :: Codensity IO (Emitter IO ChartOptions)
+
+#+begin_src haskell-ng :results output
+grain = grid OuterPos (Range 0 1) 100 :: [Double]
+gaps' x = glue (Committer display) <$> gapEffect <$> fmap (x,)
+ani grain f = grid OuterPos (Range 0 1) grain & fmap (\x -> Lens.transformOnOf Lens.template Lens.uniplate (f x) lineExample) & qList
+go = gaps' 0.1 <$|> ani 100 (\x -> over chroma' (*x))
+-- ani f x = grid OuterPos (Range 0 1) x & (\x -> Lens.transformOnOf Lens.template Lens.uniplate (f x) lineExample) & qList
+-- <$> (qList $ fmap (\x -> Lens.transformOnOf Lens.template Lens.uniplate (over chroma' (*1)) >>> over opac' (const x) lineExample) grain)
+-- gaps' 0.2 <$|> ani (\x -> over chroma' (*x)) 100
+#+end_src
+
+#+RESULTS:
+#+begin_example
+<interactive>:41:11: error: [GHC-88464]
+    Variable not in scope: glue :: t0 -> a0 -> b
+    Suggested fix:
+      Perhaps use data constructor ‘Blue’ (imported from Text.Pretty.Simple)
+
+<interactive>:41:17: error: [GHC-88464]
+    Data constructor not in scope:
+      Committer :: (ChartOptions -> IO Bool) -> t0
+
+<interactive>:41:40: error: [GHC-88464]
+    Variable not in scope: gapEffect :: f (t, a) -> a0
+<interactive>:42:61: error: [GHC-76037]
+    Not in scope: ‘Lens.transformOnOf’
+    Note: No module named ‘Lens’ is imported.
+
+<interactive>:42:80: error: [GHC-76037]
+    Not in scope: ‘Lens.template’
+    Note: No module named ‘Lens’ is imported.
+
+<interactive>:42:94: error: [GHC-76037]
+    Not in scope: ‘Lens.uniplate’
+    Note: No module named ‘Lens’ is imported.
+<interactive>:43:6: error: [GHC-88464]
+    Variable not in scope: gaps' :: t1 -> t2
+
+<interactive>:43:16: error: [GHC-88464]
+    Variable not in scope: (<$|>) :: t2 -> t3 -> t
+    Suggested fix:
+      Perhaps use one of these:
+        ‘<$>’ (imported from NumHask.Prelude),
+        ‘<|>’ (imported from NumHask.Prelude),
+        ‘<$!>’ (imported from Control.Monad)
+
+<interactive>:43:21: error: [GHC-88464]
+    Variable not in scope:
+      ani :: t0 -> (Double -> Colour -> Colour) -> t3
+    Suggested fix:
+      Perhaps use one of these:
+        ‘and’ (imported from NumHask.Prelude),
+        ‘any’ (imported from NumHask.Prelude),
+        ‘T.any’ (imported from Data.Text)
+#+end_example
 
 * logo
 
@@ -204,11 +354,11 @@ disp (vertCO NoAlign 0 [unitExample, skinny])
 ** text style box not right in below chart
 
 #+begin_src haskell-ng :results output
-disp $ mempty & set #chartTree (textChart (Just $ (addPoint (Point (1) (-0)) (aspect 2))) 0.4 (defaultTextStyle & set #size 0.2 & set #textAnchor AnchorEnd) ["line one", "line two"]) & set (#markupOptions % #chartAspect) (FixedAspect 1.5) & set (#markupOptions % #markupHeight) Nothing & set #hudOptions defaultHudOptions & over (#hudOptions % #frames) (<> [ Priority 200 (defaultFrameOptions & set #frame (Just defaultRectStyle) & set #anchorTo HudStyleSection )])
+c $ mempty & set #chartTree (textChart (Just $ (addPoint (Point (1) (-0)) (aspect 2))) 0.4 (defaultTextStyle & set #size 0.2 & set #textAnchor AnchorEnd) ["line one", "line two"]) & set (#markupOptions % #chartAspect) (FixedAspect 1.5) & set (#markupOptions % #markupHeight) Nothing & set #hudOptions defaultHudOptions & over (#hudOptions % #frames) (<> [ Priority 200 (defaultFrameOptions & set #frame (Just defaultRectStyle) & set #anchorTo HudStyleSection )])
 #+end_src
 
 #+RESULTS:
-: <interactive>:40:33: error: [GHC-88464]
+: <interactive>:308:30: error: [GHC-88464]
 :     Variable not in scope:
 :       textChart
 :         :: Maybe (Rect Double) -> t0 -> Chart.Style -> [a0] -> ChartTree
@@ -5088,7 +5238,7 @@ twidth = maybe zero (\(Rect x z _ _) -> z - x) (styleBoxes (fst <$> es))
 gapwidth t = maybe 0 (\(Rect x z _ _) -> z - x) (sbox t)
 l' = stack (view #numStacks l) AlignLeft AlignMid (view #hgap l) ( ( \(t, a) -> hori AlignMid (view #vgap l + bool (twidth - gapwidth t) 0 (view #alignCharts l == AlignRight)) (fmap unnamed [[t], a])) <$> es)
 
-disp $ mempty @ChartOptions & (set #chartTree (legendFrame l l'))
+c $ mempty @ChartOptions & (set #chartTree (legendFrame l l'))
 
 #+end_src
 
@@ -5174,3 +5324,35 @@ disp $ mempty @ChartOptions & set (#markupOptions % #chartAspect) ChartAspect & 
 : -3.9999999999999994e-2
 : Just Rect (-1.1916) (-0.23000000000000012) (-8.879999999999999e-2) 8.88e-2
 : True
+
+* Done bug#45
+
+#+begin_src haskell-ng :results output
+ls = [ [Point 0.0 1.0, Point 1.0 1.0, Point 2.0 5.0], [Point 0.0 0.0, Point 2.8 3.0], [Point 0.5 4.0, Point 0.5 0]]
+lss = (\x -> defaultLineStyle & set #borderSize 0 & set #color (paletteO x 0.6) & set #size (0.025 * fromIntegral (x + 1))) <$> [0,1,2]
+cs = zipWith (\l ps -> LineChart l [ps]) lss ls
+lo = defaultLegendOptions & set #scaleP ScalePX & set #place PlaceRight & set #legendCharts (zipWith (\t c -> (t, [c])) ["palette #0", "palette #1", "palette #2"] cs) & set #numStacks 1 & set #scaleChartsBy 0.25 & set #stackAlign1 AlignLeft & set #stackAlign2 AlignMid & set #stackAlign3 AlignMid & set #alignCharts AlignRight
+ho = defaultHudOptions & set #legends [ Priority 12 lo]
+lineExample = mempty @ChartOptions & set #hudOptions ho & set #chartTree (named "line" cs)
+debugLineExample = debugExample $ lineExample & Lens.transformOnOf Lens.template Lens.uniplate (over opac' (*0.7))
+
+c debugLineExample
+writeChartOptions "other/debuglineexample.svg" debugLineExample
+#+end_src
+
+#+RESULTS:
+: True
+
+
+** decomposition of chart
+
+#+begin_src haskell-ng :results output
+:t cs!!2
+sbox (cs!!2)
+cs!!2
+#+end_src
+
+#+RESULTS:
+: cs!!2 :: Chart
+: Just Rect 0.4775 0.5225 (-2.25e-2) 4.0225
+: Chart {chartStyle = Style {size = 4.5e-2, borderSize = 1.0e-2, color = Colour 0.66 0.07 0.55 1.00, borderColor = Colour 0.02 0.29 0.48 1.00, scaleP = NoScaleP, textAnchor = AnchorMiddle, rotation = Nothing, translate = Nothing, escapeText = EscapeText, frame = Nothing, lineCap = Nothing, lineJoin = Nothing, dasharray = Nothing, dashoffset = Nothing, hsize = 0.6, vsize = 1.1, vshift = -0.25, glyphShape = SquareGlyph}, chartData = LineData [[Point 0.5 4.0,Point 0.5 0.0]]}
