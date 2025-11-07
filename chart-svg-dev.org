@@ -56,7 +56,8 @@ Configuration is affected by the following files:
 - cabal.project.local
 Build profile: -w ghc-9.12.2 -O1
 In order, the following will be built (use -v for more details):
- - chart-svg-dev-0.0.2.0 (interactive) (lib) (file /Users/tonyday567/haskell/chart-svg-dev/dist-newstyle/build/aarch64-osx/ghc-9.12.2/chart-svg-0.8.2.1/cache/build changed)
+ - chart-svg-dev-0.0.2.0 (interactive) (lib) (configuration changed)
+Configuring library for chart-svg-dev-0.0.2.0...
 Preprocessing library for chart-svg-dev-0.0.2.0...
 GHCi, version 9.12.2: https://www.haskell.org/ghc/  :? for help
 [1 of 1] Compiling Chart.Dev        ( src/Chart/Dev.hs, interpreted )
@@ -71,8 +72,8 @@ Ok, one module reloaded.
 
 
 #+RESULTS:
-: Setting phasgehrcsi >t o stucn .::. . C(hpaorrttO p9t1i6o6n)s  (->c trIlO- c Btooo lq
-: uit)
+: Setting pghhacsie>r s to cs t::u n.C.h.a r(tpOoprtti o9n1s6 6->)  (IcOt rlB-oco lt
+: o quit)
 
 #+begin_src haskell-ng :results output
 c unitExample
@@ -136,6 +137,121 @@ glue (Committer c) <$|> animate 4 100 (\x -> Lens.transformOnOf Lens.template Le
 #+end_src
 
 #+RESULTS:
+
+** animate axis ticks
+
+#+begin_src haskell-ng :results output
+import NumHask.Prelude
+stamp x = TextChart defaultTextStyle [(fixed (Just 2) x, Point 0 0)]
+glue (Committer c) <$|> animate 4 100 (\x -> unitExample & over #chartTree (<> (unnamed $ pure $ stamp x)) & over (#chartTree % charts' % each % #chartData % rectData') (fmap (fmap (fmap (*x)))))
+#+end_src
+
+#+RESULTS:
+
+#+begin_src haskell-ng :results output
+stamp x = TextChart defaultTextStyle [(fixed (Just 2) x, Point 0 0)]
+glue (Committer c) <$|> animate 40 100 (\x -> unitExample & over #chartTree (<> (unnamed $ pure $ stamp x)) & over (#chartTree % charts' % each % #chartData % rectData') (fmap (fmap (fmap ((10 ** (10*x - 5))  *)))))
+#+end_src
+
+#+RESULTS:
+
+
+#+begin_src haskell-ng :results output
+:t (\x -> unitExample & over (#chartTree % chart' % each % #chartData % rectData') (fmap (fmap (fmap (P.id)))))
+#+end_src
+
+#+begin_src haskell-ng :results output
+:t \f x -> unitExample & over (#chartTree % charts' % each) f
+#+end_src
+
+#+RESULTS:
+: <interactive>:1:51: error: [GHC-39999]
+:     • No instance for ‘Each i0 Chart Chart a0 b0’
+:         arising from a use of ‘each’
+:     • In the second argument of ‘(%)’, namely ‘each’
+:       In the first argument of ‘over’, namely
+:         ‘(#chartTree % chart' % each)’
+:       In the second argument of ‘(&)’, namely
+:         ‘over (#chartTree % chart' % each) f’
+
+
+#+begin_src haskell-ng :results output
+:t unitExample & over #chartTree (<> (unnamed $ pure $ stamp 0.2)) & toListOf (#chartTree % rectData')
+#+end_src
+
+
+#+begin_src haskell-ng :results output
+:t unitExample & over (#chartTree % charts' % each % #chartData % rectData') (fmap (fmap (fmap (0.5*))))
+:t rectData'
+#+end_src
+
+
+#+RESULTS:
+: unitExample & over (#chartTree % charts' % each % #chartData % rectData') (fmap (fmap (fmap (0.5*))))
+:   :: ChartOptions
+: rectData' :: Lens' ChartData (Maybe [Rect Double])
+
+#+begin_src haskell-ng :results output
+:i ChartData
+#+end_src
+
+#+RESULTS:
+#+begin_example
+type ChartData :: *
+data ChartData
+  = RectData [Rect Double]
+  | LineData [[Point Double]]
+  | GlyphData [Point Double]
+  | TextData [(Text, Point Double)]
+  | PathData [PathData Double]
+  | BlankData [Rect Double]
+  	-- Defined in ‘Chart.Primitive’
+instance Generic ChartData -- Defined in ‘Chart.Primitive’
+instance Eq ChartData -- Defined in ‘Chart.Primitive’
+instance Show ChartData -- Defined in ‘Chart.Primitive’
+type instance P.Rep ChartData
+  = D1
+      (MetaData
+         "ChartData" "Chart.Primitive" "chart-svg-0.8.2.1-inplace" False)
+      ((C1
+          (MetaCons "RectData" PrefixI False)
+          (S1
+             (MetaSel
+                Nothing NoSourceUnpackedness NoSourceStrictness DecidedLazy)
+             (Rec0 [Rect Double]))
+        :+: (C1
+               (MetaCons "LineData" PrefixI False)
+               (S1
+                  (MetaSel
+                     Nothing NoSourceUnpackedness NoSourceStrictness DecidedLazy)
+                  (Rec0 [[Point Double]]))
+             :+: C1
+                   (MetaCons "GlyphData" PrefixI False)
+                   (S1
+                      (MetaSel
+                         Nothing NoSourceUnpackedness NoSourceStrictness DecidedLazy)
+                      (Rec0 [Point Double]))))
+       :+: (C1
+              (MetaCons "TextData" PrefixI False)
+              (S1
+                 (MetaSel
+                    Nothing NoSourceUnpackedness NoSourceStrictness DecidedLazy)
+                 (Rec0 [(Text, Point Double)]))
+            :+: (C1
+                   (MetaCons "PathData" PrefixI False)
+                   (S1
+                      (MetaSel
+                         Nothing NoSourceUnpackedness NoSourceStrictness DecidedLazy)
+                      (Rec0 [PathData Double]))
+                 :+: C1
+                       (MetaCons "BlankData" PrefixI False)
+                       (S1
+                          (MetaSel
+                             Nothing NoSourceUnpackedness NoSourceStrictness DecidedLazy)
+                          (Rec0 [Rect Double])))))
+  	-- Defined in ‘Chart.Primitive’
+#+end_example
+
 
 * lens conversion
 
