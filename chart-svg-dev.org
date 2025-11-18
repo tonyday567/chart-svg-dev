@@ -50,20 +50,7 @@ import Data.FormatN
 #+end_src
 
 #+RESULTS:
-#+begin_example
-Configuration is affected by the following files:
-- cabal.project
-- cabal.project.local
-Build profile: -w ghc-9.12.2 -O1
-In order, the following will be built (use -v for more details):
- - chart-svg-dev-0.0.2.0 (interactive) (lib) (configuration changed)
-Configuring library for chart-svg-dev-0.0.2.0...
-Preprocessing library for chart-svg-dev-0.0.2.0...
-GHCi, version 9.12.2: https://www.haskell.org/ghc/  :? for help
-[1 of 1] Compiling Chart.Dev        ( src/Chart/Dev.hs, interpreted )
-Ok, one module loaded.
-Ok, one module reloaded.
-#+end_example
+: Ok, one module reloaded.
 
 #+begin_src haskell-ng :results output
 (c,q) <- startChartServerWith (defaultSocketConfig & set #port 9166) (chartSocketPage Nothing)
@@ -72,8 +59,7 @@ Ok, one module reloaded.
 
 
 #+RESULTS:
-: Setting pghhacsie>r s to cs t::u n.C.h.a r(tpOoprtti o9n1s6 6->)  (IcOt rlB-oco lt
-: o quit)
+: Setting phasers gthoc is>t un...c  (::p orCth a9r1t6O6p)t i(ocntsr l->- c ItOo  qBuoiotl)
 
 #+begin_src haskell-ng :results output
 c unitExample
@@ -81,6 +67,168 @@ c unitExample
 
 #+RESULTS:
 : True
+
+
+
+* ToDo pie
+
+Starting with some simple data:
+
+| word   | number |
+|--------+--------|
+| person |     20 |
+| woman  |     25 |
+| man    |     15 |
+| camera |      5 |
+| tv     |     35 |
+
+
+A stacked bar chart:
+
+#+begin_src haskell-ng :results output
+words = ["person","woman","man","camera","tv"]
+numbers = [20,25,15,5,35]
+#+end_src
+
+#+RESULTS:
+
+#+begin_src haskell-ng :results output
+d = BarData (pure numbers) words ["numbers"]
+#+end_src
+
+#+RESULTS:
+
+#+begin_src haskell-ng :results output
+c $ barChart (defaultBarOptions & set #barStacked Stacked & set #barOrientation Hori) (flipBarData d)
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+c lineExample
+#+end_src
+
+#+RESULTS:
+: True
+
+#+begin_src haskell-ng :results output
+:i BarOptions
+#+end_src
+
+
+#+RESULTS:
+#+begin_example
+type BarOptions :: *
+data BarOptions
+  = BarOptions {barRectStyles :: [Chart.Style],
+                barTextStyles :: [Chart.Style],
+                outerGap :: Double,
+                innerGap :: Double,
+                textGap :: Double,
+                textGapNegative :: Double,
+                textShiftVert :: Double,
+                displayValues :: Bool,
+                valueFormatN :: FormatN,
+                barOrientation :: Orientation,
+                barStacked :: Stacked,
+                barLegendOptions :: LegendOptions}
+  	-- Defined in ‘Chart.Bar’
+instance Eq BarOptions -- Defined in ‘Chart.Bar’
+instance Generic BarOptions -- Defined in ‘Chart.Bar’
+instance Show BarOptions -- Defined in ‘Chart.Bar’
+type instance P.Rep BarOptions
+  = D1
+      (MetaData
+         "BarOptions" "Chart.Bar" "chart-svg-0.8.2.1-inplace" False)
+      (C1
+         (MetaCons "BarOptions" PrefixI True)
+         (((S1
+              (MetaSel
+                 (Just "barRectStyles")
+                 NoSourceUnpackedness
+                 NoSourceStrictness
+                 DecidedLazy)
+              (Rec0 [Chart.Style])
+            :*: (S1
+                   (MetaSel
+                      (Just "barTextStyles")
+                      NoSourceUnpackedness
+                      NoSourceStrictness
+                      DecidedLazy)
+                   (Rec0 [Chart.Style])
+                 :*: S1
+                       (MetaSel
+                          (Just "outerGap")
+                          NoSourceUnpackedness
+                          NoSourceStrictness
+                          DecidedLazy)
+                       (Rec0 Double)))
+           :*: (S1
+                  (MetaSel
+                     (Just "innerGap")
+                     NoSourceUnpackedness
+                     NoSourceStrictness
+                     DecidedLazy)
+                  (Rec0 Double)
+                :*: (S1
+                       (MetaSel
+                          (Just "textGap")
+                          NoSourceUnpackedness
+                          NoSourceStrictness
+                          DecidedLazy)
+                       (Rec0 Double)
+                     :*: S1
+                           (MetaSel
+                              (Just "textGapNegative")
+                              NoSourceUnpackedness
+                              NoSourceStrictness
+                              DecidedLazy)
+                           (Rec0 Double))))
+          :*: ((S1
+                  (MetaSel
+                     (Just "textShiftVert")
+                     NoSourceUnpackedness
+                     NoSourceStrictness
+                     DecidedLazy)
+                  (Rec0 Double)
+                :*: (S1
+                       (MetaSel
+                          (Just "displayValues")
+                          NoSourceUnpackedness
+                          NoSourceStrictness
+                          DecidedLazy)
+                       (Rec0 Bool)
+                     :*: S1
+                           (MetaSel
+                              (Just "valueFormatN")
+                              NoSourceUnpackedness
+                              NoSourceStrictness
+                              DecidedLazy)
+                           (Rec0 FormatN)))
+               :*: (S1
+                      (MetaSel
+                         (Just "barOrientation")
+                         NoSourceUnpackedness
+                         NoSourceStrictness
+                         DecidedLazy)
+                      (Rec0 Orientation)
+                    :*: (S1
+                           (MetaSel
+                              (Just "barStacked")
+                              NoSourceUnpackedness
+                              NoSourceStrictness
+                              DecidedLazy)
+                           (Rec0 Stacked)
+                         :*: S1
+                               (MetaSel
+                                  (Just "barLegendOptions")
+                                  NoSourceUnpackedness
+                                  NoSourceStrictness
+                                  DecidedLazy)
+                               (Rec0 LegendOptions))))))
+  	-- Defined in ‘Chart.Bar’
+#+end_example
 
 
 * ToDo animate
