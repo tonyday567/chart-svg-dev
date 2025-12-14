@@ -1,0 +1,49 @@
+* Imports
+
+#+begin_src haskell-ng :results output
+:r
+:set -Wno-type-defaults
+:set -Wno-name-shadowing
+:set -XOverloadedLabels
+:set -XOverloadedStrings
+:set -XTupleSections
+:set -XQuasiQuotes
+:set -XRebindableSyntax
+import Chart.Dev
+import NumHask.Prelude as P
+import NumHask.Space as S
+import Prelude qualified
+import Control.Category ((>>>))
+import Data.Function
+import Data.Maybe
+import Data.Bool
+import Data.List qualified as List
+import Faker.Lorem
+import Chart
+import Prettychart
+import Chart.Examples
+import Optics.Core
+import Data.ByteString.Char8 qualified as C
+import Data.Text qualified as T
+import Control.Monad
+import NumHask.Prelude qualified as NH
+import Data.Functor.Identity
+import Data.Bifunctor
+import Prettyprinter
+import Text.Pretty.Simple
+import MarkupParse
+import DotParse
+import DotParse.Examples
+import Data.String.Interpolate
+
+import DataFrame
+
+(display, quit) <- startChartServer (Just "chart-svg-dev")
+disp x = display $ x & set (#markupOptions % #markupHeight) (Just 250) & set (#hudOptions % #frames % ix 1 % #item % #buffer) 0.1
+disp $ lineExample
+#+end_src
+
+#+RESULTS:
+: Ok, one module reloaded.
+: Setting phasers to stun... (port 9160) (cgthrcli->c  to quit)
+: True

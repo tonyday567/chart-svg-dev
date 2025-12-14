@@ -1,2 +1,4 @@
 packages:
   chart-svg-dev.cabal
+  ../perf/perf.cabal
+  ../chart-svg/chart-svg.cabal
