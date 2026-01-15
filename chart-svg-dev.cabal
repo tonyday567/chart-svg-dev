@@ -16,26 +16,6 @@ source-repository head
   type: git
   location: https://github.com/tonyday567/chart-svg-dev
 
-common ghc2024-additions
-  default-extensions:
-    DataKinds
-    DerivingStrategies
-    DisambiguateRecordFields
-    ExplicitNamespaces
-    GADTs
-    LambdaCase
-    MonoLocalBinds
-    RoleAnnotations
-
-common ghc2024-stanza
-  if impl(ghc >=9.10)
-    default-language:
-      GHC2024
-  else
-    import: ghc2024-additions
-    default-language:
-      GHC2021
-
 common ghc-options-stanza
     ghc-options:
         -Wall
@@ -49,6 +29,8 @@ common ghc-options-stanza
 library
   import: ghc2024-stanza
   import: ghc-options-stanza
+  default-language:
+      GHC2024
   hs-source-dirs:
     src
   default-extensions:
@@ -73,7 +55,6 @@ library
     mwc-random,
     markup-parse,
     dotparse,
-    string-interpolate,
   exposed-modules:
     Chart.Dev
 
@@ -100,4 +81,3 @@ executable chart-svg-example-diff
         , tasty
         , Diff
         , bytestring
-        , string-interpolate

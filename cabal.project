@@ -2,3 +2,27 @@ packages:
   chart-svg-dev.cabal
   ../perf/perf.cabal
   ../chart-svg/chart-svg.cabal
+
+allow-newer:
+  indexed-traversable:base,
+  tdigest:base,
+  these:base,
+  indexed-traversable-instances:base,
+  quickcheck-instances:base,
+  quickcheck-instances:containers,
+  uuid-types:template-haskell,
+  time-compat:base,
+  optics-core:containers
+allow-newer: binary:base
+allow-newer: indexed-traversable:containers
+allow-newer: microlens-th:template-haskell
+allow-newer: binary:containers
+allow-newer: chart-svg:time
+allow-newer: numhask-space:time
+allow-newer: chart-svg:harpie
+allow-newer: prettychart:time
+allow-newer: binary:containers
+allow-newer: binary:containers
+allow-newer: binary:containers
+allow-newer: *:*
+allow-newer: *:base
