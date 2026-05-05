@@ -27,7 +27,6 @@ common ghc-options-stanza
         -Wredundant-constraints
 
 library
-  import: ghc2024-stanza
   import: ghc-options-stanza
   default-language:
       GHC2024
@@ -69,7 +68,8 @@ common ghc-options-exe-stanza
 executable chart-svg-example-diff
     import: ghc-options-exe-stanza
     import: ghc-options-stanza
-    import: ghc2024-stanza
+    default-language:
+      GHC2024
     main-is: diff.hs
     hs-source-dirs: app
     build-depends:

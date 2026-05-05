@@ -2,6 +2,12 @@ packages:
   chart-svg-dev.cabal
   ../perf/perf.cabal
   ../chart-svg/chart-svg.cabal
+  ../scotty/scotty.cabal
+
+source-repository-package
+  type: git
+  location: https://github.com/snowleopard/alga.git
+  branch: main
 
 allow-newer:
   indexed-traversable:base,
