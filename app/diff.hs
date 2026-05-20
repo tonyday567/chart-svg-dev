@@ -14,7 +14,7 @@ import Chart.Examples
 import Data.Algorithm.DiffOutput
 import Data.Algorithm.Diff
 import Data.ByteString.Char8 qualified as C
-import MarkupParse
+import Circuit.Markup
 import Data.Bool
 import Data.Bifunctor
 import Control.Category ((>>>))

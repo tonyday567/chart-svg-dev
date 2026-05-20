@@ -52,7 +52,7 @@ library
     prettyprinter,
     pretty-simple,
     mwc-random,
-    markup-parse,
+    circuits-parser,
     dotparse,
   exposed-modules:
     Chart.Dev
@@ -74,7 +74,7 @@ executable chart-svg-example-diff
     hs-source-dirs: app
     build-depends:
         , chart-svg
-        , markup-parse
+        , circuits-parser
         , numhask
         , tasty-golden
         , base
