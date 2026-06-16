@@ -42,7 +42,6 @@ library
     lens,
     optics-core,
     microlens,
-    perf,
     bytestring,
     text,
     numhask,
