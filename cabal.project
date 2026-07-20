@@ -5,8 +5,15 @@ packages:
   ../prettychart/prettychart.cabal
   ../dotparse/dotparse.cabal
   ../circuits-parser/circuits-parser.cabal
+  ../circuits/circuits.cabal
+  ../numhask/numhask.cabal
+  ../numhask-space/numhask-space.cabal
+  ../formatn/formatn.cabal
+  ../harpie/harpie.cabal
 
 write-ghc-environment-files: always
 
 allow-newer:
-  tdigest:base
+  tdigest:base,
+  bytestring-lexing:base,
+  bytestring-lexing:bytestring
