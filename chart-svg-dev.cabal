@@ -51,7 +51,6 @@ library
     prettyprinter,
     pretty-simple,
     mwc-random,
-    circuits-parser,
     dotparse,
   exposed-modules:
     Chart.Dev
@@ -63,20 +62,3 @@ common ghc-options-exe-stanza
         -rtsopts
         -threaded
         -with-rtsopts=-N
-
-executable chart-svg-example-diff
-    import: ghc-options-exe-stanza
-    import: ghc-options-stanza
-    default-language:
-      GHC2024
-    main-is: diff.hs
-    hs-source-dirs: app
-    build-depends:
-        , chart-svg
-        , circuits-parser
-        , numhask
-        , tasty-golden
-        , base
-        , tasty
-        , Diff
-        , bytestring
