@@ -14,6 +14,5 @@ packages:
 write-ghc-environment-files: always
 
 allow-newer:
-  tdigest:base,
   bytestring-lexing:base,
   bytestring-lexing:bytestring
