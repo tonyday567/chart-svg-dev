@@ -8,8 +8,12 @@ packages:
   ../circuits/circuits.cabal
   ../numhask/numhask.cabal
   ../numhask-space/numhask-space.cabal
+  ../numhask-diff/numhask-diff.cabal
   ../formatn/formatn.cabal
   ../harpie/harpie.cabal
+  ../harpie-numhask/harpie-numhask.cabal
+  ../markup-parse/markup-parse.cabal
+  ../process-stats/process-stats.cabal
 
 write-ghc-environment-files: always
 

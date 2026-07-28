@@ -23,7 +23,7 @@ import Data.Text (Text)
 import Data.Text qualified as T
 import Faker.Lorem
 import NumHask.Prelude
-import NumHask.Space
+import NumHask.Space hiding (Chart)
 import Optics.Core
 import System.Random
 import System.Random.MWC.Distributions
